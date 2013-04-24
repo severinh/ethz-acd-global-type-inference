@@ -389,18 +389,18 @@ public class AstCodeGenerator {
 	}
 
 	protected void storeCallSaveRegs() {
-		for (int reg = 0; reg < calleeSave.length; reg++) {
-			push(calleeSave[reg]);
+		for (String element : calleeSave) {
+			push(element);
 		}
 	}
 
 	protected void call(String target, String res) {
-		for (int reg = 0; reg < callerSave.length; reg++) {
-			if (registers.contains(callerSave[reg]))
+		for (String element : callerSave) {
+			if (registers.contains(element))
 				continue; // not in use
-			if (callerSave[reg].equals(res))
+			if (element.equals(res))
 				continue; // will contain our result
-			push(callerSave[reg]);
+			push(element);
 		}
 		// Emit the call and save the return value:
 		emit("call", target);
@@ -1121,7 +1121,7 @@ public class AstCodeGenerator {
 	// -------------------------------------------------------
 	// EMIT CODE
 
-	private StringBuilder indent = new StringBuilder();
+	private final StringBuilder indent = new StringBuilder();
 
 	/** Creates an constant operand relative to another operand. */
 	protected String c(int i) {

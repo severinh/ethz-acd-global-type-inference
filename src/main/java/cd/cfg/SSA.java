@@ -35,7 +35,7 @@ public class SSA {
 
 	private Map<VariableSymbol, Integer> maxVersions;
 
-	private VariableSymbol uninitSym;
+	private final VariableSymbol uninitSym;
 
 	public void compute(MethodDecl mdecl) {
 		ControlFlowGraph cfg = mdecl.cfg;

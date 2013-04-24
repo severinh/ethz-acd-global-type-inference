@@ -31,8 +31,8 @@ public class AstDump {
 		return ad.sb.toString();
 	}
 
-	private StringBuilder sb = new StringBuilder();
-	private Visitor vis = new Visitor();
+	private final StringBuilder sb = new StringBuilder();
+	private final Visitor vis = new Visitor();
 
 	protected void dump(Ast ast, String indent) {
 		// print out the overall class structure

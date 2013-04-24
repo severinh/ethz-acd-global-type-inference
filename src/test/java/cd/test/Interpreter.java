@@ -132,7 +132,7 @@ public class Interpreter {
 		public static final int DIVISION_BY_ZERO = 8;
 		public static final int INTERNAL_ERROR = 22;
 
-		private int code;
+		private final int code;
 
 		public DynamicError(String message, int code) {
 			super(message);
@@ -344,7 +344,7 @@ public class Interpreter {
 
 	class JlArray extends JlReference {
 
-		private JlValue contents[];
+		private final JlValue contents[];
 
 		public JlArray(String s, int size) {
 
