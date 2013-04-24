@@ -19,12 +19,9 @@ import cd.util.DepthFirstSearchPreOrder;
 
 public class DeSSA {
 
-	public final Main main;
-
 	private int maxTemp = 0;
 
 	public DeSSA(Main main) {
-		this.main = main;
 	}
 
 	/**

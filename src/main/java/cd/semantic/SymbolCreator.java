@@ -25,8 +25,8 @@ import cd.ir.Symbol.VariableSymbol.Kind;
  */
 public class SymbolCreator extends Object {
 
-	final Main main;
-	final SymbolTable<TypeSymbol> typesTable;
+	private final Main main;
+	private final SymbolTable<TypeSymbol> typesTable;
 
 	public SymbolCreator(Main main, SymbolTable<TypeSymbol> typesTable) {
 		this.main = main;
@@ -58,9 +58,9 @@ public class SymbolCreator extends Object {
 	 * {@link MethodSymbolCreator} to create symbols for all parameters and
 	 * local variables to each method as well. Checks for duplicate members.
 	 */
-	public class ClassSymbolCreator extends AstVisitor<Void, Void> {
+	private class ClassSymbolCreator extends AstVisitor<Void, Void> {
 
-		final ClassSymbol classSym;
+		private final ClassSymbol classSym;
 
 		public ClassSymbolCreator(ClassSymbol classSym) {
 			this.classSym = classSym;
@@ -77,10 +77,7 @@ public class SymbolCreator extends Object {
 		@Override
 		public Void methodDecl(MethodDecl ast, Void arg) {
 
-			ast.sym = new MethodSymbol(ast);
-
-			ast.sym.owner = classSym;
-
+			ast.sym = new MethodSymbol(ast, classSym);
 			add(classSym.methods, ast.sym);
 
 			// create return type symbol
@@ -113,7 +110,7 @@ public class SymbolCreator extends Object {
 
 	}
 
-	public class MethodSymbolCreator extends AstVisitor<Void, Void> {
+	private class MethodSymbolCreator extends AstVisitor<Void, Void> {
 
 		final MethodSymbol methodSym;
 

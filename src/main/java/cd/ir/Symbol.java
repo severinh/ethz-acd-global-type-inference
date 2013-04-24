@@ -52,6 +52,7 @@ public abstract class Symbol {
 	}
 
 	public static class ClassSymbol extends TypeSymbol {
+
 		public final Ast.ClassDecl ast;
 		public ClassSymbol superClass;
 		public final VariableSymbol thisSymbol = new VariableSymbol("this",
@@ -60,9 +61,7 @@ public abstract class Symbol {
 		public final Map<String, MethodSymbol> methods = new HashMap<String, MethodSymbol>();
 
 		public int totalMethods = -1;
-
 		public int totalFields = -1;
-
 		public int sizeof = -1;
 
 		public ClassSymbol(Ast.ClassDecl ast) {
@@ -106,21 +105,23 @@ public abstract class Symbol {
 
 		public TypeSymbol returnType;
 
-		public ClassSymbol owner;
+		public final ClassSymbol owner;
 
 		public int vtableIndex = -1;
 
 		public MethodSymbol overrides;
 
-		public MethodSymbol(Ast.MethodDecl ast) {
+		public MethodSymbol(Ast.MethodDecl ast, ClassSymbol owner) {
 			super(ast.name);
 			this.ast = ast;
+			this.owner = owner;
 		}
 
 		@Override
 		public String toString() {
 			return name + "(...)";
 		}
+
 	}
 
 	public static class VariableSymbol extends Symbol {
@@ -131,8 +132,7 @@ public abstract class Symbol {
 
 		public final TypeSymbol type;
 		public final Kind kind;
-
-		public int version = 0;
+		public final int version;
 
 		/**
 		 * Meaning depends on the kind of variable, but generally refers to the
@@ -144,7 +144,7 @@ public abstract class Symbol {
 		 * </ul>
 		 * Computed in {@link AstCodeGenerator}.
 		 */
-		public int offset = -1;
+		public int offset;
 
 		public VariableSymbol(VariableSymbol v0sym, int version) {
 			super(v0sym.name + "_" + version);
@@ -162,6 +162,8 @@ public abstract class Symbol {
 			super(name);
 			this.type = type;
 			this.kind = kind;
+			this.version = 0;
+			this.offset = -1;
 		}
 
 		@Override

@@ -20,27 +20,28 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 	/**
 	 * If you want to run the test on just one file, then initialize this
 	 * variable like:
-	 * {@code justFile = new File("javali_tests/A2/Inheritance.javali")}.
+	 * {@code JUST_FILE = new File("javali_tests/A2/Inheritance.javali")}.
 	 */
-	// public static final File justFile = new File("javali_tests/test.javali");
-	public static final File justFile = null;
+	// public static final File JUST_FILE = new
+	// File("javali_tests/test.javali");
+	public static final File JUST_FILE = null;
 
 	/**
 	 * Directory in which to search for test files. If null, then the default is
 	 * the current directory (to include all files). To run only tests in a
 	 * particular directory, use sth. like:
-	 * {@code testDir = new File("javali_tests/A2/")}.
+	 * {@code TEST_DIR = new File("javali_tests/A2/")}.
 	 */
-	// public static final File testDir = new File("javali_tests/test");
-	public static final File testDir = null;
+	// public static final File TEST_DIR = new File("javali_tests/test");
+	public static final File TEST_DIR = null;
 
 	@Parameters
 	public static Collection<Object[]> testFiles() {
 		List<Object[]> result = new ArrayList<Object[]>();
-		if (justFile != null)
-			result.add(new Object[] { justFile });
-		else if (testDir != null) {
-			for (File file : FileUtil.findFiles(testDir)) {
+		if (JUST_FILE != null)
+			result.add(new Object[] { JUST_FILE });
+		else if (TEST_DIR != null) {
+			for (File file : FileUtil.findFiles(TEST_DIR)) {
 				result.add(new Object[] { file });
 			}
 		} else {
@@ -68,9 +69,7 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 		this.errfile = new File(String.format("%s.err", file.getPath()));
 		this.main = new Main();
 		this.main.debug = new StringWriter();
-
 		this.main.cfgdumpbase = file;
-
 	}
 
 }

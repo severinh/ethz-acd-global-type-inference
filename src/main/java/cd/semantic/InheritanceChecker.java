@@ -15,7 +15,7 @@ import cd.util.Pair;
 
 public class InheritanceChecker extends AstVisitor<Void, Void> {
 
-	ClassSymbol classSym;
+	private ClassSymbol classSym;
 
 	@Override
 	public Void classDecl(ClassDecl ast, Void arg) {

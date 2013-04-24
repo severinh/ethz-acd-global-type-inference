@@ -36,13 +36,13 @@ import cd.util.DepthFirstSearchPreOrder;
 
 public class Optimizer {
 
-	private final boolean INTENSE_DEBUG = true;
-	private final int MAX_INNER = 16, MAX_OUTER = 16;
+	private static final boolean INTENSE_DEBUG = true;
+	private static final int MAX_INNER = 16, MAX_OUTER = 16;
 
-	public final Main main;
-	public int changes = 0;
+	private final Main main;
+	private int changes = 0;
 
-	public static int overall;
+	private static int overall;
 
 	public Optimizer(Main main) {
 		this.main = main;
@@ -86,7 +86,7 @@ public class Optimizer {
 		} while (changes > oldChanges && outer++ < MAX_OUTER);
 	}
 
-	public class ConstantPropagation extends AstVisitor<Void, Void> {
+	private class ConstantPropagation extends AstVisitor<Void, Void> {
 
 		@SuppressWarnings("serial")
 		public class NotConstantException extends Exception {
@@ -270,8 +270,9 @@ public class Optimizer {
 
 	}
 
-	public class CopyPropagation {
-		public Map<VariableSymbol, Expr> copiedSymbols = new HashMap<VariableSymbol, Expr>();
+	private class CopyPropagation {
+
+		private Map<VariableSymbol, Expr> copiedSymbols = new HashMap<VariableSymbol, Expr>();
 
 		public void compute(MethodDecl md) {
 			process(md.cfg.start);
@@ -397,21 +398,21 @@ public class Optimizer {
 		}
 	}
 
-	public class CommonSubexpressionElimination {
+	private class CommonSubexpressionElimination {
 
-		class Canonical {
+		private class Canonical {
 
 			/**
 			 * Canonical string representation of the expression. Constructed by
 			 * CanonicalizeVisitor.
 			 */
-			public final String key;
+			private final String key;
 
 			/**
 			 * List of Nodes each of which represents a usage of this
 			 * expression.
 			 */
-			public final List<Expr> appearances;
+			private final List<Expr> appearances;
 
 			/**
 			 * Any expression may reference other cse-able expressions. These
@@ -420,7 +421,7 @@ public class Optimizer {
 			 * to the Expression object representing "x0+x1", and prev2 pointing
 			 * to the Expression object representing "x2+x3".
 			 */
-			public final Canonical sub1, sub2;
+			private final Canonical sub1, sub2;
 
 			/**
 			 * An integer count indicating how many of the appearances above
@@ -457,13 +458,13 @@ public class Optimizer {
 			 * indicating that one of the appearances listed is no longer in the
 			 * AST.
 			 */
-			public int deadAppearances;
+			private int deadAppearances;
 
 			/**
 			 * If we decide to extract this CSE into a temporary variable, it
 			 * will be stored here.
 			 */
-			public VariableSymbol sym;
+			private VariableSymbol sym;
 
 			Canonical(String key, Canonical sub1, Canonical sub2) {
 				this.key = key;
@@ -477,17 +478,20 @@ public class Optimizer {
 			public String toString() {
 				return "(" + key + ")";
 			}
+
 		}
 
-		class BlockData {
-			public final BasicBlock block;
-			public final Map<String, Canonical> canonicalsInScope = new HashMap<String, Canonical>();
-			public final List<Canonical> canonicalsAppearingInThisBlock = new ArrayList<Canonical>();
-			public final List<BlockData> childrenData = new ArrayList<BlockData>();
+		private class BlockData {
+
+			private final BasicBlock block;
+			private final Map<String, Canonical> canonicalsInScope = new HashMap<String, Canonical>();
+			private final List<Canonical> canonicalsAppearingInThisBlock = new ArrayList<Canonical>();
+			private final List<BlockData> childrenData = new ArrayList<BlockData>();
 
 			public BlockData(BasicBlock block) {
 				this.block = block;
 			}
+
 		}
 
 		/**
@@ -644,7 +648,8 @@ public class Optimizer {
 		 * the list. This is important to ensure that we CSE the largest
 		 * expressions we can.
 		 */
-		class CanonicalizeVisitor extends ExprVisitor<Canonical, BlockData> {
+		private class CanonicalizeVisitor extends
+				ExprVisitor<Canonical, BlockData> {
 
 			/**
 			 * Adds an expr rooted at node <code>n</code> with the hash key
@@ -772,7 +777,7 @@ public class Optimizer {
 
 		}
 
-		class ExpressionFinder extends AstVisitor<Void, BlockData> {
+		private class ExpressionFinder extends AstVisitor<Void, BlockData> {
 
 			@Override
 			public Void visit(Ast ast, BlockData arg) {
@@ -799,7 +804,7 @@ public class Optimizer {
 
 		}
 
-		class ExpressionReplacer extends AstRewriteVisitor<Canonical> {
+		private class ExpressionReplacer extends AstRewriteVisitor<Canonical> {
 
 			@Override
 			protected Ast dfltExpr(Expr ast, Canonical arg) {

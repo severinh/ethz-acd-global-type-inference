@@ -15,12 +15,12 @@ import cd.ir.ControlFlowGraph;
 
 public class CfgCodeGenerator {
 
-	public final Main main;
+	private final Main main;
 	private final AstCodeGenerator cg;
 
 	public CfgCodeGenerator(Main main, Writer out) {
 		this.main = main;
-		cg = new AstCodeGenerator(main, out);
+		this.cg = new AstCodeGenerator(main, out);
 	}
 
 	public void debug(String format, Object... args) {
@@ -97,4 +97,5 @@ public class CfgCodeGenerator {
 		}
 
 	}
+
 }

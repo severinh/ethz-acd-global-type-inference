@@ -16,7 +16,7 @@ import cd.ir.ControlFlowGraph;
  */
 public class DepthFirstSearchPreOrder implements Iterable<BasicBlock> {
 
-	public final ControlFlowGraph cfg;
+	private final ControlFlowGraph cfg;
 
 	public DepthFirstSearchPreOrder(ControlFlowGraph cfg) {
 		this.cfg = cfg;

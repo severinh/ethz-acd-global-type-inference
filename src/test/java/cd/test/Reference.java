@@ -4,8 +4,9 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface Reference extends Remote {
-	public final String PARSE_FAILURE = "ParseFailure";
-	public final String SEMANTIC_PASSED = "OK\n";
+
+	public static final String PARSE_FAILURE = "ParseFailure";
+	public static final String SEMANTIC_PASSED = "OK\n";
 
 	public String parserReference(String fileText) throws RemoteException;
 
@@ -18,4 +19,5 @@ public interface Reference extends Remote {
 
 	public String optReference(String fileText, String inputText)
 			throws RemoteException;
+
 }

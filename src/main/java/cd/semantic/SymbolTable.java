@@ -18,7 +18,6 @@ import cd.ir.Symbol;
 public class SymbolTable<S extends Symbol> {
 
 	private final Map<String, S> map = new HashMap<String, S>();
-
 	private final SymbolTable<S> parent;
 
 	public SymbolTable(SymbolTable<S> parent) {
@@ -88,4 +87,5 @@ public class SymbolTable<S extends Symbol> {
 					"No type '%s' was found", name);
 		return res;
 	}
+
 }

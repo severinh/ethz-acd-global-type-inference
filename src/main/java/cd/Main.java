@@ -51,10 +51,10 @@ public class Main {
 	public File cfgdumpbase;
 
 	/** Symbols for the built-in primitive types */
-	public PrimitiveTypeSymbol intType, floatType, voidType, booleanType;
+	public final PrimitiveTypeSymbol intType, floatType, voidType, booleanType;
 
 	/** Symbols for the built-in Object and null types */
-	public Symbol.ClassSymbol objectType, nullType;
+	public final Symbol.ClassSymbol objectType, nullType;
 
 	/** Symbol for the Main type */
 	public Symbol.ClassSymbol mainType;
@@ -167,14 +167,13 @@ public class Main {
 	public void semanticCheck(List<ClassDecl> astRoots) {
 		new SemanticAnalyzer(this).check(astRoots);
 
-		// Before generating code, optimize!
-
-		// Build control flow graph:
+		// Build control flow graph
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())
 				new CFGBuilder(this).build(md);
 		CfgDump.toString(astRoots, ".cfg", cfgdumpbase, false);
-		// Compute dominators.
+		
+		// Compute dominators
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods()) {
 				debug("Computing dominators of %s", md.name);
@@ -184,16 +183,19 @@ public class Main {
 				}
 			}
 		CfgDump.toString(astRoots, ".dom", cfgdumpbase, true);
+		
 		// Introduce SSA form.
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())
 				new SSA(this).compute(md);
 		CfgDump.toString(astRoots, ".ssa", cfgdumpbase, false);
+		
 		// Optimize using SSA form.
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())
 				new Optimizer(this).compute(md);
 		CfgDump.toString(astRoots, ".opt", cfgdumpbase, false);
+		
 		// Remove SSA form.
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())
@@ -208,8 +210,9 @@ public class Main {
 
 	/** Dumps the AST to the debug stream */
 	private void dumpAst(List<ClassDecl> astRoots) throws IOException {
-		if (this.debug == null)
+		if (debug == null)
 			return;
-		this.debug.write(AstDump.toString(astRoots));
+		debug.write(AstDump.toString(astRoots));
 	}
+
 }

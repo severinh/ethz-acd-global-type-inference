@@ -7,8 +7,15 @@ import cd.ir.Ast.Expr;
 
 /** Represents the control flow graph of a single method. */
 public class ControlFlowGraph {
-	public BasicBlock start, end;
+
+	public final BasicBlock start;
+	public final BasicBlock end;
 	public final List<BasicBlock> allBlocks = new ArrayList<BasicBlock>();
+
+	public ControlFlowGraph() {
+		this.start = newBlock();
+		this.end = newBlock();
+	}
 
 	public int count() {
 		return allBlocks.size();
@@ -55,4 +62,5 @@ public class ControlFlowGraph {
 		to.predecessors.add(from);
 		from.successors.add(to);
 	}
+
 }

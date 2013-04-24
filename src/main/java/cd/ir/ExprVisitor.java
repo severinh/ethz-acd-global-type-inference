@@ -6,6 +6,7 @@ import cd.ir.Ast.Expr;
  * A visitor that only visits {@link Expr} nodes.
  */
 public class ExprVisitor<R, A> {
+
 	/**
 	 * Recurse and process {@code ast}. It is preferred to call this rather than
 	 * calling accept directly, since it can be overloaded to introduce
@@ -97,4 +98,5 @@ public class ExprVisitor<R, A> {
 	public R var(Ast.Var ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
+
 }

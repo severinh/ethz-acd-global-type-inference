@@ -7,10 +7,12 @@ import cd.ir.Ast.Expr;
 import cd.ir.Symbol.VariableSymbol;
 
 public class Phi {
+
 	public final VariableSymbol v0sym;
 	public VariableSymbol lhs;
-	public List<Expr> rhs = new ArrayList<Expr>(); // Always an Ast.Var or an
-													// Ast.Const!
+
+	// Always an Ast.Var or an Ast.Const!
+	public final List<Expr> rhs = new ArrayList<Expr>();
 
 	public Phi(VariableSymbol v0sym, int predCount) {
 		this.v0sym = v0sym;
@@ -23,4 +25,5 @@ public class Phi {
 	public String toString() {
 		return String.format("<%s = phi%s>", lhs, rhs);
 	}
+
 }

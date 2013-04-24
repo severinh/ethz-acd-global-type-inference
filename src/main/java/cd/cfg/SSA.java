@@ -24,18 +24,16 @@ import cd.util.DepthFirstSearchPreOrder;
 
 public class SSA {
 
-	public final Main main;
+	private final Main main;
+	private final VariableSymbol uninitSym;
 
 	public SSA(Main main) {
 		this.main = main;
-		uninitSym = new Symbol.VariableSymbol("__UNINIT__", main.nullType);
+		this.uninitSym = new Symbol.VariableSymbol("__UNINIT__", main.nullType);
 	}
 
 	private MethodSymbol msym;
-
 	private Map<VariableSymbol, Integer> maxVersions;
-
-	private final VariableSymbol uninitSym;
 
 	public void compute(MethodDecl mdecl) {
 		ControlFlowGraph cfg = mdecl.cfg;

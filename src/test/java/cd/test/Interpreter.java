@@ -92,7 +92,6 @@ public class Interpreter {
 	}
 
 	public String operationSummary() {
-
 		List<String> operationSummaries = new ArrayList<String>();
 
 		for (Object operation : opCounts.keySet()) {
@@ -113,9 +112,11 @@ public class Interpreter {
 	/** Thrown in cases that should be ruled out by static analysis: */
 	@SuppressWarnings("serial")
 	class StaticError extends RuntimeException {
+
 		public StaticError(String message) {
 			super(message);
 		}
+
 	}
 
 	/** Thrown in cases that are not ruled out by static analysis: */

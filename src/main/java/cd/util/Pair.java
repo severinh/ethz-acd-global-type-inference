@@ -5,8 +5,9 @@ import java.util.List;
 
 /** Simple class for joining two objects of the same type */
 public class Pair<T> {
-	public T a;
-	public T b;
+
+	public final T a;
+	public final T b;
 
 	public Pair(T a, T b) {
 		this.a = a;
@@ -49,4 +50,5 @@ public class Pair<T> {
 		}
 		return sb.toString();
 	}
+
 }

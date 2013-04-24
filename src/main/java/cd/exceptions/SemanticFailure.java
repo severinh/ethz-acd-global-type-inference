@@ -5,6 +5,7 @@ package cd.exceptions;
  * user's program.
  */
 public class SemanticFailure extends RuntimeException {
+
 	private static final long serialVersionUID = 5375946759285719123L;
 
 	public enum Cause {

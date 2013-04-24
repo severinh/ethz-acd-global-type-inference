@@ -29,13 +29,13 @@ import cd.util.FileUtil;
 
 abstract public class AbstractTestSamplePrograms {
 
-	final static boolean ignoreExtraCreditTests = true;
+	protected final static boolean IGNORE_EXTRA_CREDIT_TESTS = true;
 
-	public File file, sfile, binfile, infile;
-	public File parserreffile, semanticreffile, execreffile, cfgreffile,
+	protected File file, sfile, binfile, infile;
+	protected File parserreffile, semanticreffile, execreffile, cfgreffile,
 			optreffile;
-	public File errfile;
-	public Main main;
+	protected File errfile;
+	protected Main main;
 
 	public void assertEquals(String phase, String exp, String act) {
 		act = act.replace("\r\n", "\n"); // for windows machines
@@ -48,7 +48,6 @@ abstract public class AbstractTestSamplePrograms {
 	 * Compare the output of two executions while ignoring small differences due
 	 * to floating point errors. E.g. outputs "1.23456" and "1.23455" are OK
 	 * even though they are slightly different.
-	 * 
 	 */
 	public void assertEqualOutput(String phase, String exp, String act) {
 		act = act.replace("\r\n", "\n"); // for windows machines
@@ -110,7 +109,7 @@ abstract public class AbstractTestSamplePrograms {
 		if (new File(file.getAbsolutePath() + ".64bitonly").exists()
 				&& Integer.valueOf(System.getProperty("sun.arch.data.model")) == 32) {
 			System.err.println("--> Ignoring test because it's 64-bit-only");
-		} else if (ignoreExtraCreditTests
+		} else if (IGNORE_EXTRA_CREDIT_TESTS
 				&& file.getAbsolutePath().contains("extraCredit")) {
 			System.err
 					.println("--> Ignoring optional test that checks extra-credit parts");

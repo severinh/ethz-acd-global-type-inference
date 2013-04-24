@@ -20,9 +20,8 @@ public class Dominator {
 		this.main = main;
 	}
 
-	public List<BasicBlock> blocksInRevPostOrder;
-
-	public int[] postOrderIndex;
+	private List<BasicBlock> blocksInRevPostOrder;
+	private int[] postOrderIndex;
 
 	public void compute(ControlFlowGraph cfg) {
 		// Compute the post order information for the control flow graph

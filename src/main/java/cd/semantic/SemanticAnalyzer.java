@@ -16,7 +16,7 @@ import cd.ir.Symbol.VariableSymbol;
 
 public class SemanticAnalyzer {
 
-	public final Main main;
+	private final Main main;
 
 	public SemanticAnalyzer(Main main) {
 		this.main = main;

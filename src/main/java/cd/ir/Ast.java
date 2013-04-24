@@ -22,7 +22,7 @@ public abstract class Ast {
 	 * <p>
 	 * <b>Note:</b> this list may contain null pointers!
 	 */
-	public final List<Ast> rwChildren;
+	protected final List<Ast> rwChildren;
 
 	protected Ast(int fixedCount) {
 		if (fixedCount == -1)
@@ -98,6 +98,7 @@ public abstract class Ast {
 			item.type = type;
 			return item;
 		}
+
 	}
 
 	/**
@@ -129,6 +130,7 @@ public abstract class Ast {
 		public void setRight(Expr node) {
 			this.rwChildren.set(1, node);
 		}
+
 	}
 
 	/** Base class used for expressions with a single argument */
@@ -152,9 +154,11 @@ public abstract class Ast {
 
 	/** Base class used for things with no arguments */
 	protected static abstract class LeafExpr extends Expr {
+
 		public LeafExpr() {
 			super(0);
 		}
+
 	}
 
 	/** Represents {@code this}, the current object */
@@ -193,7 +197,7 @@ public abstract class Ast {
 
 		};
 
-		public BOp operator;
+		public final BOp operator;
 
 		public BinaryOp(Expr left, BOp operator, Expr right) {
 			super(left, right);
@@ -209,12 +213,13 @@ public abstract class Ast {
 		public BinaryOp deepCopy() {
 			return postCopy(new BinaryOp(left(), operator, right()));
 		}
+
 	}
 
 	/** A Cast from one type to another: {@code (typeName)arg} */
 	public static class Cast extends ArgExpr {
 
-		public String typeName;
+		public final String typeName;
 		public TypeSymbol typeSym;
 
 		public Cast(Expr arg, String typeName) {
@@ -241,6 +246,7 @@ public abstract class Ast {
 	}
 
 	public static class FloatConst extends LeafExpr {
+
 		public final float value;
 
 		public FloatConst(float value) {
@@ -256,6 +262,7 @@ public abstract class Ast {
 		public FloatConst deepCopy() {
 			return postCopy(new FloatConst(value));
 		}
+
 	}
 
 	public static class IntConst extends LeafExpr {
@@ -406,12 +413,14 @@ public abstract class Ast {
 	public static class UnaryOp extends ArgExpr {
 
 		public static enum UOp {
+
 			U_PLUS("+"), U_MINUS("-"), U_BOOL_NOT("!");
 			public String repr;
 
 			private UOp(String repr) {
 				this.repr = repr;
 			}
+
 		};
 
 		public final UOp operator;
@@ -436,7 +445,6 @@ public abstract class Ast {
 	public static class Var extends LeafExpr {
 
 		public String name;
-
 		public VariableSymbol sym;
 
 		/**
@@ -510,8 +518,7 @@ public abstract class Ast {
 
 	public static class MethodCallExpr extends Expr {
 
-		public String methodName;
-
+		public final String methodName;
 		public MethodSymbol sym;
 
 		public MethodCallExpr(Expr rcvr, String methodName, List<Expr> arguments) {
@@ -590,9 +597,11 @@ public abstract class Ast {
 
 	/** Interface for all statements */
 	public static abstract class Stmt extends Ast {
+
 		protected Stmt(int fixedCount) {
 			super(fixedCount);
 		}
+
 	}
 
 	/** Represents an empty statement: has no effect. */
@@ -930,15 +939,17 @@ public abstract class Ast {
 
 	/** Interface for all declarations */
 	public static abstract class Decl extends Ast {
+
 		protected Decl(int fixedCount) {
 			super(fixedCount);
 		}
+
 	}
 
 	public static class VarDecl extends Decl {
 
-		public String type;
-		public String name;
+		public final String type;
+		public final String name;
 		public VariableSymbol sym;
 
 		public VarDecl(String type, String name) {
@@ -987,7 +998,6 @@ public abstract class Ast {
 
 		@Override
 		public Ast deepCopy() {
-
 			List<Ast> result = new ArrayList<Ast>();
 
 			for (final Ast ast : this.rwChildren) {
@@ -995,16 +1005,17 @@ public abstract class Ast {
 			}
 
 			return new Seq(result);
-
 		}
+
 	}
 
 	public static class MethodDecl extends Decl {
 
-		public String returnType;
-		public String name;
-		public List<String> argumentTypes;
-		public List<String> argumentNames;
+		public final String returnType;
+		public final String name;
+		public final List<String> argumentTypes;
+		public final List<String> argumentNames;
+
 		public MethodSymbol sym;
 		public ControlFlowGraph cfg;
 
@@ -1059,8 +1070,8 @@ public abstract class Ast {
 
 	public static class ClassDecl extends Decl {
 
-		public String name;
-		public String superClass;
+		public final String name;
+		public final String superClass;
 		public ClassSymbol sym;
 
 		public ClassDecl(String name, String superClass,
@@ -1090,7 +1101,6 @@ public abstract class Ast {
 
 		@Override
 		public Ast deepCopy() {
-
 			List<Ast> result = new ArrayList<Ast>();
 
 			for (final Ast ast : members()) {

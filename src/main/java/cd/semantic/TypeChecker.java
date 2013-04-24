@@ -43,9 +43,9 @@ import cd.ir.Symbol.VariableSymbol;
 
 public class TypeChecker {
 
-	final Main main;
-	final SymbolTable<TypeSymbol> typeSymbols;
-	final TypingVisitor visitor = new TypingVisitor();
+	private final Main main;
+	private final SymbolTable<TypeSymbol> typeSymbols;
+	private final TypingVisitor visitor = new TypingVisitor();
 
 	private MethodDecl thisMethod;
 
@@ -66,12 +66,10 @@ public class TypeChecker {
 	 */
 	public TypeSymbol typeEquality(Expr leftExpr, Expr rightExpr,
 			SymbolTable<VariableSymbol> locals) {
-
-		final TypeSymbol leftType = type(leftExpr, locals);
-		final TypeSymbol rightType = type(rightExpr, locals);
+		TypeSymbol leftType = type(leftExpr, locals);
+		TypeSymbol rightType = type(rightExpr, locals);
 
 		if (leftType != rightType) {
-
 			throw new SemanticFailure(Cause.TYPE_ERROR,
 					"Expected operand types to be equal but found %s, %s",
 					leftType, rightType);
@@ -82,25 +80,18 @@ public class TypeChecker {
 	}
 
 	public void typeIsPrimitive(TypeSymbol type) {
-
 		if (type != main.intType && type != main.floatType) {
-
 			throw new SemanticFailure(Cause.TYPE_ERROR,
 					"Expected %s or %s for operands but found type %s",
 					main.intType, main.floatType, type);
 		}
-
 	}
 
 	public void typeIsValidForOperator(TypeSymbol type, BOp operator) {
-
 		if (operator == BOp.B_MOD && type == main.floatType) {
-
 			throw new SemanticFailure(Cause.TYPE_ERROR,
 					"Operation %s not valid for type %s", operator, type);
-
 		}
-
 	}
 
 	public ClassSymbol asClass(TypeSymbol type) {
@@ -151,7 +142,8 @@ public class TypeChecker {
 		new StmtVisitor().visit(method.body(), locals);
 	}
 
-	public class StmtVisitor extends AstVisitor<Void, SymbolTable<VariableSymbol>> {
+	public class StmtVisitor extends
+			AstVisitor<Void, SymbolTable<VariableSymbol>> {
 
 		@Override
 		protected Void dfltExpr(Expr ast, SymbolTable<VariableSymbol> locals) {
@@ -198,7 +190,8 @@ public class TypeChecker {
 		}
 
 		@Override
-		public Void methodCall(MethodCall ast, SymbolTable<VariableSymbol> locals) {
+		public Void methodCall(MethodCall ast,
+				SymbolTable<VariableSymbol> locals) {
 
 			ClassSymbol rcvrType = asClass(type(ast.receiver(), locals));
 			MethodSymbol mthd = rcvrType.getMethod(ast.methodName);
@@ -233,7 +226,8 @@ public class TypeChecker {
 		}
 
 		@Override
-		public Void returnStmt(ReturnStmt ast, SymbolTable<VariableSymbol> locals) {
+		public Void returnStmt(ReturnStmt ast,
+				SymbolTable<VariableSymbol> locals) {
 
 			if (ast.arg() == null) {
 
@@ -265,7 +259,8 @@ public class TypeChecker {
 		}
 
 		@Override
-		public TypeSymbol binaryOp(BinaryOp ast, SymbolTable<VariableSymbol> locals) {
+		public TypeSymbol binaryOp(BinaryOp ast,
+				SymbolTable<VariableSymbol> locals) {
 
 			switch (ast.operator) {
 
@@ -378,29 +373,34 @@ public class TypeChecker {
 		}
 
 		@Override
-		public TypeSymbol newArray(NewArray ast, SymbolTable<VariableSymbol> locals) {
+		public TypeSymbol newArray(NewArray ast,
+				SymbolTable<VariableSymbol> locals) {
 			checkType(ast.arg(), main.intType, locals);
 			return typeSymbols.getType(ast.typeName);
 		}
 
 		@Override
-		public TypeSymbol newObject(NewObject ast, SymbolTable<VariableSymbol> arg) {
+		public TypeSymbol newObject(NewObject ast,
+				SymbolTable<VariableSymbol> arg) {
 			return typeSymbols.getType(ast.typeName);
 		}
 
 		@Override
-		public TypeSymbol nullConst(NullConst ast, SymbolTable<VariableSymbol> arg) {
+		public TypeSymbol nullConst(NullConst ast,
+				SymbolTable<VariableSymbol> arg) {
 			return main.nullType;
 		}
 
 		@Override
-		public TypeSymbol thisRef(ThisRef ast, SymbolTable<VariableSymbol> locals) {
+		public TypeSymbol thisRef(ThisRef ast,
+				SymbolTable<VariableSymbol> locals) {
 			VariableSymbol vsym = locals.get("this");
 			return vsym.type;
 		}
 
 		@Override
-		public TypeSymbol unaryOp(UnaryOp ast, SymbolTable<VariableSymbol> locals) {
+		public TypeSymbol unaryOp(UnaryOp ast,
+				SymbolTable<VariableSymbol> locals) {
 
 			switch (ast.operator) {
 			case U_PLUS:
@@ -475,7 +475,8 @@ public class TypeChecker {
 
 		/** Any other kind of expression is not a value lvalue */
 		@Override
-		protected TypeSymbol dfltExpr(Expr ast, SymbolTable<VariableSymbol> locals) {
+		protected TypeSymbol dfltExpr(Expr ast,
+				SymbolTable<VariableSymbol> locals) {
 			throw new SemanticFailure(Cause.NOT_ASSIGNABLE,
 					"'%s' is not a valid lvalue", AstOneLine.toString(ast));
 		}

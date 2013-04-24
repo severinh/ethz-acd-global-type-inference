@@ -9,14 +9,9 @@ public class Config {
 	};
 
 	/**
-	 * If using X86-64, this flag should be set to true
-	 */
-	public static final boolean x64_tests = false;
-
-	/**
 	 * What kind of system we are on
 	 */
-	public static final SystemKind systemKind;
+	public static final SystemKind SYSTEM_KIND;
 
 	/**
 	 * Defines the extension used for assembler files on this platform.
@@ -82,11 +77,10 @@ public class Config {
 	public static final int SIZEOF_PTR = 4;
 
 	static {
-
 		String os = System.getProperty("os.name").toLowerCase();
 
 		if (os.indexOf("windows") != -1 || os.indexOf("nt") != -1) {
-			systemKind = SystemKind.WINDOWS;
+			SYSTEM_KIND = SystemKind.WINDOWS;
 			BINARYEXT = ".exe";
 			MAIN = "_main";
 			PRINTF = "_printf";
@@ -104,7 +98,7 @@ public class Config {
 			DATA_STR_SECTION = ".section .data";
 			COMMENT_SEP = ";";
 		} else if (os.equals("mac os x") || os.equals("darwin")) {
-			systemKind = SystemKind.MACOSX;
+			SYSTEM_KIND = SystemKind.MACOSX;
 			BINARYEXT = ".bin";
 			MAIN = "_main";
 			PRINTF = "_printf";
@@ -120,7 +114,7 @@ public class Config {
 			DATA_STR_SECTION = ".cstring";
 			COMMENT_SEP = "#";
 		} else {
-			systemKind = SystemKind.LINUX;
+			SYSTEM_KIND = SystemKind.LINUX;
 			BINARYEXT = ".bin";
 			MAIN = "main";
 			PRINTF = "printf";
