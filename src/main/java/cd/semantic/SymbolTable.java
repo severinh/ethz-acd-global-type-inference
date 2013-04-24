@@ -15,13 +15,13 @@ import cd.ir.Symbol;
  * {@link TypeChecker} to store the various scopes for local, parameter, and
  * field lookup.
  */
-public class SymTable<S extends Symbol> {
+public class SymbolTable<S extends Symbol> {
 
 	private final Map<String, S> map = new HashMap<String, S>();
 
-	private final SymTable<S> parent;
+	private final SymbolTable<S> parent;
 
-	public SymTable(SymTable<S> parent) {
+	public SymbolTable(SymbolTable<S> parent) {
 		this.parent = parent;
 	}
 
@@ -34,7 +34,7 @@ public class SymTable<S extends Symbol> {
 
 	public List<S> allSymbols() {
 		List<S> result = new ArrayList<S>();
-		SymTable<S> st = this;
+		SymbolTable<S> st = this;
 		while (st != null) {
 			for (S sym : st.map.values())
 				result.add(sym);

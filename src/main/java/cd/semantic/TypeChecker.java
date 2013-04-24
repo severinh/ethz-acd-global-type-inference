@@ -44,17 +44,17 @@ import cd.ir.Symbol.VariableSymbol;
 public class TypeChecker {
 
 	final Main main;
-	final SymTable<TypeSymbol> typeSymbols;
+	final SymbolTable<TypeSymbol> typeSymbols;
 	final TypingVisitor visitor = new TypingVisitor();
 
 	private MethodDecl thisMethod;
 
-	public TypeChecker(Main main, SymTable<TypeSymbol> typeSymbols) {
+	public TypeChecker(Main main, SymbolTable<TypeSymbol> typeSymbols) {
 		this.main = main;
 		this.typeSymbols = typeSymbols;
 	}
 
-	public TypeSymbol type(Expr expr, SymTable<VariableSymbol> locals) {
+	public TypeSymbol type(Expr expr, SymbolTable<VariableSymbol> locals) {
 		return visitor.visit(expr, locals);
 	}
 
@@ -65,7 +65,7 @@ public class TypeChecker {
 	 * @return The common type of the two expression.
 	 */
 	public TypeSymbol typeEquality(Expr leftExpr, Expr rightExpr,
-			SymTable<VariableSymbol> locals) {
+			SymbolTable<VariableSymbol> locals) {
 
 		final TypeSymbol leftType = type(leftExpr, locals);
 		final TypeSymbol rightType = type(rightExpr, locals);
@@ -139,27 +139,27 @@ public class TypeChecker {
 	}
 
 	public void checkType(Expr ast, TypeSymbol expected,
-			SymTable<VariableSymbol> locals) {
+			SymbolTable<VariableSymbol> locals) {
 		TypeSymbol actual = type(ast, locals);
 		if (!subtype(expected, actual))
 			throw new SemanticFailure(Cause.TYPE_ERROR,
 					"Expected %s but type was %s", expected, actual);
 	}
 
-	public void checkStmt(MethodDecl method, SymTable<VariableSymbol> locals) {
+	public void checkStmt(MethodDecl method, SymbolTable<VariableSymbol> locals) {
 		this.thisMethod = method;
 		new StmtVisitor().visit(method.body(), locals);
 	}
 
-	public class StmtVisitor extends AstVisitor<Void, SymTable<VariableSymbol>> {
+	public class StmtVisitor extends AstVisitor<Void, SymbolTable<VariableSymbol>> {
 
 		@Override
-		protected Void dfltExpr(Expr ast, SymTable<VariableSymbol> locals) {
+		protected Void dfltExpr(Expr ast, SymbolTable<VariableSymbol> locals) {
 			throw new RuntimeException("Should not get here");
 		}
 
 		@Override
-		public Void assign(Assign ast, SymTable<VariableSymbol> locals) {
+		public Void assign(Assign ast, SymbolTable<VariableSymbol> locals) {
 			TypeSymbol lhs = typeLhs(ast.left(), locals);
 			TypeSymbol rhs = type(ast.right(), locals);
 			if (!subtype(lhs, rhs))
@@ -170,26 +170,26 @@ public class TypeChecker {
 
 		@Override
 		public Void builtInWrite(BuiltInWrite ast,
-				SymTable<VariableSymbol> locals) {
+				SymbolTable<VariableSymbol> locals) {
 			checkType(ast.arg(), main.intType, locals);
 			return null;
 		}
 
 		@Override
 		public Void builtInWriteFloat(BuiltInWriteFloat ast,
-				SymTable<VariableSymbol> locals) {
+				SymbolTable<VariableSymbol> locals) {
 			checkType(ast.arg(), main.floatType, locals);
 			return null;
 		}
 
 		@Override
 		public Void builtInWriteln(BuiltInWriteln ast,
-				SymTable<VariableSymbol> locals) {
+				SymbolTable<VariableSymbol> locals) {
 			return null;
 		}
 
 		@Override
-		public Void ifElse(IfElse ast, SymTable<VariableSymbol> locals) {
+		public Void ifElse(IfElse ast, SymbolTable<VariableSymbol> locals) {
 			checkType(ast.condition(), main.booleanType, locals);
 			visit(ast.then(), locals);
 			if (ast.otherwise() != null)
@@ -198,7 +198,7 @@ public class TypeChecker {
 		}
 
 		@Override
-		public Void methodCall(MethodCall ast, SymTable<VariableSymbol> locals) {
+		public Void methodCall(MethodCall ast, SymbolTable<VariableSymbol> locals) {
 
 			ClassSymbol rcvrType = asClass(type(ast.receiver(), locals));
 			MethodSymbol mthd = rcvrType.getMethod(ast.methodName);
@@ -227,13 +227,13 @@ public class TypeChecker {
 		}
 
 		@Override
-		public Void whileLoop(WhileLoop ast, SymTable<VariableSymbol> locals) {
+		public Void whileLoop(WhileLoop ast, SymbolTable<VariableSymbol> locals) {
 			checkType(ast.condition(), main.booleanType, locals);
 			return visit(ast.body(), locals);
 		}
 
 		@Override
-		public Void returnStmt(ReturnStmt ast, SymTable<VariableSymbol> locals) {
+		public Void returnStmt(ReturnStmt ast, SymbolTable<VariableSymbol> locals) {
 
 			if (ast.arg() == null) {
 
@@ -256,16 +256,16 @@ public class TypeChecker {
 	}
 
 	public class TypingVisitor extends
-			ExprVisitor<TypeSymbol, SymTable<VariableSymbol>> {
+			ExprVisitor<TypeSymbol, SymbolTable<VariableSymbol>> {
 
 		@Override
-		public TypeSymbol visit(Expr ast, SymTable<VariableSymbol> arg) {
+		public TypeSymbol visit(Expr ast, SymbolTable<VariableSymbol> arg) {
 			ast.type = super.visit(ast, arg);
 			return ast.type;
 		}
 
 		@Override
-		public TypeSymbol binaryOp(BinaryOp ast, SymTable<VariableSymbol> locals) {
+		public TypeSymbol binaryOp(BinaryOp ast, SymbolTable<VariableSymbol> locals) {
 
 			switch (ast.operator) {
 
@@ -310,24 +310,24 @@ public class TypeChecker {
 
 		@Override
 		public TypeSymbol booleanConst(BooleanConst ast,
-				SymTable<VariableSymbol> arg) {
+				SymbolTable<VariableSymbol> arg) {
 			return main.booleanType;
 		}
 
 		@Override
 		public TypeSymbol builtInRead(BuiltInRead ast,
-				SymTable<VariableSymbol> arg) {
+				SymbolTable<VariableSymbol> arg) {
 			return main.intType;
 		}
 
 		@Override
 		public TypeSymbol builtInReadFloat(BuiltInReadFloat ast,
-				SymTable<VariableSymbol> arg) {
+				SymbolTable<VariableSymbol> arg) {
 			return main.floatType;
 		}
 
 		@Override
-		public TypeSymbol cast(Cast ast, SymTable<VariableSymbol> locals) {
+		public TypeSymbol cast(Cast ast, SymbolTable<VariableSymbol> locals) {
 			TypeSymbol argType = type(ast.arg(), locals);
 			ast.typeSym = typeSymbols.getType(ast.typeName);
 
@@ -340,12 +340,12 @@ public class TypeChecker {
 		}
 
 		@Override
-		protected TypeSymbol dfltExpr(Expr ast, SymTable<VariableSymbol> arg) {
+		protected TypeSymbol dfltExpr(Expr ast, SymbolTable<VariableSymbol> arg) {
 			throw new RuntimeException("Unhandled type");
 		}
 
 		@Override
-		public TypeSymbol field(Field ast, SymTable<VariableSymbol> locals) {
+		public TypeSymbol field(Field ast, SymbolTable<VariableSymbol> locals) {
 			ClassSymbol argType = asClass(type(ast.arg(), locals)); // class of
 																	// the
 																	// receiver
@@ -360,47 +360,47 @@ public class TypeChecker {
 		}
 
 		@Override
-		public TypeSymbol index(Index ast, SymTable<VariableSymbol> locals) {
+		public TypeSymbol index(Index ast, SymbolTable<VariableSymbol> locals) {
 			ArrayTypeSymbol argType = asArray(type(ast.left(), locals));
 			checkType(ast.right(), main.intType, locals);
 			return argType.elementType;
 		}
 
 		@Override
-		public TypeSymbol intConst(IntConst ast, SymTable<VariableSymbol> arg) {
+		public TypeSymbol intConst(IntConst ast, SymbolTable<VariableSymbol> arg) {
 			return main.intType;
 		}
 
 		@Override
 		public TypeSymbol floatConst(FloatConst ast,
-				SymTable<VariableSymbol> arg) {
+				SymbolTable<VariableSymbol> arg) {
 			return main.floatType;
 		}
 
 		@Override
-		public TypeSymbol newArray(NewArray ast, SymTable<VariableSymbol> locals) {
+		public TypeSymbol newArray(NewArray ast, SymbolTable<VariableSymbol> locals) {
 			checkType(ast.arg(), main.intType, locals);
 			return typeSymbols.getType(ast.typeName);
 		}
 
 		@Override
-		public TypeSymbol newObject(NewObject ast, SymTable<VariableSymbol> arg) {
+		public TypeSymbol newObject(NewObject ast, SymbolTable<VariableSymbol> arg) {
 			return typeSymbols.getType(ast.typeName);
 		}
 
 		@Override
-		public TypeSymbol nullConst(NullConst ast, SymTable<VariableSymbol> arg) {
+		public TypeSymbol nullConst(NullConst ast, SymbolTable<VariableSymbol> arg) {
 			return main.nullType;
 		}
 
 		@Override
-		public TypeSymbol thisRef(ThisRef ast, SymTable<VariableSymbol> locals) {
+		public TypeSymbol thisRef(ThisRef ast, SymbolTable<VariableSymbol> locals) {
 			VariableSymbol vsym = locals.get("this");
 			return vsym.type;
 		}
 
 		@Override
-		public TypeSymbol unaryOp(UnaryOp ast, SymTable<VariableSymbol> locals) {
+		public TypeSymbol unaryOp(UnaryOp ast, SymbolTable<VariableSymbol> locals) {
 
 			switch (ast.operator) {
 			case U_PLUS:
@@ -418,7 +418,7 @@ public class TypeChecker {
 		}
 
 		@Override
-		public TypeSymbol var(Var ast, SymTable<VariableSymbol> locals) {
+		public TypeSymbol var(Var ast, SymbolTable<VariableSymbol> locals) {
 			if (!locals.contains(ast.name))
 				throw new SemanticFailure(Cause.NO_SUCH_VARIABLE,
 						"No variable %s was found", ast.name);
@@ -428,7 +428,7 @@ public class TypeChecker {
 
 		@Override
 		public TypeSymbol methodCall(MethodCallExpr ast,
-				SymTable<VariableSymbol> locals) {
+				SymbolTable<VariableSymbol> locals) {
 
 			ClassSymbol rcvrType = asClass(type(ast.receiver(), locals));
 			MethodSymbol mthd = rcvrType.getMethod(ast.methodName);
@@ -463,26 +463,26 @@ public class TypeChecker {
 	 * type of value that may be assigned there. May fail if the expression is
 	 * not a valid LHS (for example, a "final" field).
 	 */
-	public TypeSymbol typeLhs(Expr expr, SymTable<VariableSymbol> locals) {
+	public TypeSymbol typeLhs(Expr expr, SymbolTable<VariableSymbol> locals) {
 		return new LValueVisitor().visit(expr, locals);
 	}
 
 	/**
-	 * @see TypeChecker#typeLhs(Expr, SymTable)
+	 * @see TypeChecker#typeLhs(Expr, SymbolTable)
 	 */
 	class LValueVisitor extends
-			ExprVisitor<TypeSymbol, SymTable<VariableSymbol>> {
+			ExprVisitor<TypeSymbol, SymbolTable<VariableSymbol>> {
 
 		/** Any other kind of expression is not a value lvalue */
 		@Override
-		protected TypeSymbol dfltExpr(Expr ast, SymTable<VariableSymbol> locals) {
+		protected TypeSymbol dfltExpr(Expr ast, SymbolTable<VariableSymbol> locals) {
 			throw new SemanticFailure(Cause.NOT_ASSIGNABLE,
 					"'%s' is not a valid lvalue", AstOneLine.toString(ast));
 		}
 
 		/** A field can always be assigned to. */
 		@Override
-		public TypeSymbol field(Field ast, SymTable<VariableSymbol> locals) {
+		public TypeSymbol field(Field ast, SymbolTable<VariableSymbol> locals) {
 			TypeSymbol ts = type(ast, locals);
 			return ts;
 		}
@@ -491,13 +491,13 @@ public class TypeChecker {
 		 * An array dereference can always be assigned to
 		 */
 		@Override
-		public TypeSymbol index(Index ast, SymTable<VariableSymbol> locals) {
+		public TypeSymbol index(Index ast, SymbolTable<VariableSymbol> locals) {
 			return type(ast, locals);
 		}
 
 		/** A variable can always be assigned to. */
 		@Override
-		public TypeSymbol var(Var ast, SymTable<VariableSymbol> locals) {
+		public TypeSymbol var(Var ast, SymbolTable<VariableSymbol> locals) {
 			TypeSymbol ts = type(ast, locals);
 			return ts;
 		}

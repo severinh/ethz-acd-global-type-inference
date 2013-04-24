@@ -26,9 +26,9 @@ import cd.ir.Symbol.VariableSymbol.Kind;
 public class SymbolCreator extends Object {
 
 	final Main main;
-	final SymTable<TypeSymbol> typesTable;
+	final SymbolTable<TypeSymbol> typesTable;
 
-	public SymbolCreator(Main main, SymTable<TypeSymbol> typesTable) {
+	public SymbolCreator(Main main, SymbolTable<TypeSymbol> typesTable) {
 		this.main = main;
 		this.typesTable = typesTable;
 	}

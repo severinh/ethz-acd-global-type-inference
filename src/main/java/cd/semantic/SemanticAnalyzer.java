@@ -23,7 +23,7 @@ public class SemanticAnalyzer {
 	}
 
 	public void check(List<ClassDecl> classDecls) throws SemanticFailure {
-		SymTable<TypeSymbol> typeSymbols = createSymbols(classDecls);
+		SymbolTable<TypeSymbol> typeSymbols = createSymbols(classDecls);
 		checkInheritance(classDecls);
 		checkStartPoint(typeSymbols);
 		checkMethodBodies(typeSymbols, classDecls);
@@ -38,10 +38,10 @@ public class SemanticAnalyzer {
 	 * 
 	 * @see SymbolCreator
 	 */
-	private SymTable<TypeSymbol> createSymbols(List<ClassDecl> classDecls) {
+	private SymbolTable<TypeSymbol> createSymbols(List<ClassDecl> classDecls) {
 
 		// Start by creating a symbol for all built-in types.
-		SymTable<TypeSymbol> typeSymbols = new SymTable<TypeSymbol>(null);
+		SymbolTable<TypeSymbol> typeSymbols = new SymbolTable<TypeSymbol>(null);
 
 		typeSymbols.add(main.intType);
 		typeSymbols.add(main.booleanType);
@@ -90,7 +90,7 @@ public class SemanticAnalyzer {
 	 * Guarantee there is a class Main which defines a method main with no
 	 * arguments.
 	 */
-	private void checkStartPoint(SymTable<TypeSymbol> typeSymbols) {
+	private void checkStartPoint(SymbolTable<TypeSymbol> typeSymbols) {
 		Symbol mainClass = typeSymbols.get("Main");
 		if (mainClass != null && mainClass instanceof ClassSymbol) {
 			ClassSymbol cs = (ClassSymbol) mainClass;
@@ -110,13 +110,13 @@ public class SemanticAnalyzer {
 	 * 
 	 * @see TypeChecker
 	 */
-	private void checkMethodBodies(SymTable<TypeSymbol> typeSymbols,
+	private void checkMethodBodies(SymbolTable<TypeSymbol> typeSymbols,
 			List<ClassDecl> classDecls) {
 		TypeChecker tc = new TypeChecker(main, typeSymbols);
 
 		for (ClassDecl classd : classDecls) {
 
-			SymTable<VariableSymbol> fldTable = new SymTable<VariableSymbol>(
+			SymbolTable<VariableSymbol> fldTable = new SymbolTable<VariableSymbol>(
 					null);
 
 			// add all fields of this class, or any of its super classes
@@ -139,7 +139,7 @@ public class SemanticAnalyzer {
 
 				}
 
-				SymTable<VariableSymbol> mthdTable = new SymTable<VariableSymbol>(
+				SymbolTable<VariableSymbol> mthdTable = new SymbolTable<VariableSymbol>(
 						fldTable);
 
 				mthdTable.add(classd.sym.thisSymbol);
