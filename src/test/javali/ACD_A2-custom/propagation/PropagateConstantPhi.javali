@@ -1,0 +1,15 @@
+class Main {
+  void main() {
+    test(true);
+  }
+  
+  void test(boolean b) {
+    int c;
+    if (b) {
+      c = 2;
+    } else {
+      c = 2;
+    }
+    write(c);
+  }
+}

@@ -1,0 +1,22 @@
+class Main {
+  void main() {
+    int x,y;
+    while (unknown()) {
+      x = 1;
+      write(x);
+      while (unknown()) {
+        y = 2;
+        write(y);  
+        x = y; 
+      }
+      write(x);
+    }
+    
+    // on some paths, x and why are still uninitialized here but that's ok
+    write(2);
+  }
+  
+  boolean unknown() {
+  	return false;
+  }
+}

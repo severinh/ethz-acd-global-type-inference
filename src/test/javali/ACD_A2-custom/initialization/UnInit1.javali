@@ -1,0 +1,17 @@
+class Main {
+  void main() {
+    int out;
+    boolean b;
+    b = true;
+    out = test(b);
+    write(out);
+  }
+  
+  int test (boolean b) {
+    int x;
+    if (b) {
+      x = 1;
+    } 
+    return x;
+  }
+}

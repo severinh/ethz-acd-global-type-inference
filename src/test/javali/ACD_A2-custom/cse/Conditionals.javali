@@ -1,0 +1,16 @@
+class Main {
+   void main() {
+     int a, b, c;
+     a = read();
+     b = read();
+     c = 0;
+     if (a > 0) {
+     	c = a + b;
+     } else {
+     	c = a + b;
+     }
+     c = a + b;
+     write(c);
+     writeln();
+   }
+}

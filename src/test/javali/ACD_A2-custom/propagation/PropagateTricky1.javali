@@ -1,0 +1,23 @@
+class Main {
+  void main() {
+    int x,y,z;
+    boolean a,b,c;
+    
+    x = 1;
+    y = x;
+    z = y;
+    write(z);
+    
+    if (true) {
+      a = true;
+      b = a;
+      c = b;
+    } else {
+      c = false;
+    }
+    
+    if (c) {
+      write(11);
+    }
+  }
+}

@@ -1,0 +1,12 @@
+class Main {
+  void main() {
+    Foo f, r;
+    // DO NOT INITIALIZE
+    // f = new Foo();
+    r = f.next.next.next;
+  }
+}
+
+class Foo {
+  Foo next;
+}

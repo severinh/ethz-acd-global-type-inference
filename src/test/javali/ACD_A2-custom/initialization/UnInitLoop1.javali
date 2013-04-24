@@ -1,0 +1,21 @@
+class Main {
+  void main() {
+    int out;
+    out = test();
+    write(out);
+  }
+  
+  int test () {
+    int first;
+    int c;
+    c = 0;
+    while (c < 100) {
+      c = c+1;
+      if (first == 0) {
+        c = c+17;
+      }
+      first = 0;
+    } 
+    return c;
+  }
+}

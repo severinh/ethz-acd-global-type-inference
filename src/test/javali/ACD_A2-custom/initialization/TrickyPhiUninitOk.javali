@@ -1,0 +1,31 @@
+class Main {
+  void main() {
+    test(true,false,true);
+  }
+  
+  /**
+   * NOTE: Some x_i are used again in phi nodes, but those phi nodes are 
+   * 	   only ever used in phi nodes again (thus not _really_ live)
+   */
+  void test (boolean b1, boolean b2, boolean b3) {
+    int x;
+    int y;
+    if (b1) {
+   	  if (b2) {
+        x = 1;
+      } else {
+		// initialization of x missing
+      }
+      y = 1;
+    } else {
+	  if (b3) {
+	    x = 3;
+	  } else {
+	    x = 4;
+	  }
+	  y = 2;
+    }
+    
+    write(y);
+  }
+}

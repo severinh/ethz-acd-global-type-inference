@@ -1,0 +1,18 @@
+class Main {
+	void foo (int p) {
+		int i;
+		if (p < 10) {
+			i = 2;
+		} else {
+			i = 22;
+		}
+		write(i);
+		writeln();
+	}
+	
+	void main() {
+		foo(8);
+		foo(10);
+		foo(12);
+	}
+}

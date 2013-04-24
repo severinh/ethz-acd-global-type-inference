@@ -1,0 +1,19 @@
+class Main {
+	boolean unknown() {
+		return false;
+	}
+	
+	void main() {
+		int x;
+		while (unknown()) {
+			if (unknown()) {
+				x = 10;
+			} else {
+				while (unknown()) {
+					x = 20;
+				}
+			}
+			write(x);
+		}
+	}
+}

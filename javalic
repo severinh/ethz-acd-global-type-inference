@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Runs the Javali compiler from the command line.
+
+mvn exec:java --quiet -Dexec.mainClass="cd.Main" -Dexec.args="$@"

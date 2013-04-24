@@ -1,0 +1,30 @@
+class Main {
+   void main() { 
+   
+      int input, count, i, zeros, notZeros;   
+      
+      count = 0;
+      i = 0;
+      input = 0;
+      zeros = 0;
+      notZeros = 0;
+      
+      count = read();
+      
+      while (i < count) {
+         input = read();
+         if (input == 0) {
+            zeros = zeros + 1;
+         } else {
+            notZeros = notZeros + 1;
+         }
+         i = i + 1;
+      }
+   
+      write(zeros);
+      writeln();
+      write(notZeros);
+      writeln();
+      
+   }
+}

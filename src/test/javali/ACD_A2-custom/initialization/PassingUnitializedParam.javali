@@ -1,0 +1,16 @@
+class Main {
+  void main() {
+    Foo foo;
+    int result;
+    result = test(foo);
+    write(result);
+  }
+  
+  int test (Foo f) {
+    return f.x;
+  }
+}
+
+class Foo {
+  int x;
+}

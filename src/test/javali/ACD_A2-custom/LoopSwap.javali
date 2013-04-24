@@ -1,0 +1,19 @@
+class Main {
+	void swap(int x, int y) {
+		int t;
+		while (x > y) {
+			t = x;
+			x = y;
+			y = t;
+		}
+		write(x);
+		writeln();
+		write(y);
+		writeln();
+	}
+	
+	void main() {
+		swap(2, 5);
+		swap(5, 2);
+	}
+}

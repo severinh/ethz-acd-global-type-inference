@@ -1,0 +1,17 @@
+class Main {
+  int i;
+  
+  void main() {
+    int a, b;
+    this.i = 1;
+    a = 1 + foo();
+    b = 1 + foo();
+    write(this.i);
+  }
+  
+  int foo() {
+    i = i+1;
+	return 1; 
+  }
+  
+}

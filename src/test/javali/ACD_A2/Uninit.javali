@@ -1,0 +1,9 @@
+// Test an obviously uninitialized variable.  You 
+// probably want to add some more involved tests
+// than this!
+class Main {
+   void main() {
+     int i;
+     write(i); writeln();
+   }
+}

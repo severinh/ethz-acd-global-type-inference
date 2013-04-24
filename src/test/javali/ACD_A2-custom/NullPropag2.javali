@@ -1,0 +1,19 @@
+     class Main {
+       void main() {
+         Foo x;
+         x = null;
+         if (x != null) {
+           x.bla();
+         }
+         
+         if (null != null) {
+           x.bla();
+         }
+       }
+     }
+     
+     class Foo {
+     	void bla() {
+     		write(1);
+     	}
+     }

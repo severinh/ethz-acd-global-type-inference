@@ -1,0 +1,10 @@
+class Main {
+  void main() {
+    int x,y,z;
+    x = 100;
+    y = 0;
+    z = x / y;
+    write(z);
+    z = x % y;
+  }
+}

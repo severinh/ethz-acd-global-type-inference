@@ -1,0 +1,85 @@
+class Main {
+	void integer_arithmetic() {
+		int a, b;
+		a = -(((4 * (6 + 3) - 1) / 5 + 2) % 2);
+		write(a);
+		writeln();
+		b = (3 + a) + ((5 * 2) - 1);
+		write(b);
+	}
+	
+	void integer_comparisons() {
+		if (3 <= 5) {
+			write(42);
+		}
+		if (5 <= 3) {
+			write(-1);
+		}
+		if (3 < 5) {
+			write(42);
+		}
+		if (5 < 3) {
+			write(-1);
+		}
+		if (3 != 5) {
+			write(42);
+		}
+		while (3 == 5) {
+			write(-1);
+		}
+		if (3 > 5) {
+			write(-1);
+		}
+		if (5 > 3) {
+			write(42);
+		}
+		if (3 >= 5) {
+			write(-1);
+		}
+		if (5 >= 3) {
+			write(42);
+		}
+	}
+	
+	void boolean_arithmetic() {
+		boolean p, q;
+	
+		p = !((true || false) && true);
+		writeb(p);
+		writeln();
+		q = p && (false || !(false));
+		writeb(q);
+		writeln();
+		
+		q = p && true;
+		writeb(q);
+		writeln();
+		
+		writeb(!!p);
+		writeb(!!!q);
+		
+		// TODO: Currently not folded
+		writeb(p && true);
+		writeln();
+		writeb(p && false);
+		writeln();
+		writeb(true || q);
+		writeln();
+		writeb(false || q);
+		writeln();
+	}
+	
+	void main() {
+		integer_arithmetic();
+		integer_comparisons();
+		boolean_arithmetic();
+	}
+  
+	void writeb (boolean b) {
+		if (b) {
+		  write(1);
+		} else {
+		  write(0);
+		}
+  	}
+  }

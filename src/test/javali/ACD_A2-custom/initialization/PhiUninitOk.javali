@@ -1,0 +1,19 @@
+class Main {
+  void main() {
+    int out;
+    boolean b;
+    b = true;
+    test(b);
+  }
+  
+  void test (boolean b) {
+    int x,y;
+    if (b) {
+      x = 1;
+      write(x);
+    } else {
+      y = 2;
+      write(y);
+    } 
+  }
+}

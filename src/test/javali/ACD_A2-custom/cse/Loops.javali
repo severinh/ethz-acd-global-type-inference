@@ -1,0 +1,53 @@
+class Main {
+	void body(int x, int y, int z) {
+		int t, i;
+		t = (y * z) + x;
+		i = 10;
+		while (i >= 0) {
+			t = (y * z) + x;
+			t = t + 1; // Dead definition
+			j = 10;
+			while (j >= 0) {
+				t = (y * z);
+				j = j - 1;
+			}
+			i = i - 1;
+		}
+		x = y * z;
+		y = z;
+		write(x);
+		writeln();
+		write(y);
+		writeln();
+		write(z);
+		writeln();
+		write(t);
+	}
+	
+	void condition(int x, int y, int z) {
+		int i, j;
+		i = 0;
+		while (i <= 10 && (x * (y + z) >= y + z)) {
+			j = 0;
+			while (j <= 10 && (x * (x * (y + z)) >= y + z)) {
+				if ((y + z <= x * (y + z)) || z > 0) {
+					j = j + 1;
+				}
+				j = j + 1;
+			}
+			i = i + 1;
+		}
+		write(y + z);
+		writeln();
+		write(x * (y + z));
+		writeln();
+	}
+	
+	void main() {
+		body(3, 5, 8);
+		body(5, 8, 13);
+		
+		condition(2, 4, 6);
+		condition(4, 6, 8);
+	}
+}

@@ -1,0 +1,9 @@
+class Main {
+  void main() {
+    int[] arr;
+    // DO NOT INITIALIZE
+    //arr = new int[3];
+    arr[0] = 1;
+    write(arr[0]);
+  }
+}

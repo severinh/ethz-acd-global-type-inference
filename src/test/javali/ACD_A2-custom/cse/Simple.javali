@@ -1,0 +1,13 @@
+class Main {
+  void main() {
+    calc(1,2);
+  }
+  
+  void calc(int c, int d) {
+  	int a,b;
+  	a = c+d;
+  	b = c+d;
+    write(a);
+    write(b);
+  }
+}

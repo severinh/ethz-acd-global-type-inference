@@ -1,0 +1,21 @@
+class Main {
+	void foo(int a, int b, int c, int d, int e) {
+		int w, v, x, y, z;
+		w = a + b;
+		x = (e - ((a + b) * d)) % e;
+		y = (a + b) * d;
+		z = e - ((a + b) * d);
+		write(w);
+		writeln();
+		write(x);
+		writeln();
+		write(y);
+		writeln();
+		write(z);
+		writeln();
+	}
+	
+	void main() {
+		foo(1, 2, 3, 4, 5);
+	}
+}
