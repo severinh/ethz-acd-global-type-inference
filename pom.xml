@@ -6,7 +6,7 @@
 	<artifactId>acd</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
-	
+
 	<name>Javali Compiler with Type Inference</name>
 	<url>http://www.lst.inf.ethz.ch/teaching/lectures/ss13/2810/index.php</url>
 
@@ -14,7 +14,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<antlr.version>3.5</antlr.version>
 	</properties>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.antlr</groupId>
@@ -38,8 +38,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -48,12 +48,57 @@
 				<version>${antlr.version}</version>
 				<executions>
 					<execution>
-					<goals>
-						<goal>antlr</goal>
-					</goals>
+						<goals>
+							<goal>antlr</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12</version>
+				<configuration>
+					<!-- Required to make Cobertura work with Java 1.7 -->
+					<!-- See http://stackoverflow.com/questions/10869127/maven-build-causes-verifyerror-with-java-1-7 -->
+					<argLine>-XX:-UseSplitVerifier</argLine>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<!-- Jenkins by default defines a property BUILD_NUMBER which is used to 
+			enable the profile. -->
+		<profile>
+			<id>jenkins</id>
+			<activation>
+				<property>
+					<name>env.BUILD_NUMBER</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>cobertura-maven-plugin</artifactId>
+						<version>2.2</version>
+						<configuration>
+							<formats>
+								<format>xml</format>
+							</formats>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>cobertura</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
