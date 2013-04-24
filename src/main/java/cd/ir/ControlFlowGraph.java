@@ -9,21 +9,21 @@ import cd.ir.Ast.Expr;
 public class ControlFlowGraph {
 	public BasicBlock start, end;
 	public final List<BasicBlock> allBlocks = new ArrayList<BasicBlock>();
-	
+
 	public int count() {
 		return allBlocks.size();
 	}
-	
+
 	public BasicBlock newBlock() {
 		BasicBlock blk = new BasicBlock(count());
 		allBlocks.add(blk);
 		return blk;
 	}
-	
+
 	/**
-	 * Given a list of basic blocks that do not yet have successors,
-	 * merges their control flows into a single successor and returns
-	 * the new successor.
+	 * Given a list of basic blocks that do not yet have successors, merges
+	 * their control flows into a single successor and returns the new
+	 * successor.
 	 */
 	public BasicBlock join(BasicBlock... pred) {
 		BasicBlock result = newBlock();
@@ -35,11 +35,11 @@ public class ControlFlowGraph {
 		}
 		return result;
 	}
-	
-	/** Terminates {@code blk} so that it evaluates {@code code},
-	 * and creates two new basic blocks, one for the case where
-	 * the result is true, and one for the case where the result is
-	 * false.
+
+	/**
+	 * Terminates {@code blk} so that it evaluates {@code code}, and creates two
+	 * new basic blocks, one for the case where the result is true, and one for
+	 * the case where the result is false.
 	 */
 	public void terminateInCondition(BasicBlock blk, Expr cond) {
 		assert blk.condition == null;

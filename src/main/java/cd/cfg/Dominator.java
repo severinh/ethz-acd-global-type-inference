@@ -9,21 +9,21 @@ import cd.Main;
 import cd.ir.BasicBlock;
 import cd.ir.ControlFlowGraph;
 
-/** 
+/**
  * Computes dominators and dominator tree of a control-flow graph.
  */
 public class Dominator {
-	
+
 	public final Main main;
-	
+
 	public Dominator(Main main) {
 		this.main = main;
 	}
-	
+
 	public List<BasicBlock> blocksInRevPostOrder;
 
-	public int[] postOrderIndex;	
-	
+	public int[] postOrderIndex;
+
 	public void compute(ControlFlowGraph cfg) {
 		// Compute the post order information for the control flow graph
 		blocksInRevPostOrder = new ArrayList<BasicBlock>();
@@ -36,15 +36,16 @@ public class Dominator {
 			changed = false;
 			for (BasicBlock blk : blocksInRevPostOrder) {
 				BasicBlock dom = null;
-				
-				for (BasicBlock pblk : blk.predecessors) {						
+
+				for (BasicBlock pblk : blk.predecessors) {
 					if (dom == null)
 						dom = pblk;
-					else if (pblk == cfg.start || pblk.dominatorTreeParent != null)
+					else if (pblk == cfg.start
+							|| pblk.dominatorTreeParent != null)
 						// if dominator of our pred is initialized
 						dom = intersect(dom, pblk);
 				}
-				
+
 				if (dom != blk.dominatorTreeParent) {
 					blk.dominatorTreeParent = dom;
 					changed = true;
@@ -60,13 +61,14 @@ public class Dominator {
 			main.debug("blk=%s preds=%s", blk, blk.predecessors);
 
 			for (BasicBlock pblk : blk.predecessors) {
-					main.debug("blk=%s(%s) pblk=%s", blk, blk.dominatorTreeParent, pblk);
-					BasicBlock runner = pblk;
-					while (runner != blk.dominatorTreeParent && runner != null) {
-						runner.dominanceFrontier.add(blk);
-						runner = runner.dominatorTreeParent;
-					}
+				main.debug("blk=%s(%s) pblk=%s", blk, blk.dominatorTreeParent,
+						pblk);
+				BasicBlock runner = pblk;
+				while (runner != blk.dominatorTreeParent && runner != null) {
+					runner.dominanceFrontier.add(blk);
+					runner = runner.dominatorTreeParent;
 				}
+			}
 		}
 	}
 
@@ -85,16 +87,18 @@ public class Dominator {
 
 	public void depthFirstSearch(BasicBlock blk, BitSet visited) {
 		// Did we visit blk already?
-		if (visited.get(blk.index)) return;
+		if (visited.get(blk.index))
+			return;
 		visited.set(blk.index);
-		
+
 		// Visit blk's successors
 		for (BasicBlock cblk : blk.successors)
 			depthFirstSearch(cblk, visited);
-		
+
 		// Add blk to post order array
 		postOrderIndex[blk.index] = blocksInRevPostOrder.size();
-		blocksInRevPostOrder.add(blk); // initially in post order, but gets reversed later
+		blocksInRevPostOrder.add(blk); // initially in post order, but gets
+										// reversed later
 	}
 
 }

@@ -12,11 +12,11 @@ import cd.ir.AstVisitor;
 import cd.util.Pair;
 
 public class AstDump {
-	
+
 	public static String toString(Ast ast) {
 		return toString(ast, "");
 	}
-	
+
 	public static String toString(List<? extends Ast> astRoots) {
 		StringBuilder sb = new StringBuilder();
 		for (Ast a : astRoots) {
@@ -30,17 +30,16 @@ public class AstDump {
 		ad.dump(ast, indent);
 		return ad.sb.toString();
 	}
-	
+
 	private StringBuilder sb = new StringBuilder();
 	private Visitor vis = new Visitor();
-		
+
 	protected void dump(Ast ast, String indent) {
 		// print out the overall class structure
 		sb.append(indent);
 		String nodeName = ast.getClass().getSimpleName();
 		List<Pair<?>> flds = vis.visit(ast, null);
-		sb.append(String.format("%s (%s)\n", 
-				nodeName,
+		sb.append(String.format("%s (%s)\n", nodeName,
 				Pair.join(flds, ": ", ", ")));
 
 		// print out any children
@@ -49,40 +48,40 @@ public class AstDump {
 			dump(child, newIndent);
 		}
 	}
-	
+
 	protected class Visitor extends AstVisitor<List<Pair<?>>, Void> {
-		
+
 		@Override
 		protected List<Pair<?>> dflt(Ast ast, Void arg) {
 			ArrayList<Pair<?>> res = new ArrayList<Pair<?>>();
-			
+
 			// Get the list of fields and sort them by name:
 			java.lang.Class<? extends Ast> rclass = ast.getClass();
-			List<java.lang.reflect.Field> rflds = 
-				Arrays.asList(rclass.getFields());
-			Collections.sort(rflds, new Comparator<java.lang.reflect.Field> () {
+			List<java.lang.reflect.Field> rflds = Arrays.asList(rclass
+					.getFields());
+			Collections.sort(rflds, new Comparator<java.lang.reflect.Field>() {
 				@Override
 				public int compare(Field o1, Field o2) {
 					return o1.getName().compareTo(o2.getName());
 				}
 			});
-			
+
 			// Create pairs for each one that is not of type Ast:
 			for (java.lang.reflect.Field rfld : rflds) {
 				rfld.setAccessible(true);
-				
+
 				// ignore various weird fields that show up from
 				// time to time:
 				if (rfld.getName().startsWith("$"))
 					continue;
-				
+
 				// ignore fields of AST type, and rwChildren (they should be
 				// uncovered using the normal tree walk)
 				if (rfld.getType().isAssignableFrom(Ast.class))
 					continue;
 				if (rfld.getName().equals("rwChildren"))
 					continue;
-				
+
 				// ignore NULL fields, but add others to our list of pairs
 				try {
 					Object value = rfld.get(ast);
@@ -92,12 +91,12 @@ public class AstDump {
 					throw new RuntimeException(e);
 				} catch (IllegalAccessException e) {
 					throw new RuntimeException(e);
-				}				
+				}
 			}
-			
+
 			return res;
 		}
-		
+
 	}
 
 }

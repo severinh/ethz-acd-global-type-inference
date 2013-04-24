@@ -28,11 +28,12 @@ import cd.ir.Ast.ClassDecl;
 import cd.util.FileUtil;
 
 abstract public class AbstractTestSamplePrograms {
-	
+
 	final static boolean ignoreExtraCreditTests = true;
 
 	public File file, sfile, binfile, infile;
-	public File parserreffile, semanticreffile, execreffile, cfgreffile, optreffile;
+	public File parserreffile, semanticreffile, execreffile, cfgreffile,
+			optreffile;
 	public File errfile;
 	public Main main;
 
@@ -42,12 +43,11 @@ abstract public class AbstractTestSamplePrograms {
 			warnAboutDiff(phase, exp, act);
 		}
 	}
-	
+
 	/**
-	 * Compare the output of two executions while ignoring
-	 * small differences due to floating point errors.
-	 * E.g. outputs "1.23456" and "1.23455" are OK even though 
-	 * they are slightly different. 
+	 * Compare the output of two executions while ignoring small differences due
+	 * to floating point errors. E.g. outputs "1.23456" and "1.23455" are OK
+	 * even though they are slightly different.
 	 * 
 	 */
 	public void assertEqualOutput(String phase, String exp, String act) {
@@ -55,19 +55,23 @@ abstract public class AbstractTestSamplePrograms {
 		if (!exp.equals(act)) {
 			String[] expLines = exp.split("\n");
 			String[] actLines = act.split("\n");
-			if (expLines.length != actLines.length) warnAboutDiff(phase, exp, act);
+			if (expLines.length != actLines.length)
+				warnAboutDiff(phase, exp, act);
 			for (int lineNb = 0; lineNb < expLines.length; lineNb++) {
 				String expLine = expLines[lineNb];
 				String actLine = actLines[lineNb];
 				// assumption: all output w/ a dot is a floating point nb.
-				if (expLine.contains(".") && actLine.contains(".")) {  
+				if (expLine.contains(".") && actLine.contains(".")) {
 					// allow rounding differences when comparing floating points
-					// (known bug: this doesn't work if there are two floats on a single output line)
+					// (known bug: this doesn't work if there are two floats on
+					// a single output line)
 					float expFloat = Float.valueOf(expLine);
 					float actFloat = Float.valueOf(actLine);
-					if (Math.abs(expFloat - actFloat) > 0.001) warnAboutDiff(phase, exp, act);
+					if (Math.abs(expFloat - actFloat) > 0.001)
+						warnAboutDiff(phase, exp, act);
 				} else {
-					if (!expLine.equals(actLine)) warnAboutDiff(phase, exp, act);
+					if (!expLine.equals(actLine))
+						warnAboutDiff(phase, exp, act);
 				}
 			}
 		}
@@ -92,10 +96,10 @@ abstract public class AbstractTestSamplePrograms {
 			exc.printStackTrace();
 		}
 		Assert.assertEquals(
-				String.format("Phase %s for %s failed!", phase,
-						file.getPath()), exp, act);
+				String.format("Phase %s for %s failed!", phase, file.getPath()),
+				exp, act);
 	}
-	
+
 	public static int counter = 0;
 
 	@Test
@@ -103,33 +107,38 @@ abstract public class AbstractTestSamplePrograms {
 		System.err.println("[" + counter++ + " = " + file + "]");
 
 		// ignore 64-bit-only tests when running 32-bit Java
-		if (new File(file.getAbsolutePath()+".64bitonly").exists() &&
-				Integer.valueOf(System.getProperty("sun.arch.data.model")) == 32) {
+		if (new File(file.getAbsolutePath() + ".64bitonly").exists()
+				&& Integer.valueOf(System.getProperty("sun.arch.data.model")) == 32) {
 			System.err.println("--> Ignoring test because it's 64-bit-only");
-		} else if (ignoreExtraCreditTests && file.getAbsolutePath().contains("extraCredit")) { 
-			System.err.println("--> Ignoring optional test that checks extra-credit parts");
+		} else if (ignoreExtraCreditTests
+				&& file.getAbsolutePath().contains("extraCredit")) {
+			System.err
+					.println("--> Ignoring optional test that checks extra-credit parts");
 		} else {
-			boolean hasWellDefinedOutput = !new File(file.getAbsolutePath()+".undefinedOutput").exists();
-			
+			boolean hasWellDefinedOutput = !new File(file.getAbsolutePath()
+					+ ".undefinedOutput").exists();
+
 			try {
 				// Load the input and reference results:
 				// Note: this may use the network if no .ref files exist.
-	
+
 				// Delete intermediate files from previous runs:
 				if (sfile.exists())
 					sfile.delete();
 				if (binfile.exists())
 					binfile.delete();
-	
+
 				// Parse the file and check that the generated AST is correct,
-				// or if the parser failed that the correct message was generated:
+				// or if the parser failed that the correct message was
+				// generated:
 				List<ClassDecl> astRoots = testParser();
 				if (astRoots != null) {
 					// Run the semantic check and check that errors
 					// are detected correctly, etc.
 					boolean passedSemanticAnalysis = testSemanticAnalyzer(astRoots);
 					if (passedSemanticAnalysis) {
-						boolean passedCodeGen = testCodeGenerator(astRoots, hasWellDefinedOutput);
+						boolean passedCodeGen = testCodeGenerator(astRoots,
+								hasWellDefinedOutput);
 
 						if (passedCodeGen)
 							testOptimizer(astRoots);
@@ -147,7 +156,7 @@ abstract public class AbstractTestSamplePrograms {
 				e.printStackTrace(err);
 				throw e;
 			}
-	
+
 			// if we get here, then the test passed, so delete the errfile:
 			// (which has been accumulating debug output etc)
 			if (errfile.exists())
@@ -205,7 +214,7 @@ abstract public class AbstractTestSamplePrograms {
 		assertEquals("semantic", semanticRef, result);
 		return passed;
 	}
-	
+
 	private void testOptimizer(List<ClassDecl> astRoots) throws IOException {
 		// Determine the input and expected operation counts.
 		String inFile = (infile.exists() ? FileUtil.read(infile) : "");
@@ -234,11 +243,11 @@ abstract public class AbstractTestSamplePrograms {
 	}
 
 	/**
-	 * Run the code generator, assemble the resulting .s file, and (if the output
-	 * is well-defined) compare against the expected output.
+	 * Run the code generator, assemble the resulting .s file, and (if the
+	 * output is well-defined) compare against the expected output.
 	 */
-	public boolean testCodeGenerator(List<ClassDecl> astRoots, boolean hasWellDefinedOutput)
-			throws IOException {
+	public boolean testCodeGenerator(List<ClassDecl> astRoots,
+			boolean hasWellDefinedOutput) throws IOException {
 		// Determine the input and expected output.
 		String inFile = (infile.exists() ? FileUtil.read(infile) : "");
 		String execRef = findExecRef(inFile);
@@ -273,13 +282,15 @@ abstract public class AbstractTestSamplePrograms {
 		// Compute the output to what we expected to see.
 		if (execRef.equals(execOut))
 			return true;
-		if (hasWellDefinedOutput) assertEqualOutput("exec", execRef, execOut);
+		if (hasWellDefinedOutput)
+			assertEqualOutput("exec", execRef, execOut);
 		return false;
 	}
 
 	public String findParserRef() throws IOException {
 		// Check for a .ref file
-		if (parserreffile.exists() && parserreffile.lastModified() > file.lastModified()) {
+		if (parserreffile.exists()
+				&& parserreffile.lastModified() > file.lastModified()) {
 			return FileUtil.read(parserreffile);
 		}
 
@@ -303,7 +314,8 @@ abstract public class AbstractTestSamplePrograms {
 
 		// Read in the result
 		String res;
-		if (semanticreffile.exists() && semanticreffile.lastModified() > file.lastModified())
+		if (semanticreffile.exists()
+				&& semanticreffile.lastModified() > file.lastModified())
 			res = FileUtil.read(semanticreffile);
 		else {
 			Reference ref = openClient();
@@ -330,7 +342,8 @@ abstract public class AbstractTestSamplePrograms {
 
 	public String findExecRef(String inputText) throws IOException {
 		// Check for a .ref file
-		if (execreffile.exists() && execreffile.lastModified() > file.lastModified()) {
+		if (execreffile.exists()
+				&& execreffile.lastModified() > file.lastModified()) {
 			return FileUtil.read(execreffile);
 		}
 
@@ -348,7 +361,8 @@ abstract public class AbstractTestSamplePrograms {
 
 	private String findOptimizerRef(String inputText) throws IOException {
 		// Check for a .ref file
-		if (optreffile.exists() && optreffile.lastModified() > file.lastModified()) {
+		if (optreffile.exists()
+				&& optreffile.lastModified() > file.lastModified()) {
 			return FileUtil.read(optreffile);
 		}
 
@@ -393,5 +407,4 @@ abstract public class AbstractTestSamplePrograms {
 		}
 	}
 
-	
 }

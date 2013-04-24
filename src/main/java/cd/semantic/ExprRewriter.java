@@ -5,10 +5,9 @@ import cd.ir.Ast.Var;
 import cd.ir.AstRewriteVisitor;
 
 /**
- * Runs after the semantic check and rewrites expressions to be more
- * normalized.  For example, references to a field {@code foo} 
- * are rewritten to always use {@link Ast.Field} objects (i.e.,
- * {@code this.foo}.
+ * Runs after the semantic check and rewrites expressions to be more normalized.
+ * For example, references to a field {@code foo} are rewritten to always use
+ * {@link Ast.Field} objects (i.e., {@code this.foo}.
  */
 public class ExprRewriter extends AstRewriteVisitor<Void> {
 
@@ -16,14 +15,12 @@ public class ExprRewriter extends AstRewriteVisitor<Void> {
 	public Ast var(Var ast, Void arg) {
 		switch (ast.sym.kind) {
 		case PARAM:
-		case LOCAL: 
+		case LOCAL:
 			// Leave params or local variables alone
 			return ast;
 		case FIELD:
 			// Convert an implicit field reference to "this.foo"
-			Ast.Field f = new Ast.Field(
-					new Ast.ThisRef(),
-					ast.name);
+			Ast.Field f = new Ast.Field(new Ast.ThisRef(), ast.name);
 			f.sym = ast.sym;
 			f.type = ast.type;
 			return f;

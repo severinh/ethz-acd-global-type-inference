@@ -384,7 +384,7 @@ public class AstCodeGenerator {
 		for (int reg = calleeSave.length - 1; reg >= 0; reg--) {
 			// don't use pop here to not change tempOffset at each return stmt.
 			offset += Config.SIZEOF_PTR;
-			emitLoad(tempOffset+offset, BP, calleeSave[reg]);
+			emitLoad(tempOffset + offset, BP, calleeSave[reg]);
 		}
 	}
 
@@ -544,8 +544,7 @@ public class AstCodeGenerator {
 			new OperandsDispatcher() {
 
 				@Override
-				public void integerOp(String leftReg, BOp op,
-						String rightReg) {
+				public void integerOp(String leftReg, BOp op, String rightReg) {
 
 					switch (op) {
 					case B_TIMES:
@@ -864,20 +863,19 @@ public class AstCodeGenerator {
 			case U_PLUS:
 				break;
 
-			case U_MINUS:
-				{
-					if (ast.type == main.floatType) {
-						emitGprRegToFloatReg(FLOAT_REG_0, argReg);
-						push("%eax");
-						emit("movd", FLOAT_REG_0, "%eax");
-						emit("xorl", "$2147483648", "%eax");
-						emit("movd", "%eax", FLOAT_REG_0);
-						pop("%eax");
-						emitFloatRegToGprReg(argReg, FLOAT_REG_0);
-					} else {
-						emit("negl", argReg);
-					}
+			case U_MINUS: {
+				if (ast.type == main.floatType) {
+					emitGprRegToFloatReg(FLOAT_REG_0, argReg);
+					push("%eax");
+					emit("movd", FLOAT_REG_0, "%eax");
+					emit("xorl", "$2147483648", "%eax");
+					emit("movd", "%eax", FLOAT_REG_0);
+					pop("%eax");
+					emitFloatRegToGprReg(argReg, FLOAT_REG_0);
+				} else {
+					emit("negl", argReg);
 				}
+			}
 				break;
 
 			case U_BOOL_NOT:
@@ -1059,8 +1057,8 @@ public class AstCodeGenerator {
 
 				@Override
 				protected Void dfltExpr(Expr ast, Void arg) {
-					throw new RuntimeException(
-							"Store to unexpected lvalue " + ast);
+					throw new RuntimeException("Store to unexpected lvalue "
+							+ ast);
 				}
 
 			}
@@ -1382,11 +1380,11 @@ public class AstCodeGenerator {
 	}
 
 	protected void emitMethodSuffix(boolean returnNull) {
-			if (returnNull)
-				emit("movl", "$0", "%eax");
-			restoreCalleeSaveRegs();
-			emit("leave");
-			emit("ret");
+		if (returnNull)
+			emit("movl", "$0", "%eax");
+		restoreCalleeSaveRegs();
+		emit("leave");
+		emit("ret");
 	}
 
 }

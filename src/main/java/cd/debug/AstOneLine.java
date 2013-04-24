@@ -33,13 +33,13 @@ import cd.ir.Ast.WhileLoop;
 import cd.ir.AstVisitor;
 
 public class AstOneLine {
-	
+
 	public static String toString(Ast ast) {
 		return new Visitor().visit(ast, null);
 	}
 
 	protected static class Visitor extends AstVisitor<String, Void> {
-		
+
 		public String str(Ast ast) {
 			return ast.accept(this, null);
 		}
@@ -51,8 +51,8 @@ public class AstOneLine {
 
 		@Override
 		public String binaryOp(BinaryOp ast, Void arg) {
-			return String.format("(%s %s %s)", 
-					str(ast.left()), ast.operator.repr, str(ast.right()));
+			return String.format("(%s %s %s)", str(ast.left()),
+					ast.operator.repr, str(ast.right()));
 		}
 
 		@Override
@@ -64,7 +64,7 @@ public class AstOneLine {
 		public String builtInRead(BuiltInRead ast, Void arg) {
 			return String.format("read()");
 		}
-		
+
 		@Override
 		public String builtInReadFloat(BuiltInReadFloat ast, Void arg) {
 			return String.format("readf()");
@@ -74,7 +74,7 @@ public class AstOneLine {
 		public String builtInWrite(BuiltInWrite ast, Void arg) {
 			return String.format("write(%s)", str(ast.arg()));
 		}
-		
+
 		@Override
 		public String builtInWriteFloat(BuiltInWriteFloat ast, Void arg) {
 			return String.format("writef(%s)", str(ast.arg()));
@@ -102,7 +102,8 @@ public class AstOneLine {
 
 		@Override
 		public String ifElse(IfElse ast, Void arg) {
-			return String.format("if (%s) {...} else {...}", str(ast.condition()));
+			return String.format("if (%s) {...} else {...}",
+					str(ast.condition()));
 		}
 
 		@Override
@@ -114,7 +115,7 @@ public class AstOneLine {
 		public String intConst(IntConst ast, Void arg) {
 			return Integer.toString(ast.value);
 		}
-		
+
 		@Override
 		public String floatConst(FloatConst ast, Void arg) {
 			return String.format("%.10f", ast.value);
@@ -122,14 +123,16 @@ public class AstOneLine {
 
 		@Override
 		public String methodCall(MethodCall ast, Void arg) {
-			return String.format("%s.%s(...)", str(ast.receiver()), ast.methodName);
+			return String.format("%s.%s(...)", str(ast.receiver()),
+					ast.methodName);
 		}
-		
+
 		@Override
 		public String methodCall(MethodCallExpr ast, Void arg) {
-			return String.format("%s.%s(...)", str(ast.receiver()), ast.methodName);
+			return String.format("%s.%s(...)", str(ast.receiver()),
+					ast.methodName);
 		}
-		
+
 		@Override
 		public String methodDecl(MethodDecl ast, Void arg) {
 			return String.format("%s %s(...) {...}", ast.returnType, ast.name);
@@ -164,10 +167,11 @@ public class AstOneLine {
 		public String thisRef(ThisRef ast, Void arg) {
 			return "this";
 		}
-		
+
 		@Override
 		public String returnStmt(ReturnStmt ast, Void arg) {
-			return ast.arg() != null ? String.format("return %s", str(ast.arg())) : "return";
+			return ast.arg() != null ? String.format("return %s",
+					str(ast.arg())) : "return";
 		}
 
 		@Override
@@ -178,11 +182,11 @@ public class AstOneLine {
 		@Override
 		public String var(Var ast, Void arg) {
 			if (ast.sym != null) {
-				String symName = ast.sym.toString(); 
+				String symName = ast.sym.toString();
 				if (ast.name == null || ast.name.equals(symName))
 					return symName;
-				
-				// Return something strange to warn about the mismatch here: 
+
+				// Return something strange to warn about the mismatch here:
 				return String.format("(%s!=%s)", symName, ast.name);
 			} else
 				return ast.name;
@@ -197,6 +201,6 @@ public class AstOneLine {
 		public String whileLoop(WhileLoop ast, Void arg) {
 			return String.format("while (%s) {...}", str(ast.condition()));
 		}
-		
+
 	}
 }

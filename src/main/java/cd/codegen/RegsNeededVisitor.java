@@ -26,20 +26,20 @@ import cd.ir.Ast.UnaryOp;
 import cd.ir.Ast.Var;
 import cd.ir.AstVisitor;
 
-/** 
- * Determines the maximum number of registers 
- * required to execute one subtree. */
+/**
+ * Determines the maximum number of registers required to execute one subtree.
+ */
 public class RegsNeededVisitor extends AstVisitor<Integer, Void> {
-	
+
 	public int calc(Ast ast) {
 		return visit(ast, null);
 	}
-	
-	private Map<Ast,Integer> memo = new HashMap<Ast, Integer>();
-	
-	/** 
-	 * Override visit() so as to memorize the results and avoid
-	 * unnecessary computation
+
+	private Map<Ast, Integer> memo = new HashMap<Ast, Integer>();
+
+	/**
+	 * Override visit() so as to memorize the results and avoid unnecessary
+	 * computation
 	 */
 	@Override
 	public Integer visit(Ast ast, Void arg) {
@@ -47,9 +47,9 @@ public class RegsNeededVisitor extends AstVisitor<Integer, Void> {
 			return memo.get(ast);
 		Integer res = ast.accept(this, null);
 		memo.put(ast, res);
-		return res;		
+		return res;
 	}
-	
+
 	@Override
 	protected Integer dflt(Ast ast, Void arg) {
 		// For a non-expression, it suffices to find the
@@ -70,8 +70,8 @@ public class RegsNeededVisitor extends AstVisitor<Integer, Void> {
 	public Integer binaryOp(BinaryOp ast, Void arg) {
 		int left = calc(ast.left());
 		int right = calc(ast.right());
-		int ifLeftFirst = max(left, right+1);
-		int ifRightFirst = max(left+1, right);
+		int ifLeftFirst = max(left, right + 1);
+		int ifRightFirst = max(left + 1, right);
 		int overall = min(ifLeftFirst, ifRightFirst);
 		return overall;
 	}
@@ -85,7 +85,7 @@ public class RegsNeededVisitor extends AstVisitor<Integer, Void> {
 	public Integer builtInRead(BuiltInRead ast, Void arg) {
 		return 1;
 	}
-	
+
 	@Override
 	public Integer builtInReadFloat(BuiltInReadFloat ast, Void arg) {
 		return 1;
@@ -100,7 +100,7 @@ public class RegsNeededVisitor extends AstVisitor<Integer, Void> {
 	public Integer index(Index ast, Void arg) {
 		return max(calc(ast.left()) + 1, calc(ast.right()));
 	}
-	
+
 	@Override
 	public Integer field(Field ast, Void arg) {
 		return calc(ast.arg());
@@ -110,7 +110,7 @@ public class RegsNeededVisitor extends AstVisitor<Integer, Void> {
 	public Integer intConst(IntConst ast, Void arg) {
 		return 1;
 	}
-	
+
 	@Override
 	public Integer floatConst(FloatConst ast, Void arg) {
 		return 1;
@@ -135,7 +135,7 @@ public class RegsNeededVisitor extends AstVisitor<Integer, Void> {
 	public Integer thisRef(ThisRef ast, Void arg) {
 		return 1;
 	}
-	
+
 	@Override
 	public Integer methodCall(MethodCallExpr ast, Void arg) {
 		return 1;
@@ -149,5 +149,5 @@ public class RegsNeededVisitor extends AstVisitor<Integer, Void> {
 	@Override
 	public Integer var(Var ast, Void arg) {
 		return 1;
-	}		
+	}
 }

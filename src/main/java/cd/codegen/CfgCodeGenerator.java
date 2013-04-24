@@ -32,7 +32,7 @@ public class CfgCodeGenerator {
 		for (ClassDecl cdecl : astRoots)
 			new CfgStmtVisitor().visit(cdecl, null);
 	}
-	
+
 	public class CfgStmtVisitor extends AstVisitor<Void, Void> {
 
 		@Override
@@ -47,25 +47,25 @@ public class CfgCodeGenerator {
 		@Override
 		public Void methodDecl(MethodDecl ast, Void arg) {
 			cg.emitMethodPrefix(ast);
-			
+
 			ControlFlowGraph cfg = ast.cfg;
 			assert cfg != null;
 
-			Map<BasicBlock, String> labels = new HashMap<BasicBlock, String>(); 
+			Map<BasicBlock, String> labels = new HashMap<BasicBlock, String>();
 			for (BasicBlock blk : cfg.allBlocks)
 				labels.put(blk, cg.uniqueLabel());
 			String exitLabel = cg.uniqueLabel();
-			
+
 			cg.emit("jmp", labels.get(cfg.start));
 
 			for (BasicBlock blk : cfg.allBlocks) {
-				
+
 				cg.emitCommentSection("Basic block " + blk.index);
 				cg.emitLabel(labels.get(blk));
-				
+
 				for (Ast instr : blk.instructions)
 					cg.sdg.gen(instr);
-				
+
 				if (blk == cfg.end) {
 					cg.emitComment(String.format("Return"));
 					assert blk.successors.size() == 0;
@@ -74,12 +74,14 @@ public class CfgCodeGenerator {
 					assert blk.successors.size() == 2;
 					cg.emitComment(String.format(
 							"Exit to block %d if true, block %d if false",
-							blk.trueSuccessor().index, blk.falseSuccessor().index));
-					cg.genJumpIfFalse(blk.condition, labels.get(blk.falseSuccessor()));
+							blk.trueSuccessor().index,
+							blk.falseSuccessor().index));
+					cg.genJumpIfFalse(blk.condition,
+							labels.get(blk.falseSuccessor()));
 					cg.emit("jmp", labels.get(blk.trueSuccessor()));
 				} else {
-					cg.emitComment(String.format(
-							"Exit to block %d", blk.successors.get(0).index));
+					cg.emitComment(String.format("Exit to block %d",
+							blk.successors.get(0).index));
 					assert blk.successors.size() == 1;
 					cg.emit("jmp", labels.get(blk.successors.get(0)));
 				}
@@ -87,13 +89,12 @@ public class CfgCodeGenerator {
 
 			cg.emitLabel(exitLabel);
 			if (ast.sym.returnType.equals(main.voidType)) {
-				cg.emitMethodSuffix(true);	
+				cg.emitMethodSuffix(true);
 			} else {
 				cg.emitMethodSuffix(true);
 			}
 			return null;
 		}
-		
+
 	}
 }
-

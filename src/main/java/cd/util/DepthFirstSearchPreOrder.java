@@ -10,14 +10,14 @@ import cd.ir.BasicBlock;
 import cd.ir.ControlFlowGraph;
 
 /**
- * A potentially handy iterator which yields the blocks in a control-flow
- * graph.  The order is pre-order, depth-first.  Pre-order means that a
- * node is visited before its successors. 
+ * A potentially handy iterator which yields the blocks in a control-flow graph.
+ * The order is pre-order, depth-first. Pre-order means that a node is visited
+ * before its successors.
  */
 public class DepthFirstSearchPreOrder implements Iterable<BasicBlock> {
-	
+
 	public final ControlFlowGraph cfg;
-	
+
 	public DepthFirstSearchPreOrder(ControlFlowGraph cfg) {
 		this.cfg = cfg;
 	}
@@ -25,10 +25,10 @@ public class DepthFirstSearchPreOrder implements Iterable<BasicBlock> {
 	@Override
 	public Iterator<BasicBlock> iterator() {
 		return new Iterator<BasicBlock>() {
-			
+
 			/** Blocks we still need to visit */
 			private final Stack<BasicBlock> stack = new Stack<BasicBlock>();
-			
+
 			/** Blocks we pushed thus far */
 			private final Set<BasicBlock> pushed = new HashSet<BasicBlock>();
 
@@ -46,14 +46,14 @@ public class DepthFirstSearchPreOrder implements Iterable<BasicBlock> {
 			public BasicBlock next() {
 				if (stack.isEmpty())
 					throw new NoSuchElementException();
-				
+
 				BasicBlock res = stack.pop();
 				for (BasicBlock s : res.successors)
 					if (!pushed.contains(s)) {
 						pushed.add(s);
 						stack.add(s);
 					}
-				
+
 				return res;
 			}
 
@@ -61,7 +61,7 @@ public class DepthFirstSearchPreOrder implements Iterable<BasicBlock> {
 			public void remove() {
 				throw new UnsupportedOperationException();
 			}
-			
+
 		};
 	}
 
