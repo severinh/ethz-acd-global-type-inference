@@ -16,7 +16,7 @@ public class Pair<T> {
 	public static <T> List<Pair<T>> zip(List<T> listA, List<T> listB) {
 		List<Pair<T>> res = new ArrayList<Pair<T>>();
 		for (int i = 0; i < Math.min(listA.size(), listB.size()); i++) {
-			res.add(new Pair(listA.get(i), listB.get(i)));
+			res.add(new Pair<T>(listA.get(i), listB.get(i)));
 		}
 		return res;
 	}

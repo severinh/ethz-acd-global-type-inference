@@ -366,6 +366,8 @@ public class Optimizer {
 					case LOCAL:
 					case PARAM:
 						return true;
+					default:
+						break;
 					}
 					return false;
 				}
@@ -677,6 +679,8 @@ public class Optimizer {
 						left = right;
 						right = temp;
 					}
+				default:
+					break;
 				}
 				
 				String c = left + ast.operator.repr + right;

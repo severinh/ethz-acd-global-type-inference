@@ -612,7 +612,8 @@ public class AstCodeGenerator {
 						break;
 					case B_MOD:
 						break; // This operation is not supported
-
+					default:
+						break;
 					}
 
 					emitFloatRegToGprReg(leftReg, FLOAT_REG_0);
@@ -640,6 +641,8 @@ public class AstCodeGenerator {
 						break;
 					case B_GREATER_OR_EQUAL:
 						emitCmpFloat("jae", leftReg, rightReg);
+						break;
+					default:
 						break;
 					}
 
