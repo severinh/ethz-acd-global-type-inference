@@ -812,7 +812,7 @@ public class Interpreter {
 		@Override
 		public JlValue not() {
 			return new JlBoolean(!value);
-		};
+		}
 
 		@Override
 		public JlValue or(JlValue obj) {

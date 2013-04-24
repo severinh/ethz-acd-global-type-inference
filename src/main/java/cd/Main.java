@@ -77,29 +77,30 @@ public class Main {
 
 	/** Parse command line, invoke compile() routine */
 	public static void main(String args[]) throws IOException {
-
 		Main m = new Main();
 
 		for (String file : args) {
-
 			if (file.equals("-d"))
 				m.debug = new OutputStreamWriter(System.err);
 			else {
 				if (m.debug != null)
 					m.cfgdumpbase = new File(file);
-				FileReader fin = new FileReader(file);
+
+				List<ClassDecl> astRoots;
 
 				// Parse:
-				List<ClassDecl> astRoots = m.parse(file, fin, false);
+				try (FileReader fin = new FileReader(file)) {
+					astRoots = m.parse(file, fin, false);
+				}
 
 				// Run the semantic check:
 				m.semanticCheck(astRoots);
 
 				// Generate code:
 				String sFile = file + Config.ASMEXT;
-				FileWriter fout = new FileWriter(sFile);
-				m.generateCode(astRoots, fout);
-				fout.close();
+				try (FileWriter fout = new FileWriter(sFile);) {
+					m.generateCode(astRoots, fout);
+				}
 			}
 		}
 	}

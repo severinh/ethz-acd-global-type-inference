@@ -14,6 +14,7 @@ import java.util.List;
 public class FileUtil {
 
 	public static String readAll(Reader ubReader) throws IOException {
+		@SuppressWarnings("resource")
 		BufferedReader bReader = new BufferedReader(ubReader);
 		StringBuilder sb = new StringBuilder();
 
@@ -28,13 +29,15 @@ public class FileUtil {
 	}
 
 	public static String read(File file) throws IOException {
-		return readAll(new FileReader(file));
+		try (FileReader reader = new FileReader(file)) {
+			return readAll(reader);
+		}
 	}
 
 	public static void write(File file, String text) throws IOException {
-		FileWriter writer = new FileWriter(file);
-		writer.write(text);
-		writer.close();
+		try (FileWriter writer = new FileWriter(file)) {
+			writer.write(text);
+		}
 	}
 
 	public static String runCommand(File dir, String[] command,
@@ -55,9 +58,10 @@ public class FileUtil {
 		pb.redirectErrorStream(true);
 		Process p = pb.start();
 		if (input != null && !input.equals("")) {
-			OutputStreamWriter osw = new OutputStreamWriter(p.getOutputStream());
-			osw.write(input);
-			osw.close();
+			try (OutputStreamWriter osw = new OutputStreamWriter(
+					p.getOutputStream())) {
+				osw.write(input);
+			}
 		}
 		String result = readAll(new InputStreamReader(p.getInputStream()));
 

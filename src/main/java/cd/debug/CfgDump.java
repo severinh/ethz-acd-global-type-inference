@@ -19,12 +19,9 @@ public class CfgDump {
 			boolean dumpDominators) {
 		if (filename == null)
 			return;
-		FileWriter fw;
-		try {
-			fw = new FileWriter(new File(filename.getAbsolutePath() + phase
-					+ ".dot"));
+		try (FileWriter fw = new FileWriter(new File(filename.getAbsolutePath()
+				+ phase + ".dot"))) {
 			fw.write(toString(mdecl, dumpDominators));
-			fw.close();
 		} catch (IOException e) {
 		}
 	}
@@ -33,12 +30,9 @@ public class CfgDump {
 			String phase, File filename, boolean dumpDominators) {
 		if (filename == null)
 			return;
-		FileWriter fw;
-		try {
-			fw = new FileWriter(new File(filename.getAbsolutePath() + phase
-					+ ".dot"));
+		try (FileWriter fw = new FileWriter(new File(filename.getAbsolutePath()
+				+ phase + ".dot"))) {
 			fw.write(toString(astRoots, dumpDominators));
-			fw.close();
 		} catch (IOException e) {
 		}
 	}

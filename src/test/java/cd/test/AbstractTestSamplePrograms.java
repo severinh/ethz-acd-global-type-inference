@@ -77,8 +77,7 @@ abstract public class AbstractTestSamplePrograms {
 	}
 
 	private void warnAboutDiff(String phase, String exp, String act) {
-		try {
-			PrintStream err = new PrintStream(errfile);
+		try (PrintStream err = new PrintStream(errfile)) {
 			err.println("Debug information for file: " + this.file);
 			err.println(this.main.debug.toString());
 			err.println(String.format(
@@ -88,7 +87,6 @@ abstract public class AbstractTestSamplePrograms {
 			err.println(act);
 			err.println("The difference is:");
 			err.println(Diff.computeDiff(exp, act));
-			err.close();
 		} catch (FileNotFoundException exc) {
 			System.err.println("Unable to write debug output to " + errfile
 					+ ":");
@@ -146,13 +144,14 @@ abstract public class AbstractTestSamplePrograms {
 			} catch (org.junit.ComparisonFailure cf) {
 				throw cf;
 			} catch (Throwable e) {
-				PrintStream err = new PrintStream(errfile);
-				err.println("Debug information for file: " + this.file);
-				err.println(this.main.debug.toString());
-				err.println("Test failed because an exception was thrown:");
-				err.println("    " + e.getLocalizedMessage());
-				err.println("Stack trace:");
-				e.printStackTrace(err);
+				try (PrintStream err = new PrintStream(errfile)) {
+					err.println("Debug information for file: " + this.file);
+					err.println(this.main.debug.toString());
+					err.println("Test failed because an exception was thrown:");
+					err.println("    " + e.getLocalizedMessage());
+					err.println("Stack trace:");
+					e.printStackTrace(err);
+				}
 				throw e;
 			}
 
@@ -252,9 +251,9 @@ abstract public class AbstractTestSamplePrograms {
 		String execRef = findExecRef(inFile);
 
 		// Run the code generator:
-		FileWriter fw = new FileWriter(this.sfile);
-		main.generateCode(astRoots, fw);
-		fw.close();
+		try (FileWriter fw = new FileWriter(this.sfile)) {
+			main.generateCode(astRoots, fw);
+		}
 
 		// At this point, we have generated a .s file and we have to compile
 		// it to a binary file. We need to call out to GCC or something

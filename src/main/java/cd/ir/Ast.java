@@ -195,7 +195,7 @@ public abstract class Ast {
 				this.repr = repr;
 			}
 
-		};
+		}
 
 		public final BOp operator;
 
@@ -421,7 +421,7 @@ public abstract class Ast {
 				this.repr = repr;
 			}
 
-		};
+		}
 
 		public final UOp operator;
 

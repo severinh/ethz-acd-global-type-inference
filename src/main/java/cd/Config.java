@@ -6,7 +6,7 @@ public class Config {
 
 	public static enum SystemKind {
 		LINUX, WINDOWS, MACOSX
-	};
+	}
 
 	/**
 	 * What kind of system we are on
