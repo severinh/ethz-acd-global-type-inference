@@ -53,7 +53,7 @@ public class AstDump {
 
 		@Override
 		protected List<Pair<?>> dflt(Ast ast, Void arg) {
-			ArrayList<Pair<?>> res = new ArrayList<Pair<?>>();
+			ArrayList<Pair<?>> res = new ArrayList<>();
 
 			// Get the list of fields and sort them by name:
 			java.lang.Class<? extends Ast> rclass = ast.getClass();
@@ -86,7 +86,7 @@ public class AstDump {
 				try {
 					Object value = rfld.get(ast);
 					if (value != null)
-						res.add(new Pair<Object>(rfld.getName(), value));
+						res.add(new Pair<>(rfld.getName(), value));
 				} catch (IllegalArgumentException e) {
 					throw new RuntimeException(e);
 				} catch (IllegalAccessException e) {

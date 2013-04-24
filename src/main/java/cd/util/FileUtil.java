@@ -91,7 +91,7 @@ public class FileUtil {
 
 	/** Finds all .javali under directory {@code testDir} and returns them. */
 	public static List<File> findFiles(File testDir) {
-		List<File> result = new ArrayList<File>();
+		List<File> result = new ArrayList<>();
 		for (File testFile : testDir.listFiles()) {
 			if (testFile.getName().endsWith(".javali"))
 				result.add(testFile);

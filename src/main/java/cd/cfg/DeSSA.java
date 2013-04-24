@@ -63,7 +63,7 @@ public class DeSSA {
 				VariableSymbol tempSym;
 
 				/** Outgoing edges */
-				final List<DepNode> copiedToNodes = new ArrayList<DepNode>();
+				final List<DepNode> copiedToNodes = new ArrayList<>();
 
 				/** Flags used while walking graph */
 				boolean onStack, walkedChildren;
@@ -106,7 +106,7 @@ public class DeSSA {
 
 			for (int i = 0; i < blk.predecessors.size(); i++) {
 				// Construct nodes in the dependency graph:
-				final Map<VariableSymbol, DepNode> depNodes = new HashMap<VariableSymbol, DepNode>();
+				final Map<VariableSymbol, DepNode> depNodes = new HashMap<>();
 				for (Phi phi : blk.phis.values())
 					depNodes.put(phi.lhs, new DepNode(phi.lhs));
 
@@ -120,7 +120,7 @@ public class DeSSA {
 				// symbols,
 				// and therefore we add the assignment at the end so as to
 				// preserve X's value.
-				final List<Assign> assigns = new ArrayList<Assign>();
+				final List<Assign> assigns = new ArrayList<>();
 				for (Phi phi : blk.phis.values()) {
 					assert blk.predecessors.size() == phi.rhs.size();
 					DepNode lhsNode = depNodes.get(phi.lhs);

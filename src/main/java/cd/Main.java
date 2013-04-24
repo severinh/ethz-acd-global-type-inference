@@ -125,7 +125,7 @@ public class Main {
 	 */
 	public List<ClassDecl> parse(String fileName, Reader file,
 			boolean debugParser) throws IOException {
-		List<ClassDecl> result = new ArrayList<ClassDecl>();
+		List<ClassDecl> result = new ArrayList<>();
 
 		result = parseWithAntlr(fileName, file);
 		return result;
@@ -172,7 +172,7 @@ public class Main {
 			for (MethodDecl md : cd.methods())
 				new CFGBuilder(this).build(md);
 		CfgDump.toString(astRoots, ".cfg", cfgdumpbase, false);
-		
+
 		// Compute dominators
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods()) {
@@ -183,19 +183,19 @@ public class Main {
 				}
 			}
 		CfgDump.toString(astRoots, ".dom", cfgdumpbase, true);
-		
+
 		// Introduce SSA form.
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())
 				new SSA(this).compute(md);
 		CfgDump.toString(astRoots, ".ssa", cfgdumpbase, false);
-		
+
 		// Optimize using SSA form.
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())
 				new Optimizer(this).compute(md);
 		CfgDump.toString(astRoots, ".opt", cfgdumpbase, false);
-		
+
 		// Remove SSA form.
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())

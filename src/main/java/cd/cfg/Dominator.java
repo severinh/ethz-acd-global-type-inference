@@ -25,7 +25,7 @@ public class Dominator {
 
 	public void compute(ControlFlowGraph cfg) {
 		// Compute the post order information for the control flow graph
-		blocksInRevPostOrder = new ArrayList<BasicBlock>();
+		blocksInRevPostOrder = new ArrayList<>();
 		postOrderIndex = new int[cfg.allBlocks.size()];
 		depthFirstSearch(cfg.start, new BitSet());
 		Collections.reverse(blocksInRevPostOrder);

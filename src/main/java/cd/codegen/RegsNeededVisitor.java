@@ -35,7 +35,7 @@ public class RegsNeededVisitor extends AstVisitor<Integer, Void> {
 		return visit(ast, null);
 	}
 
-	private final Map<Ast, Integer> memo = new HashMap<Ast, Integer>();
+	private final Map<Ast, Integer> memo = new HashMap<>();
 
 	/**
 	 * Override visit() so as to memorize the results and avoid unnecessary

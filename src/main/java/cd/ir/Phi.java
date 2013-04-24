@@ -12,7 +12,7 @@ public class Phi {
 	public VariableSymbol lhs;
 
 	// Always an Ast.Var or an Ast.Const!
-	public final List<Expr> rhs = new ArrayList<Expr>();
+	public final List<Expr> rhs = new ArrayList<>();
 
 	public Phi(VariableSymbol v0sym, int predCount) {
 		this.v0sym = v0sym;

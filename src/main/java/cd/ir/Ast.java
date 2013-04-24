@@ -26,7 +26,7 @@ public abstract class Ast {
 
 	protected Ast(int fixedCount) {
 		if (fixedCount == -1)
-			this.rwChildren = new ArrayList<Ast>();
+			this.rwChildren = new ArrayList<>();
 		else
 			this.rwChildren = Arrays.asList(new Ast[fixedCount]);
 	}
@@ -36,7 +36,7 @@ public abstract class Ast {
 	 * never contain null pointers.
 	 */
 	public List<Ast> children() {
-		ArrayList<Ast> result = new ArrayList<Ast>();
+		ArrayList<Ast> result = new ArrayList<>();
 		for (Ast n : rwChildren) {
 			if (n != null)
 				result.add(n);
@@ -49,7 +49,7 @@ public abstract class Ast {
 	 * given type.
 	 */
 	public <A> List<A> childrenOfType(Class<A> C) {
-		List<A> res = new ArrayList<A>();
+		List<A> res = new ArrayList<>();
 		for (Ast c : children()) {
 			if (C.isInstance(c))
 				res.add(C.cast(c));
@@ -550,7 +550,7 @@ public abstract class Ast {
 		 * i.e, for a method call {@code a.b(c,d)} returns {@code [a, c, d]}
 		 */
 		public List<Expr> allArguments() {
-			ArrayList<Expr> result = new ArrayList<Expr>();
+			ArrayList<Expr> result = new ArrayList<>();
 			for (Ast chi : this.rwChildren)
 				result.add((Expr) chi);
 			return Collections.unmodifiableList(result);
@@ -561,7 +561,7 @@ public abstract class Ast {
 		 * method call {@code a.b(c,d)} returns {@code [c, d]}
 		 */
 		public List<Expr> argumentsWithoutReceiver() {
-			ArrayList<Expr> result = new ArrayList<Expr>();
+			ArrayList<Expr> result = new ArrayList<>();
 			for (int i = 1; i < this.rwChildren.size(); i++)
 				result.add((Expr) this.rwChildren.get(i));
 			return Collections.unmodifiableList(result);
@@ -574,7 +574,7 @@ public abstract class Ast {
 
 		public List<Expr> deepCopyArguments() {
 
-			ArrayList<Expr> result = new ArrayList<Expr>();
+			ArrayList<Expr> result = new ArrayList<>();
 
 			for (final Expr expr : argumentsWithoutReceiver()) {
 				result.add((Expr) expr.deepCopy());
@@ -855,7 +855,7 @@ public abstract class Ast {
 		 * i.e, for a method call {@code a.b(c,d)} returns {@code [a, c, d]}
 		 */
 		public List<Expr> allArguments() {
-			ArrayList<Expr> result = new ArrayList<Expr>();
+			ArrayList<Expr> result = new ArrayList<>();
 			for (Ast chi : this.rwChildren)
 				result.add((Expr) chi);
 			return Collections.unmodifiableList(result);
@@ -866,7 +866,7 @@ public abstract class Ast {
 		 * method call {@code a.b(c,d)} returns {@code [c, d]}
 		 */
 		public List<Expr> argumentsWithoutReceiver() {
-			ArrayList<Expr> result = new ArrayList<Expr>();
+			ArrayList<Expr> result = new ArrayList<>();
 			for (int i = 1; i < this.rwChildren.size(); i++)
 				result.add((Expr) this.rwChildren.get(i));
 			return Collections.unmodifiableList(result);
@@ -878,8 +878,7 @@ public abstract class Ast {
 		}
 
 		public List<Expr> deepCopyArguments() {
-
-			ArrayList<Expr> result = new ArrayList<Expr>();
+			ArrayList<Expr> result = new ArrayList<>();
 
 			for (final Expr expr : argumentsWithoutReceiver()) {
 				result.add((Expr) expr.deepCopy());
@@ -998,7 +997,7 @@ public abstract class Ast {
 
 		@Override
 		public Ast deepCopy() {
-			List<Ast> result = new ArrayList<Ast>();
+			List<Ast> result = new ArrayList<>();
 
 			for (final Ast ast : this.rwChildren) {
 				result.add(ast.deepCopy());
@@ -1101,7 +1100,7 @@ public abstract class Ast {
 
 		@Override
 		public Ast deepCopy() {
-			List<Ast> result = new ArrayList<Ast>();
+			List<Ast> result = new ArrayList<>();
 
 			for (final Ast ast : members()) {
 				result.add(ast.deepCopy());

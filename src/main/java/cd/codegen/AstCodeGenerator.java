@@ -310,7 +310,7 @@ public class AstCodeGenerator {
 	}
 
 	// Simplistic Register management:
-	List<String> registers = new ArrayList<String>();
+	List<String> registers = new ArrayList<>();
 
 	final String calleeSave[] = new String[] { "%esi", "%edi", "%ebx" };
 
@@ -479,7 +479,7 @@ public class AstCodeGenerator {
 				pop(leftReg);
 			}
 
-			return new Pair<String>(leftReg, rightReg);
+			return new Pair<>(leftReg, rightReg);
 
 		}
 

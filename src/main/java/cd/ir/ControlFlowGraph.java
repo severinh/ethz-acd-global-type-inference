@@ -10,7 +10,7 @@ public class ControlFlowGraph {
 
 	public final BasicBlock start;
 	public final BasicBlock end;
-	public final List<BasicBlock> allBlocks = new ArrayList<BasicBlock>();
+	public final List<BasicBlock> allBlocks = new ArrayList<>();
 
 	public ControlFlowGraph() {
 		this.start = newBlock();

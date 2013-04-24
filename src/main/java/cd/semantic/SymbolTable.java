@@ -17,7 +17,7 @@ import cd.ir.Symbol;
  */
 public class SymbolTable<S extends Symbol> {
 
-	private final Map<String, S> map = new HashMap<String, S>();
+	private final Map<String, S> map = new HashMap<>();
 	private final SymbolTable<S> parent;
 
 	public SymbolTable(SymbolTable<S> parent) {
@@ -32,7 +32,7 @@ public class SymbolTable<S extends Symbol> {
 	}
 
 	public List<S> allSymbols() {
-		List<S> result = new ArrayList<S>();
+		List<S> result = new ArrayList<>();
 		SymbolTable<S> st = this;
 		while (st != null) {
 			for (S sym : st.map.values())

@@ -81,7 +81,7 @@ public class Interpreter {
 	// We count the number of binary and unary operations that
 	// occurred during execution and compare this to a fully-optimized version.
 	// The key to this hashtable is either a BinaryOp.BOp or UnaryOp.UOp.
-	private final Map<Object, Integer> opCounts = new HashMap<Object, Integer>();
+	private final Map<Object, Integer> opCounts = new HashMap<>();
 
 	private void increment(Object operator) {
 		Integer current = opCounts.get(operator);
@@ -92,7 +92,7 @@ public class Interpreter {
 	}
 
 	public String operationSummary() {
-		List<String> operationSummaries = new ArrayList<String>();
+		List<String> operationSummaries = new ArrayList<>();
 
 		for (Object operation : opCounts.keySet()) {
 			operationSummaries.add(String.format("%s: %s\n", operation,
@@ -277,7 +277,7 @@ public class Interpreter {
 
 	class JlObject extends JlReference {
 
-		protected Map<VariableSymbol, JlValue> fields = new HashMap<VariableSymbol, JlValue>();
+		protected Map<VariableSymbol, JlValue> fields = new HashMap<>();
 
 		public JlObject(String s) {
 			super(s);
@@ -322,7 +322,7 @@ public class Interpreter {
 				return true;
 
 			// Make up a set of acceptable types. Check for circular loops!
-			Set<String> superTypes = new HashSet<String>();
+			Set<String> superTypes = new HashSet<>();
 			String currentType = this.typeName;
 
 			while (!currentType.equals("Object")) {
@@ -856,7 +856,7 @@ public class Interpreter {
 
 		public StackFrame(JlObject thisPointer) {
 			this.thisPointer = thisPointer;
-			this.variables = new HashMap<VariableSymbol, JlValue>();
+			this.variables = new HashMap<>();
 		}
 
 		public JlValue var(VariableSymbol name) {
@@ -1042,7 +1042,7 @@ public class Interpreter {
 
 			JlObject rcvr = expr(ast.receiver(), frame).asObject();
 
-			List<JlValue> arguments = new ArrayList<JlValue>();
+			List<JlValue> arguments = new ArrayList<>();
 			for (Ast arg : ast.argumentsWithoutReceiver()) {
 				arguments.add(expr(arg, frame));
 			}
@@ -1214,7 +1214,7 @@ public class Interpreter {
 
 			JlObject rcvr = expr(ast.receiver(), frame).asObject();
 
-			List<JlValue> arguments = new ArrayList<JlValue>();
+			List<JlValue> arguments = new ArrayList<>();
 			for (Ast arg : ast.argumentsWithoutReceiver()) {
 				arguments.add(expr(arg, frame));
 			}
@@ -1261,7 +1261,7 @@ public class Interpreter {
 
 			ClassDecl cd = findClassDecl(typeName);
 
-			final List<MethodDecl> result = new ArrayList<MethodDecl>();
+			final List<MethodDecl> result = new ArrayList<>();
 
 			for (Ast mem : cd.members()) {
 

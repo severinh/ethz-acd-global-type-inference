@@ -51,7 +51,7 @@ public class CfgCodeGenerator {
 			ControlFlowGraph cfg = ast.cfg;
 			assert cfg != null;
 
-			Map<BasicBlock, String> labels = new HashMap<BasicBlock, String>();
+			Map<BasicBlock, String> labels = new HashMap<>();
 			for (BasicBlock blk : cfg.allBlocks)
 				labels.put(blk, cg.uniqueLabel());
 			String exitLabel = cg.uniqueLabel();

@@ -36,7 +36,7 @@ public class BasicBlock {
 	 * List of predecessor blocks in the flow graph (i.e., blocks for which
 	 * {@code this} is a successor).
 	 */
-	public final List<BasicBlock> predecessors = new ArrayList<BasicBlock>();
+	public final List<BasicBlock> predecessors = new ArrayList<>();
 
 	/**
 	 * List of successor blocks in the flow graph (those that come after the
@@ -50,12 +50,12 @@ public class BasicBlock {
 	 * @see #trueSuccessor()
 	 * @see #falseSuccessor()
 	 */
-	public final List<BasicBlock> successors = new ArrayList<BasicBlock>();
+	public final List<BasicBlock> successors = new ArrayList<>();
 
 	/**
 	 * List of instructions in this basic block.
 	 */
-	public final List<Ast> instructions = new ArrayList<Ast>();
+	public final List<Ast> instructions = new ArrayList<>();
 
 	/**
 	 * If non-null, indicates that this basic block should have two successors.
@@ -75,14 +75,14 @@ public class BasicBlock {
 	 * Children of this basic block in the dominator tree (initially empty until
 	 * computed).
 	 */
-	public final List<BasicBlock> dominatorTreeChildren = new ArrayList<BasicBlock>();
+	public final List<BasicBlock> dominatorTreeChildren = new ArrayList<>();
 
 	/**
 	 * Contains the dominance frontier of this block. A block b is in the
 	 * dominance frontier of another block c if c does not dominate b, but c
 	 * DOES dominate a predecessor of b.
 	 */
-	public final Set<BasicBlock> dominanceFrontier = new HashSet<BasicBlock>();
+	public final Set<BasicBlock> dominanceFrontier = new HashSet<>();
 
 	/**
 	 * Contains any phi nodes attached to this basic block. Phi nodes are keyed
@@ -93,7 +93,7 @@ public class BasicBlock {
 	 * {@code x3 = phi(x2, x3)}, then {@code x0} would be the key under which
 	 * {@code P} would be stored.
 	 */
-	public final Map<VariableSymbol, Phi> phis = new HashMap<VariableSymbol, Phi>();
+	public final Map<VariableSymbol, Phi> phis = new HashMap<>();
 
 	public BasicBlock(int index) {
 		this.index = index;

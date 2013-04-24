@@ -45,7 +45,7 @@ public class SSA {
 			main.debug("  Adding Phis for %s of %s", bb, mdecl.name);
 
 			// Compute iterated dominance frontier for this block 'bb'.
-			Set<BasicBlock> idf = new HashSet<BasicBlock>();
+			Set<BasicBlock> idf = new HashSet<>();
 			computeIteratedDominanceFrontier(bb, idf);
 			main.debug("    df=%s", bb.dominanceFrontier);
 			main.debug("    idf=%s", idf);
@@ -56,8 +56,8 @@ public class SSA {
 		}
 		// Phase 2: Renumber
 		msym = mdecl.sym;
-		maxVersions = new HashMap<VariableSymbol, Integer>();
-		Map<VariableSymbol, VariableSymbol> currentVersions = new HashMap<VariableSymbol, VariableSymbol>();
+		maxVersions = new HashMap<>();
+		Map<VariableSymbol, VariableSymbol> currentVersions = new HashMap<>();
 		for (VariableSymbol sym : mdecl.sym.parameters)
 			currentVersions.put(sym, sym);
 		for (VariableSymbol sym : mdecl.sym.locals.values())
@@ -103,7 +103,7 @@ public class SSA {
 
 	private void renumberBlock(BasicBlock block,
 			Map<VariableSymbol, VariableSymbol> inCurrentVersions) {
-		Map<VariableSymbol, VariableSymbol> currentVersions = new HashMap<VariableSymbol, VariableSymbol>(
+		Map<VariableSymbol, VariableSymbol> currentVersions = new HashMap<>(
 				inCurrentVersions);
 
 		for (Phi phi : block.phis.values()) {
@@ -192,14 +192,14 @@ public class SSA {
 	private void findUninitialized(ControlFlowGraph cfg) {
 		// Construct a map from each var defined in a phi
 		// to the set of symbols whose value it may take on.
-		final Map<VariableSymbol, Phi> phiDefs = new HashMap<VariableSymbol, Phi>();
+		final Map<VariableSymbol, Phi> phiDefs = new HashMap<>();
 		for (BasicBlock blk : new DepthFirstSearchPreOrder(cfg))
 			for (Phi phi : blk.phis.values())
 				phiDefs.put(phi.lhs, phi);
 
 		// Walk the basic blocks and try to find uses of
 		// uninitialized variables.
-		final Map<VariableSymbol, Set<VariableSymbol>> expansions = new HashMap<VariableSymbol, Set<VariableSymbol>>();
+		final Map<VariableSymbol, Set<VariableSymbol>> expansions = new HashMap<>();
 		AstVisitor<Void, Void> uninitVisitor = new AstVisitor<Void, Void>() {
 
 			/** Helper for {@code expand()}. */
@@ -223,7 +223,7 @@ public class SSA {
 			private Set<VariableSymbol> expand(VariableSymbol sym) {
 				Set<VariableSymbol> result = expansions.get(sym);
 				if (result == null) {
-					result = new HashSet<VariableSymbol>();
+					result = new HashSet<>();
 					expandInto(sym, result);
 					expansions.put(sym, result);
 				}

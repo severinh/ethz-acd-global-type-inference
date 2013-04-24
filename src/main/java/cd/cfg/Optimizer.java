@@ -272,7 +272,7 @@ public class Optimizer {
 
 	private class CopyPropagation {
 
-		private Map<VariableSymbol, Expr> copiedSymbols = new HashMap<VariableSymbol, Expr>();
+		private Map<VariableSymbol, Expr> copiedSymbols = new HashMap<>();
 
 		public void compute(MethodDecl md) {
 			process(md.cfg.start);
@@ -284,7 +284,7 @@ public class Optimizer {
 			// Detect if a phi has arguments which are all the same value.
 			for (Phi phi : blk.phis.values()) {
 				// bit of a hack, but safe for constants/variables:
-				Set<String> strings = new HashSet<String>();
+				Set<String> strings = new HashSet<>();
 				for (Expr rhs : phi.rhs)
 					strings.add(AstOneLine.toString(rhs));
 				if (strings.size() == 1) {
@@ -468,7 +468,7 @@ public class Optimizer {
 
 			Canonical(String key, Canonical sub1, Canonical sub2) {
 				this.key = key;
-				this.appearances = new ArrayList<Expr>();
+				this.appearances = new ArrayList<>();
 				this.sub1 = sub1;
 				this.sub2 = sub2;
 				this.deadAppearances = 0;
@@ -484,9 +484,9 @@ public class Optimizer {
 		private class BlockData {
 
 			private final BasicBlock block;
-			private final Map<String, Canonical> canonicalsInScope = new HashMap<String, Canonical>();
-			private final List<Canonical> canonicalsAppearingInThisBlock = new ArrayList<Canonical>();
-			private final List<BlockData> childrenData = new ArrayList<BlockData>();
+			private final Map<String, Canonical> canonicalsInScope = new HashMap<>();
+			private final List<Canonical> canonicalsAppearingInThisBlock = new ArrayList<>();
+			private final List<BlockData> childrenData = new ArrayList<>();
 
 			public BlockData(BasicBlock block) {
 				this.block = block;

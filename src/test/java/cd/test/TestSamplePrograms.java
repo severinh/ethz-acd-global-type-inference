@@ -37,7 +37,7 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 
 	@Parameters
 	public static Collection<Object[]> testFiles() {
-		List<Object[]> result = new ArrayList<Object[]>();
+		List<Object[]> result = new ArrayList<>();
 		if (JUST_FILE != null)
 			result.add(new Object[] { JUST_FILE });
 		else if (TEST_DIR != null) {

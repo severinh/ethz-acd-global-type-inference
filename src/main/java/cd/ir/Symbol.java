@@ -57,8 +57,8 @@ public abstract class Symbol {
 		public ClassSymbol superClass;
 		public final VariableSymbol thisSymbol = new VariableSymbol("this",
 				this);
-		public final Map<String, VariableSymbol> fields = new HashMap<String, VariableSymbol>();
-		public final Map<String, MethodSymbol> methods = new HashMap<String, MethodSymbol>();
+		public final Map<String, VariableSymbol> fields = new HashMap<>();
+		public final Map<String, MethodSymbol> methods = new HashMap<>();
 
 		public int totalMethods = -1;
 		public int totalFields = -1;
@@ -100,8 +100,8 @@ public abstract class Symbol {
 	public static class MethodSymbol extends Symbol {
 
 		public final Ast.MethodDecl ast;
-		public final Map<String, VariableSymbol> locals = new HashMap<String, VariableSymbol>();
-		public final List<VariableSymbol> parameters = new ArrayList<VariableSymbol>();
+		public final Map<String, VariableSymbol> locals = new HashMap<>();
+		public final List<VariableSymbol> parameters = new ArrayList<>();
 
 		public TypeSymbol returnType;
 

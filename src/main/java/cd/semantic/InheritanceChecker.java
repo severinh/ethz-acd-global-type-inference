@@ -22,7 +22,7 @@ public class InheritanceChecker extends AstVisitor<Void, Void> {
 		classSym = ast.sym;
 
 		// check for cycles in the inheritance hierarchy:
-		Set<ClassSymbol> supers = new HashSet<ClassSymbol>();
+		Set<ClassSymbol> supers = new HashSet<>();
 		ClassSymbol sc = classSym.superClass;
 		supers.add(classSym);
 		while (sc != null) {

@@ -27,10 +27,10 @@ public class DepthFirstSearchPreOrder implements Iterable<BasicBlock> {
 		return new Iterator<BasicBlock>() {
 
 			/** Blocks we still need to visit */
-			private final Stack<BasicBlock> stack = new Stack<BasicBlock>();
+			private final Stack<BasicBlock> stack = new Stack<>();
 
 			/** Blocks we pushed thus far */
-			private final Set<BasicBlock> pushed = new HashSet<BasicBlock>();
+			private final Set<BasicBlock> pushed = new HashSet<>();
 
 			{
 				stack.add(cfg.start);

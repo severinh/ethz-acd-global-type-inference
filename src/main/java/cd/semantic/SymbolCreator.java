@@ -88,7 +88,7 @@ public class SymbolCreator extends Object {
 			}
 
 			// create symbols for each parameter
-			Set<String> pnames = new HashSet<String>();
+			Set<String> pnames = new HashSet<>();
 			for (int i = 0; i < ast.argumentNames.size(); i++) {
 				String argumentName = ast.argumentNames.get(i);
 				String argumentType = ast.argumentTypes.get(i);

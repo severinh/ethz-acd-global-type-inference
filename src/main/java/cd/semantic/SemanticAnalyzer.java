@@ -41,7 +41,7 @@ public class SemanticAnalyzer {
 	private SymbolTable<TypeSymbol> createSymbols(List<ClassDecl> classDecls) {
 
 		// Start by creating a symbol for all built-in types.
-		SymbolTable<TypeSymbol> typeSymbols = new SymbolTable<TypeSymbol>(null);
+		SymbolTable<TypeSymbol> typeSymbols = new SymbolTable<>(null);
 
 		typeSymbols.add(main.intType);
 		typeSymbols.add(main.booleanType);
@@ -116,8 +116,7 @@ public class SemanticAnalyzer {
 
 		for (ClassDecl classd : classDecls) {
 
-			SymbolTable<VariableSymbol> fldTable = new SymbolTable<VariableSymbol>(
-					null);
+			SymbolTable<VariableSymbol> fldTable = new SymbolTable<>(null);
 
 			// add all fields of this class, or any of its super classes
 			for (ClassSymbol p = classd.sym; p != null; p = p.superClass)
@@ -139,7 +138,7 @@ public class SemanticAnalyzer {
 
 				}
 
-				SymbolTable<VariableSymbol> mthdTable = new SymbolTable<VariableSymbol>(
+				SymbolTable<VariableSymbol> mthdTable = new SymbolTable<>(
 						fldTable);
 
 				mthdTable.add(classd.sym.thisSymbol);

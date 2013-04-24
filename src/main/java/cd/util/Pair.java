@@ -15,22 +15,22 @@ public class Pair<T> {
 	}
 
 	public static <T> List<Pair<T>> zip(List<T> listA, List<T> listB) {
-		List<Pair<T>> res = new ArrayList<Pair<T>>();
+		List<Pair<T>> res = new ArrayList<>();
 		for (int i = 0; i < Math.min(listA.size(), listB.size()); i++) {
-			res.add(new Pair<T>(listA.get(i), listB.get(i)));
+			res.add(new Pair<>(listA.get(i), listB.get(i)));
 		}
 		return res;
 	}
 
 	public static <T> List<T> unzipA(List<Pair<T>> list) {
-		List<T> res = new ArrayList<T>();
+		List<T> res = new ArrayList<>();
 		for (Pair<T> p : list)
 			res.add(p.a);
 		return res;
 	}
 
 	public static <T> List<T> unzipB(List<Pair<T>> list) {
-		List<T> res = new ArrayList<T>();
+		List<T> res = new ArrayList<>();
 		for (Pair<T> p : list)
 			res.add(p.b);
 		return res;
