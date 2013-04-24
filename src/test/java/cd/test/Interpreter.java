@@ -190,6 +190,7 @@ public class Interpreter {
 			super(s); 
 		}		
 		
+		@Override
 		public JlReference asRef() { 
 			return this; 
 		}
@@ -200,6 +201,7 @@ public class Interpreter {
 		public abstract void setDeref(int index, JlValue val);
 		public abstract boolean canBeCastTo(String typeName);
 		
+		@Override
 		public String toString() {
 			return String.format("%s(%x)", typeName, System.identityHashCode(this));
 		}
@@ -211,6 +213,7 @@ public class Interpreter {
 		protected Map<VariableSymbol, JlValue> fields = new HashMap<VariableSymbol, JlValue>();
 		
 		public JlObject(String s) { super(s); }
+		@Override
 		public JlObject asObject() { return this; }
 		
 		@Override 
@@ -331,6 +334,7 @@ public class Interpreter {
 	class JlNull extends JlReference {
 		
 		public JlNull() { super("null"); }
+		@Override
 		public JlReference asRef() { return this; }
 		
 		@Override 
@@ -475,6 +479,7 @@ public class Interpreter {
 			
 		}
 		
+		@Override
 		public JlValue less(JlValue obj) { 
 			
 			if (obj instanceof JlFloat) {
@@ -485,6 +490,7 @@ public class Interpreter {
 			
 		}
 		
+		@Override
 		public JlValue lessOrEqual(JlValue obj) { 
 		
 			if (obj instanceof JlFloat) {
@@ -495,6 +501,7 @@ public class Interpreter {
 		
 		}
 		
+		@Override
 		public JlValue greater(JlValue obj) { 
 		
 			if (obj instanceof JlFloat) {
@@ -505,6 +512,7 @@ public class Interpreter {
 		
 		}
 		
+		@Override
 		public JlValue greaterOrEqual(JlValue obj) {
 		
 			if (obj instanceof JlFloat) {
@@ -604,6 +612,7 @@ public class Interpreter {
 			
 		}
 		
+		@Override
 		public JlValue less(JlValue obj) { 
 			
 			if (obj instanceof JlInt) {
@@ -614,6 +623,7 @@ public class Interpreter {
 			
 		}
 		
+		@Override
 		public JlValue lessOrEqual(JlValue obj) { 
 		
 			if (obj instanceof JlInt) {
@@ -624,6 +634,7 @@ public class Interpreter {
 		
 		}
 		
+		@Override
 		public JlValue greater(JlValue obj) { 
 		
 			if (obj instanceof JlInt) {
@@ -634,6 +645,7 @@ public class Interpreter {
 		
 		}
 		
+		@Override
 		public JlValue greaterOrEqual(JlValue obj) {
 		
 			if (obj instanceof JlInt) {
@@ -738,6 +750,7 @@ public class Interpreter {
 			variables.put(name, val);
 		}
 		
+		@Override
 		public String toString() {
 			return String.format("StackFrame(%s) {%s}", System.identityHashCode(this), variables.toString());
 		}

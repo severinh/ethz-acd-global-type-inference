@@ -63,6 +63,7 @@ public abstract class Ast {
 	public abstract Ast deepCopy();
 	
 	/** Convenient debugging printout */
+	@Override
 	public String toString() {
 		return String.format(
 				"(%s)@%x",
@@ -83,6 +84,7 @@ public abstract class Ast {
 		/** Type that this expression will evaluate to (computed in semantic phase). */
 		public TypeSymbol type;
 		
+		@Override
 		public <R,A> R accept(AstVisitor<R, A> visitor, A arg) {
 			return this.accept((ExprVisitor<R,A>)visitor, arg);
 		}

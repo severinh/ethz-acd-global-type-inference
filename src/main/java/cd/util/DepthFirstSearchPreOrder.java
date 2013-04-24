@@ -22,6 +22,7 @@ public class DepthFirstSearchPreOrder implements Iterable<BasicBlock> {
 		this.cfg = cfg;
 	}
 
+	@Override
 	public Iterator<BasicBlock> iterator() {
 		return new Iterator<BasicBlock>() {
 			
@@ -36,10 +37,12 @@ public class DepthFirstSearchPreOrder implements Iterable<BasicBlock> {
 				pushed.add(cfg.start);
 			}
 
+			@Override
 			public boolean hasNext() {
 				return !stack.isEmpty();
 			}
 
+			@Override
 			public BasicBlock next() {
 				if (stack.isEmpty())
 					throw new NoSuchElementException();
@@ -54,6 +57,7 @@ public class DepthFirstSearchPreOrder implements Iterable<BasicBlock> {
 				return res;
 			}
 
+			@Override
 			public void remove() {
 				throw new UnsupportedOperationException();
 			}

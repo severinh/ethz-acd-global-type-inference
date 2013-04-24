@@ -61,6 +61,7 @@ public class AstDump {
 			List<java.lang.reflect.Field> rflds = 
 				Arrays.asList(rclass.getFields());
 			Collections.sort(rflds, new Comparator<java.lang.reflect.Field> () {
+				@Override
 				public int compare(Field o1, Field o2) {
 					return o1.getName().compareTo(o2.getName());
 				}

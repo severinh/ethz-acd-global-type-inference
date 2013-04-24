@@ -448,7 +448,8 @@ public class Optimizer {
 	            this.deadAppearances = 0;
 	        }
 	        
-	        public String toString() {
+	        @Override
+			public String toString() {
 	        	return "("+key+")";
 	        }
 	    }

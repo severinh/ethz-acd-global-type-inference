@@ -198,7 +198,7 @@ public class TypeChecker {
 		
 		@Override
 		public Void ifElse(IfElse ast, SymTable<VariableSymbol> locals) {
-			checkType((Expr)ast.condition(), main.booleanType, locals);
+			checkType(ast.condition(), main.booleanType, locals);
 			visit(ast.then(), locals);
 			if (ast.otherwise() != null)
 				visit(ast.otherwise(), locals);
@@ -238,7 +238,7 @@ public class TypeChecker {
 
 		@Override
 		public Void whileLoop(WhileLoop ast, SymTable<VariableSymbol> locals) {
-			checkType((Expr)ast.condition(), main.booleanType, locals);
+			checkType(ast.condition(), main.booleanType, locals);
 			return visit(ast.body(), locals);
 		}
 		

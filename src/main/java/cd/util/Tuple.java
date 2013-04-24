@@ -10,6 +10,7 @@ public class Tuple<A,B> {
 		this.b = b;
 	}
 	
+	@Override
 	public String toString() {
 		return "(" + a.toString() + ", " + b.toString() + ")";
 	}

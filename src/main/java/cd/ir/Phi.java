@@ -18,6 +18,7 @@ public class Phi {
 			rhs.add(Ast.Var.withSym(v0sym));
 	}
 	
+	@Override
 	public String toString() {
 		return String.format("<%s = phi%s>", lhs, rhs); 
 	}

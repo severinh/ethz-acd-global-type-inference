@@ -19,6 +19,7 @@ public abstract class Symbol {
 
 		public abstract boolean isReferenceType();
 		
+		@Override
 		public String toString() {
 			return name;
 		}
@@ -30,6 +31,7 @@ public abstract class Symbol {
 			super(name);
 		}		
 		
+		@Override
 		public boolean isReferenceType() {
 			return false;
 		}
@@ -43,6 +45,7 @@ public abstract class Symbol {
 			this.elementType = elementType;
 		}
 		
+		@Override
 		public boolean isReferenceType() {
 			return true;
 		}
@@ -76,6 +79,7 @@ public abstract class Symbol {
 			this.ast = null;
 		}
 		
+		@Override
 		public boolean isReferenceType() {
 			return true;
 		}
@@ -116,6 +120,7 @@ public abstract class Symbol {
 			this.ast = ast;
 		}
 		
+		@Override
 		public String toString() {
 			return name + "(...)";
 		}
@@ -160,6 +165,7 @@ public abstract class Symbol {
 			this.kind = kind;		
 		}
 		
+		@Override
 		public String toString() {
 			return name;
 		}
