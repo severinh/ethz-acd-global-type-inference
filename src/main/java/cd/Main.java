@@ -211,9 +211,7 @@ public class Main {
 
 	/** Dumps the AST to the debug stream */
 	private void dumpAst(List<ClassDecl> astRoots) throws IOException {
-		if (debug == null)
-			return;
-		debug.write(AstDump.toString(astRoots));
+		debug(AstDump.toString(astRoots));
 	}
 
 }
