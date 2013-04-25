@@ -1,0 +1,7 @@
+class Main {
+  void main() {
+    var y, z;
+    y = 1;
+    
+  }
+}

@@ -1,0 +1,9 @@
+class Main {
+  void main() {
+    test(1,2);    
+  }
+  
+  void test(foo, bar) {
+  
+  }
+}  

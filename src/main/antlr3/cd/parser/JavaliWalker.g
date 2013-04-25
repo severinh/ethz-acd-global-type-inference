@@ -117,7 +117,7 @@ methodHeading returns [String returnType, String mthName, List<Pair<String>> for
    ;
 
 formalParamList[List<Pair<String>> formalParams]
-	:	( ^( VarDecl t=type n=Identifier ) { $formalParams.add(new Pair<String>($t.typeName, $n.text)); } )+
+	:	( ^( VarDecl t=type? n=Identifier ) { $formalParams.add(new Pair<String>($t.typeName == null ? "?" : $t.typeName, $n.text)); } )+
 	;
 
 methodBody returns [Seq decls, Seq stmts]

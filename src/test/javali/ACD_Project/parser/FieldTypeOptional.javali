@@ -1,0 +1,7 @@
+class Main {
+  var x;
+  void main() {
+    x = 1;
+    write(x);
+  }
+}

@@ -270,10 +270,15 @@ declList
 	;
 
 varDecl
-	:	declStart=type Identifier ';'
-		-> ^( VarDecl[$declStart.start, "VarDecl"] type Identifier )
-	|	declStart=type Identifier ( ',' Identifier )+ ';'
-		-> ^( VarDeclList[$declStart.start, "VarDeclList"] type Identifier+ )
+	:	declStart=optionalTypeDecl Identifier ';'
+		-> ^( VarDecl[$declStart.start, "VarDecl"] optionalTypeDecl Identifier )
+	|	declStart=optionalTypeDecl Identifier ( ',' Identifier )+ ';'
+		-> ^( VarDeclList[$declStart.start, "VarDeclList"] optionalTypeDecl Identifier+ )
+	;
+
+optionalTypeDecl
+	:   tok='var' -> Identifier[$tok, "?"]
+	| type 
 	;
 
 methodDecl
@@ -289,8 +294,8 @@ methodHeading
    ;
 
 formalParamList
-	:	paramDecl=type Identifier ( ',' type Identifier )*
-		-> ^( VarDecl[$paramDecl.start, "VarDecl"] type Identifier )+
+	:	type? paramDecl=Identifier ( ',' type? Identifier )*
+		-> ^( VarDecl[$paramDecl, "VarDecl"] type? Identifier )+
 	;
 
 methodBody
