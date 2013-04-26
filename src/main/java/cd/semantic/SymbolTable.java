@@ -8,7 +8,7 @@ import java.util.Map;
 
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
-import cd.ir.Symbol;
+import cd.ir.symbols.Symbol;
 
 /**
  * A simple symbol table, with a pointer to the enclosing scope. Used by

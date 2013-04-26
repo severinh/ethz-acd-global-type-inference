@@ -10,11 +10,11 @@ import cd.ir.Ast;
 import cd.ir.Ast.Assign;
 import cd.ir.Ast.MethodDecl;
 import cd.ir.Ast.Var;
+import cd.ir.symbols.VariableSymbol;
+import cd.ir.symbols.VariableSymbol.Kind;
 import cd.ir.BasicBlock;
 import cd.ir.ExprVisitor;
 import cd.ir.Phi;
-import cd.ir.Symbol.VariableSymbol;
-import cd.ir.Symbol.VariableSymbol.Kind;
 import cd.util.DepthFirstSearchPreOrder;
 
 public class DeSSA {

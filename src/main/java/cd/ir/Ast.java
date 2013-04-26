@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.List;
 
 import cd.debug.AstOneLine;
-import cd.ir.Symbol.ClassSymbol;
-import cd.ir.Symbol.MethodSymbol;
-import cd.ir.Symbol.TypeSymbol;
-import cd.ir.Symbol.VariableSymbol;
+import cd.ir.symbols.ClassSymbol;
+import cd.ir.symbols.MethodSymbol;
+import cd.ir.symbols.TypeSymbol;
+import cd.ir.symbols.VariableSymbol;
 import cd.util.Pair;
 
 public abstract class Ast {

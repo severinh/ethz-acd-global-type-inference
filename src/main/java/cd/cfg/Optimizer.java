@@ -25,13 +25,13 @@ import cd.ir.Ast.NullConst;
 import cd.ir.Ast.ThisRef;
 import cd.ir.Ast.UnaryOp;
 import cd.ir.Ast.Var;
+import cd.ir.symbols.MethodSymbol;
+import cd.ir.symbols.VariableSymbol;
 import cd.ir.AstRewriteVisitor;
 import cd.ir.AstVisitor;
 import cd.ir.BasicBlock;
 import cd.ir.ExprVisitor;
 import cd.ir.Phi;
-import cd.ir.Symbol.MethodSymbol;
-import cd.ir.Symbol.VariableSymbol;
 import cd.util.DepthFirstSearchPreOrder;
 
 public class Optimizer {

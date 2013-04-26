@@ -32,14 +32,14 @@ import cd.ir.Ast.ThisRef;
 import cd.ir.Ast.UnaryOp;
 import cd.ir.Ast.Var;
 import cd.ir.Ast.WhileLoop;
+import cd.ir.symbols.ArrayTypeSymbol;
+import cd.ir.symbols.ClassSymbol;
+import cd.ir.symbols.MethodSymbol;
+import cd.ir.symbols.PrimitiveTypeSymbol;
+import cd.ir.symbols.TypeSymbol;
+import cd.ir.symbols.VariableSymbol;
 import cd.ir.AstVisitor;
 import cd.ir.ExprVisitor;
-import cd.ir.Symbol.ArrayTypeSymbol;
-import cd.ir.Symbol.ClassSymbol;
-import cd.ir.Symbol.MethodSymbol;
-import cd.ir.Symbol.PrimitiveTypeSymbol;
-import cd.ir.Symbol.TypeSymbol;
-import cd.ir.Symbol.VariableSymbol;
 
 public class TypeChecker {
 

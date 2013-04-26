@@ -39,10 +39,10 @@ import cd.ir.Ast.ThisRef;
 import cd.ir.Ast.UnaryOp;
 import cd.ir.Ast.Var;
 import cd.ir.Ast.WhileLoop;
+import cd.ir.symbols.VariableSymbol;
 import cd.ir.AstVisitor;
 import cd.ir.BasicBlock;
 import cd.ir.ControlFlowGraph;
-import cd.ir.Symbol.VariableSymbol;
 import cd.util.FileUtil;
 
 /**

@@ -7,10 +7,10 @@ import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.Ast.ClassDecl;
 import cd.ir.Ast.MethodDecl;
+import cd.ir.symbols.ClassSymbol;
+import cd.ir.symbols.MethodSymbol;
+import cd.ir.symbols.VariableSymbol;
 import cd.ir.AstVisitor;
-import cd.ir.Symbol.ClassSymbol;
-import cd.ir.Symbol.MethodSymbol;
-import cd.ir.Symbol.VariableSymbol;
 import cd.util.Pair;
 
 public class InheritanceChecker extends AstVisitor<Void, Void> {

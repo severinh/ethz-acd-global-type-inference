@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cd.ir.Ast.Expr;
-import cd.ir.Symbol.VariableSymbol;
+import cd.ir.symbols.VariableSymbol;
 
 /**
  * Node in a control flow graph. New instances should be created via the methods

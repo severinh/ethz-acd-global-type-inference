@@ -13,13 +13,12 @@ import cd.ir.Ast.Assign;
 import cd.ir.Ast.Expr;
 import cd.ir.Ast.MethodDecl;
 import cd.ir.Ast.Var;
+import cd.ir.symbols.MethodSymbol;
+import cd.ir.symbols.VariableSymbol;
 import cd.ir.AstVisitor;
 import cd.ir.BasicBlock;
 import cd.ir.ControlFlowGraph;
 import cd.ir.Phi;
-import cd.ir.Symbol;
-import cd.ir.Symbol.MethodSymbol;
-import cd.ir.Symbol.VariableSymbol;
 import cd.util.DepthFirstSearchPreOrder;
 
 public class SSA {
@@ -29,7 +28,7 @@ public class SSA {
 
 	public SSA(Main main) {
 		this.main = main;
-		this.uninitSym = new Symbol.VariableSymbol("__UNINIT__", main.nullType);
+		this.uninitSym = new VariableSymbol("__UNINIT__", main.nullType);
 	}
 
 	private MethodSymbol msym;

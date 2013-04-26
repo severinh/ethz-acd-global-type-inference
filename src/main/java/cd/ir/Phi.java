@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cd.ir.Ast.Expr;
-import cd.ir.Symbol.VariableSymbol;
+import cd.ir.symbols.VariableSymbol;
 
 public class Phi {
 

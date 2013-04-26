@@ -8,11 +8,12 @@ import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.Ast.ClassDecl;
 import cd.ir.Ast.MethodDecl;
-import cd.ir.Symbol;
-import cd.ir.Symbol.ClassSymbol;
-import cd.ir.Symbol.MethodSymbol;
-import cd.ir.Symbol.TypeSymbol;
-import cd.ir.Symbol.VariableSymbol;
+import cd.ir.symbols.ArrayTypeSymbol;
+import cd.ir.symbols.ClassSymbol;
+import cd.ir.symbols.MethodSymbol;
+import cd.ir.symbols.Symbol;
+import cd.ir.symbols.TypeSymbol;
+import cd.ir.symbols.VariableSymbol;
 
 public class SemanticAnalyzer {
 
@@ -60,8 +61,7 @@ public class SemanticAnalyzer {
 
 		// Create symbols for arrays of each type.
 		for (Symbol sym : new ArrayList<Symbol>(typeSymbols.localSymbols())) {
-			Symbol.ArrayTypeSymbol array = new Symbol.ArrayTypeSymbol(
-					(TypeSymbol) sym);
+			ArrayTypeSymbol array = new ArrayTypeSymbol((TypeSymbol) sym);
 			typeSymbols.add(array);
 		}
 
