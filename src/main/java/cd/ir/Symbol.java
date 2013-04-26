@@ -11,13 +11,20 @@ public abstract class Symbol {
 
 	public final String name;
 
-	public static abstract class TypeSymbol extends Symbol {
+	protected Symbol(String name) {
+		this.name = name;
+	}
+
+	public static class TypeSymbol extends Symbol {
 
 		public TypeSymbol(String name) {
 			super(name);
 		}
 
-		public abstract boolean isReferenceType();
+		public boolean isReferenceType() {
+			throw new IllegalStateException(
+					"unknown whether reference type or not");
+		}
 
 		@Override
 		public String toString() {
@@ -27,6 +34,7 @@ public abstract class Symbol {
 	}
 
 	public static class PrimitiveTypeSymbol extends TypeSymbol {
+
 		public PrimitiveTypeSymbol(String name) {
 			super(name);
 		}
@@ -35,9 +43,11 @@ public abstract class Symbol {
 		public boolean isReferenceType() {
 			return false;
 		}
+
 	}
 
 	public static class ArrayTypeSymbol extends TypeSymbol {
+
 		public final TypeSymbol elementType;
 
 		public ArrayTypeSymbol(TypeSymbol elementType) {
@@ -49,6 +59,7 @@ public abstract class Symbol {
 		public boolean isReferenceType() {
 			return true;
 		}
+
 	}
 
 	public static class ClassSymbol extends TypeSymbol {
@@ -170,10 +181,6 @@ public abstract class Symbol {
 		public String toString() {
 			return name;
 		}
-	}
-
-	protected Symbol(String name) {
-		this.name = name;
 	}
 
 }
