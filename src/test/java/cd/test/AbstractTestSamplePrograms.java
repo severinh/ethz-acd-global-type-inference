@@ -24,7 +24,7 @@ import cd.debug.AstDump;
 import cd.exceptions.AssemblyFailedException;
 import cd.exceptions.ParseFailure;
 import cd.exceptions.SemanticFailure;
-import cd.ir.Ast.ClassDecl;
+import cd.ir.ast.ClassDecl;
 import cd.util.FileUtil;
 
 abstract public class AbstractTestSamplePrograms {

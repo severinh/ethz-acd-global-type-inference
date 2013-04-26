@@ -1,8 +1,22 @@
 package cd.ir;
 
-import cd.ir.Ast.Decl;
-import cd.ir.Ast.Expr;
-import cd.ir.Ast.Stmt;
+import cd.ir.ast.Assign;
+import cd.ir.ast.Ast;
+import cd.ir.ast.BuiltInWrite;
+import cd.ir.ast.BuiltInWriteFloat;
+import cd.ir.ast.BuiltInWriteln;
+import cd.ir.ast.ClassDecl;
+import cd.ir.ast.Decl;
+import cd.ir.ast.Expr;
+import cd.ir.ast.IfElse;
+import cd.ir.ast.MethodCall;
+import cd.ir.ast.MethodDecl;
+import cd.ir.ast.Nop;
+import cd.ir.ast.ReturnStmt;
+import cd.ir.ast.Seq;
+import cd.ir.ast.Stmt;
+import cd.ir.ast.VarDecl;
+import cd.ir.ast.WhileLoop;
 
 /** A visitor that visits any kind of node */
 public class AstVisitor<R, A> extends ExprVisitor<R, A> {
@@ -59,55 +73,55 @@ public class AstVisitor<R, A> extends ExprVisitor<R, A> {
 		return dflt(ast, arg);
 	}
 
-	public R assign(Ast.Assign ast, A arg) {
+	public R assign(Assign ast, A arg) {
 		return dfltStmt(ast, arg);
 	}
 
-	public R builtInWrite(Ast.BuiltInWrite ast, A arg) {
+	public R builtInWrite(BuiltInWrite ast, A arg) {
 		return dfltStmt(ast, arg);
 	}
 
-	public R builtInWriteFloat(Ast.BuiltInWriteFloat ast, A arg) {
+	public R builtInWriteFloat(BuiltInWriteFloat ast, A arg) {
 		return dfltStmt(ast, arg);
 	}
 
-	public R builtInWriteln(Ast.BuiltInWriteln ast, A arg) {
+	public R builtInWriteln(BuiltInWriteln ast, A arg) {
 		return dfltStmt(ast, arg);
 	}
 
-	public R classDecl(Ast.ClassDecl ast, A arg) {
+	public R classDecl(ClassDecl ast, A arg) {
 		return dfltDecl(ast, arg);
 	}
 
-	public R methodDecl(Ast.MethodDecl ast, A arg) {
+	public R methodDecl(MethodDecl ast, A arg) {
 		return dfltDecl(ast, arg);
 	}
 
-	public R varDecl(Ast.VarDecl ast, A arg) {
+	public R varDecl(VarDecl ast, A arg) {
 		return dfltDecl(ast, arg);
 	}
 
-	public R ifElse(Ast.IfElse ast, A arg) {
+	public R ifElse(IfElse ast, A arg) {
 		return dfltStmt(ast, arg);
 	}
 
-	public R returnStmt(Ast.ReturnStmt ast, A arg) {
+	public R returnStmt(ReturnStmt ast, A arg) {
 		return dfltStmt(ast, arg);
 	}
 
-	public R methodCall(Ast.MethodCall ast, A arg) {
+	public R methodCall(MethodCall ast, A arg) {
 		return dfltStmt(ast, arg);
 	}
 
-	public R nop(Ast.Nop ast, A arg) {
+	public R nop(Nop ast, A arg) {
 		return dfltStmt(ast, arg);
 	}
 
-	public R seq(Ast.Seq ast, A arg) {
+	public R seq(Seq ast, A arg) {
 		return dflt(ast, arg);
 	}
 
-	public R whileLoop(Ast.WhileLoop ast, A arg) {
+	public R whileLoop(WhileLoop ast, A arg) {
 		return dfltStmt(ast, arg);
 	}
 }

@@ -7,16 +7,16 @@ import java.util.Set;
 import cd.Main;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
-import cd.ir.Ast.ClassDecl;
-import cd.ir.Ast.MethodDecl;
-import cd.ir.Ast.VarDecl;
+import cd.ir.ast.ClassDecl;
+import cd.ir.ast.MethodDecl;
+import cd.ir.ast.VarDecl;
+import cd.ir.symbols.ClassSymbol;
+import cd.ir.symbols.MethodSymbol;
+import cd.ir.symbols.Symbol;
+import cd.ir.symbols.TypeSymbol;
+import cd.ir.symbols.VariableSymbol;
+import cd.ir.symbols.VariableSymbol.Kind;
 import cd.ir.AstVisitor;
-import cd.ir.Symbol;
-import cd.ir.Symbol.ClassSymbol;
-import cd.ir.Symbol.MethodSymbol;
-import cd.ir.Symbol.TypeSymbol;
-import cd.ir.Symbol.VariableSymbol;
-import cd.ir.Symbol.VariableSymbol.Kind;
 
 /**
  * A helper class for {@link SemanticAnalyzer} which iterates through a class

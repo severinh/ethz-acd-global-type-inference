@@ -24,12 +24,12 @@ import cd.codegen.CfgCodeGenerator;
 import cd.debug.AstDump;
 import cd.debug.CfgDump;
 import cd.exceptions.ParseFailure;
-import cd.ir.Ast.ClassDecl;
-import cd.ir.Ast.MethodDecl;
+import cd.ir.ast.ClassDecl;
+import cd.ir.ast.MethodDecl;
+import cd.ir.symbols.ClassSymbol;
+import cd.ir.symbols.PrimitiveTypeSymbol;
+import cd.ir.symbols.TypeSymbol;
 import cd.ir.BasicBlock;
-import cd.ir.Symbol;
-import cd.ir.Symbol.PrimitiveTypeSymbol;
-import cd.ir.Symbol.TypeSymbol;
 import cd.parser.JavaliLexer;
 import cd.parser.JavaliParser;
 import cd.parser.JavaliWalker;
@@ -54,10 +54,13 @@ public class Main {
 	public final PrimitiveTypeSymbol intType, floatType, voidType, booleanType;
 
 	/** Symbols for the built-in Object and null types */
-	public final Symbol.ClassSymbol objectType, nullType;
+	public final ClassSymbol objectType, nullType;
+
+	/** Symbol for the built-in top and bottom type */
+	public final TypeSymbol topType, bottomType;
 
 	/** Symbol for the Main type */
-	public Symbol.ClassSymbol mainType;
+	public ClassSymbol mainType;
 
 	/** List of all type symbols, used by code generator. */
 	public List<TypeSymbol> allTypeSymbols;
@@ -110,8 +113,10 @@ public class Main {
 		floatType = new PrimitiveTypeSymbol("float");
 		booleanType = new PrimitiveTypeSymbol("boolean");
 		voidType = new PrimitiveTypeSymbol("void");
-		objectType = new Symbol.ClassSymbol("Object");
-		nullType = new Symbol.ClassSymbol("<null>");
+		objectType = new ClassSymbol("Object");
+		nullType = new ClassSymbol("<null>");
+		topType = new TypeSymbol("<top>");
+		bottomType = new TypeSymbol("<bottom>");
 	}
 
 	public List<ClassDecl> parse(Reader file, boolean debugParser)
@@ -210,7 +215,7 @@ public class Main {
 	}
 
 	/** Dumps the AST to the debug stream */
-	private void dumpAst(List<ClassDecl> astRoots) throws IOException {
+	private void dumpAst(List<ClassDecl> astRoots) {
 		debug(AstDump.toString(astRoots));
 	}
 

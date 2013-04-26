@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
 
-import cd.ir.Ast;
-import cd.ir.Ast.ClassDecl;
-import cd.ir.Ast.MethodDecl;
+import cd.ir.ast.Ast;
+import cd.ir.ast.ClassDecl;
+import cd.ir.ast.MethodDecl;
+import cd.ir.symbols.VariableSymbol;
 import cd.ir.BasicBlock;
 import cd.ir.Phi;
-import cd.ir.Symbol.VariableSymbol;
 
 public class CfgDump {
 

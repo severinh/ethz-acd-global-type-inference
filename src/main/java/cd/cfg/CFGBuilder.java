@@ -1,12 +1,13 @@
 package cd.cfg;
 
 import cd.Main;
-import cd.ir.Ast;
-import cd.ir.Ast.IfElse;
-import cd.ir.Ast.MethodDecl;
-import cd.ir.Ast.Seq;
-import cd.ir.Ast.Stmt;
-import cd.ir.Ast.WhileLoop;
+import cd.ir.ast.Ast;
+import cd.ir.ast.IfElse;
+import cd.ir.ast.MethodDecl;
+import cd.ir.ast.ReturnStmt;
+import cd.ir.ast.Seq;
+import cd.ir.ast.Stmt;
+import cd.ir.ast.WhileLoop;
 import cd.ir.AstVisitor;
 import cd.ir.BasicBlock;
 import cd.ir.ControlFlowGraph;
@@ -68,7 +69,7 @@ public class CFGBuilder {
 		}
 
 		@Override
-		public BasicBlock returnStmt(Ast.ReturnStmt ast, BasicBlock arg) {
+		public BasicBlock returnStmt(ReturnStmt ast, BasicBlock arg) {
 			if (arg == null)
 				return null; // dead code, no need to generate anything
 			arg.instructions.add(ast);

@@ -3,7 +3,7 @@ package cd.ir;
 import java.util.ArrayList;
 import java.util.List;
 
-import cd.ir.Ast.Expr;
+import cd.ir.ast.Expr;
 
 /** Represents the control flow graph of a single method. */
 public class ControlFlowGraph {

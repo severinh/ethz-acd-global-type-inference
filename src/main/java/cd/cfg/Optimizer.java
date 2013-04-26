@@ -13,25 +13,25 @@ import java.util.Set;
 import cd.Main;
 import cd.debug.AstOneLine;
 import cd.debug.CfgDump;
-import cd.ir.Ast;
-import cd.ir.Ast.Assign;
-import cd.ir.Ast.BinaryOp;
-import cd.ir.Ast.BooleanConst;
-import cd.ir.Ast.Cast;
-import cd.ir.Ast.Expr;
-import cd.ir.Ast.IntConst;
-import cd.ir.Ast.MethodDecl;
-import cd.ir.Ast.NullConst;
-import cd.ir.Ast.ThisRef;
-import cd.ir.Ast.UnaryOp;
-import cd.ir.Ast.Var;
-import cd.ir.AstRewriteVisitor;
+import cd.ir.ast.Assign;
+import cd.ir.ast.Ast;
+import cd.ir.ast.AstRewriteVisitor;
+import cd.ir.ast.BinaryOp;
+import cd.ir.ast.BooleanConst;
+import cd.ir.ast.Cast;
+import cd.ir.ast.Expr;
+import cd.ir.ast.IntConst;
+import cd.ir.ast.MethodDecl;
+import cd.ir.ast.NullConst;
+import cd.ir.ast.ThisRef;
+import cd.ir.ast.UnaryOp;
+import cd.ir.ast.Var;
+import cd.ir.symbols.MethodSymbol;
+import cd.ir.symbols.VariableSymbol;
 import cd.ir.AstVisitor;
 import cd.ir.BasicBlock;
 import cd.ir.ExprVisitor;
 import cd.ir.Phi;
-import cd.ir.Symbol.MethodSymbol;
-import cd.ir.Symbol.VariableSymbol;
 import cd.util.DepthFirstSearchPreOrder;
 
 public class Optimizer {
@@ -102,21 +102,21 @@ public class Optimizer {
 		public class AstRewriter extends AstRewriteVisitor<Void> {
 
 			private int asInt(Ast ast) throws NotConstantException {
-				if (ast instanceof Ast.IntConst)
-					return ((Ast.IntConst) ast).value;
+				if (ast instanceof IntConst)
+					return ((IntConst) ast).value;
 
 				// Hack to make == and != work. Note that semantic
 				// check already guarantees booleans don't appear
 				// where they are not permitted.
-				if (ast instanceof Ast.BooleanConst)
-					return (((Ast.BooleanConst) ast).value ? 1 : 0);
+				if (ast instanceof BooleanConst)
+					return (((BooleanConst) ast).value ? 1 : 0);
 
 				throw new NotConstantException();
 			}
 
 			private boolean asBool(Ast ast) throws NotConstantException {
-				if (ast instanceof Ast.BooleanConst)
-					return ((Ast.BooleanConst) ast).value;
+				if (ast instanceof BooleanConst)
+					return ((BooleanConst) ast).value;
 				throw new NotConstantException();
 			}
 
@@ -226,16 +226,16 @@ public class Optimizer {
 			}
 
 			private boolean isNull(Expr left) {
-				return (left instanceof Ast.NullConst);
+				return (left instanceof NullConst);
 			}
 
 			private Ast replace(Expr original, Integer intValue,
 					Boolean boolValue) {
-				Ast.Expr replacement = null;
+				Expr replacement = null;
 				if (intValue != null)
-					replacement = new Ast.IntConst(intValue);
+					replacement = new IntConst(intValue);
 				else if (boolValue != null)
-					replacement = new Ast.BooleanConst(boolValue);
+					replacement = new BooleanConst(boolValue);
 
 				if (replacement != null) {
 					// type of the expression does not change:
@@ -618,7 +618,7 @@ public class Optimizer {
 		private void createAssignment(BasicBlock block, int i, Canonical ex,
 				Expr expr1) {
 			main.debug("  inserting assignment to %s at index %d", ex.sym, i);
-			Assign assign = new Ast.Assign(Ast.Var.withSym(ex.sym), expr1);
+			Assign assign = new Assign(Var.withSym(ex.sym), expr1);
 			block.instructions.add(i, assign);
 		}
 
@@ -659,7 +659,7 @@ public class Optimizer {
 			 * added since then as they are subexpressions of the current
 			 * expressions.
 			 */
-			public Canonical canonicalize(Ast.Expr n, BlockData data,
+			public Canonical canonicalize(Expr n, BlockData data,
 					String exprkey, Canonical prev1, Canonical prev2) {
 				Canonical ex = data.canonicalsInScope.get(exprkey);
 
@@ -810,7 +810,7 @@ public class Optimizer {
 			protected Ast dfltExpr(Expr ast, Canonical arg) {
 				if (arg.appearances.contains(ast)) {
 					changes++;
-					return Ast.Var.withSym(arg.sym);
+					return Var.withSym(arg.sym);
 				}
 				return super.dfltExpr(ast, arg);
 			}

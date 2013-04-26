@@ -1,6 +1,23 @@
 package cd.ir;
 
-import cd.ir.Ast.Expr;
+import cd.ir.ast.Ast;
+import cd.ir.ast.BinaryOp;
+import cd.ir.ast.BooleanConst;
+import cd.ir.ast.BuiltInRead;
+import cd.ir.ast.BuiltInReadFloat;
+import cd.ir.ast.Cast;
+import cd.ir.ast.Expr;
+import cd.ir.ast.Field;
+import cd.ir.ast.FloatConst;
+import cd.ir.ast.Index;
+import cd.ir.ast.IntConst;
+import cd.ir.ast.MethodCallExpr;
+import cd.ir.ast.NewArray;
+import cd.ir.ast.NewObject;
+import cd.ir.ast.NullConst;
+import cd.ir.ast.ThisRef;
+import cd.ir.ast.UnaryOp;
+import cd.ir.ast.Var;
 
 /**
  * A visitor that only visits {@link Expr} nodes.
@@ -35,67 +52,67 @@ public class ExprVisitor<R, A> {
 		return visitChildren(ast, arg);
 	}
 
-	public R binaryOp(Ast.BinaryOp ast, A arg) {
+	public R binaryOp(BinaryOp ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R booleanConst(Ast.BooleanConst ast, A arg) {
+	public R booleanConst(BooleanConst ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R builtInRead(Ast.BuiltInRead ast, A arg) {
+	public R builtInRead(BuiltInRead ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R builtInReadFloat(Ast.BuiltInReadFloat ast, A arg) {
+	public R builtInReadFloat(BuiltInReadFloat ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R cast(Ast.Cast ast, A arg) {
+	public R cast(Cast ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R field(Ast.Field ast, A arg) {
+	public R field(Field ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R index(Ast.Index ast, A arg) {
+	public R index(Index ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R intConst(Ast.IntConst ast, A arg) {
+	public R intConst(IntConst ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R floatConst(Ast.FloatConst ast, A arg) {
+	public R floatConst(FloatConst ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R methodCall(Ast.MethodCallExpr ast, A arg) {
+	public R methodCall(MethodCallExpr ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R newObject(Ast.NewObject ast, A arg) {
+	public R newObject(NewObject ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R newArray(Ast.NewArray ast, A arg) {
+	public R newArray(NewArray ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R nullConst(Ast.NullConst ast, A arg) {
+	public R nullConst(NullConst ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R thisRef(Ast.ThisRef ast, A arg) {
+	public R thisRef(ThisRef ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R unaryOp(Ast.UnaryOp ast, A arg) {
+	public R unaryOp(UnaryOp ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
-	public R var(Ast.Var ast, A arg) {
+	public R var(Var ast, A arg) {
 		return dfltExpr(ast, arg);
 	}
 
