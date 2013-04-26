@@ -33,7 +33,9 @@ import cd.ir.BasicBlock;
 import cd.parser.JavaliLexer;
 import cd.parser.JavaliParser;
 import cd.parser.JavaliWalker;
-import cd.semantic.SemanticAnalyzer;
+import cd.semantic.SymbolTable;
+import cd.semantic.TypedSemanticAnalyzer;
+import cd.semantic.UntypedSemanticAnalyzer;
 
 /**
  * The main entrypoint for the compiler. Consists of a series of routines which
@@ -63,7 +65,7 @@ public class Main {
 	public ClassSymbol mainType;
 
 	/** List of all type symbols, used by code generator. */
-	public List<TypeSymbol> allTypeSymbols;
+	public SymbolTable<TypeSymbol> allTypeSymbols;
 
 	public void debug(String format, Object... args) {
 		if (debug != null) {
@@ -171,7 +173,8 @@ public class Main {
 	}
 
 	public void semanticCheck(List<ClassDecl> astRoots) {
-		new SemanticAnalyzer(this).check(astRoots);
+		new UntypedSemanticAnalyzer(this).check(astRoots);
+		new TypedSemanticAnalyzer(this).check(astRoots);
 
 		// Build control flow graph
 		for (ClassDecl cd : astRoots)

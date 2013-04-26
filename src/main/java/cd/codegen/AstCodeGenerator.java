@@ -127,8 +127,9 @@ public class AstCodeGenerator {
 		}
 
 		// emit vtables
-		for (TypeSymbol ts : main.allTypeSymbols)
+		for (TypeSymbol ts : main.allTypeSymbols.allSymbols()) {
 			emitVtable(ts);
+		}
 
 		// Emit some useful string constants and static data:
 		emit(Config.DATA_STR_SECTION);

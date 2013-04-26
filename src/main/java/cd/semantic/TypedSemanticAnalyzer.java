@@ -1,6 +1,5 @@
 package cd.semantic;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import cd.Main;
@@ -8,82 +7,48 @@ import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.ast.ClassDecl;
 import cd.ir.ast.MethodDecl;
-import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.Symbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 
-public class SemanticAnalyzer {
+/**
+ * Performs semantic checks on a fully typed AST, based on the already
+ * constructed symbol table.
+ * 
+ * In particular, it checks parameter and return type invariance of overriding
+ * methods, extracts the program entry point, and computes the type of each
+ * expression in the code. Since expressions have been typed using type
+ * inference already at this stage, the types probably do not change anymore.
+ * Still, it may not be a useless operation, because it is another safety net in
+ * case there is a bug in the type inference.
+ */
+public class TypedSemanticAnalyzer {
 
 	private final Main main;
 
-	public SemanticAnalyzer(Main main) {
+	public TypedSemanticAnalyzer(Main main) {
 		this.main = main;
 	}
 
 	public void check(List<ClassDecl> classDecls) throws SemanticFailure {
-		SymbolTable<TypeSymbol> typeSymbols = createSymbols(classDecls);
 		checkInheritance(classDecls);
-		checkStartPoint(typeSymbols);
-		checkMethodBodies(typeSymbols, classDecls);
+		checkStartPoint(main.allTypeSymbols);
+		checkMethodBodies(main.allTypeSymbols, classDecls);
 		rewriteMethodBodies(classDecls);
-		main.allTypeSymbols = typeSymbols.allSymbols();
-	}
-
-	/**
-	 * Creates a symbol table with symbols for all built-in types, as well as
-	 * all classes and their fields and methods. Also creates a corresponding
-	 * array symbol for every type (named {@code type[]}).
-	 * 
-	 * @see SymbolCreator
-	 */
-	private SymbolTable<TypeSymbol> createSymbols(List<ClassDecl> classDecls) {
-
-		// Start by creating a symbol for all built-in types.
-		SymbolTable<TypeSymbol> typeSymbols = new SymbolTable<>(null);
-
-		typeSymbols.add(main.intType);
-		typeSymbols.add(main.booleanType);
-		typeSymbols.add(main.floatType);
-		typeSymbols.add(main.voidType);
-		typeSymbols.add(main.objectType);
-
-		// Add symbols for all declared classes.
-		for (ClassDecl ast : classDecls) {
-			// Check for classes named Object
-			if (ast.name.equals(main.objectType.name))
-				throw new SemanticFailure(Cause.OBJECT_CLASS_DEFINED);
-			ast.sym = new ClassSymbol(ast);
-			typeSymbols.add(ast.sym);
-		}
-
-		// Create symbols for arrays of each type.
-		for (Symbol sym : new ArrayList<Symbol>(typeSymbols.localSymbols())) {
-			ArrayTypeSymbol array = new ArrayTypeSymbol((TypeSymbol) sym);
-			typeSymbols.add(array);
-		}
-
-		// For each class, create symbols for each method and field
-		SymbolCreator sc = new SymbolCreator(main, typeSymbols);
-		for (ClassDecl ast : classDecls)
-			sc.createSymbols(ast);
-
-		return typeSymbols;
 	}
 
 	/**
 	 * Check for errors related to inheritance: circular inheritance, invalid
-	 * super classes, methods with different types, etc. Note that this must be
-	 * run early because other code assumes that the inheritance is correct, for
-	 * type checking etc.
+	 * super classes. Note that this must be run early because other code
+	 * assumes that the inheritance is correct, for type checking etc.
 	 * 
-	 * @see InheritanceChecker
+	 * @see TypedInheritanceChecker
 	 */
 	private void checkInheritance(List<ClassDecl> classDecls) {
 		for (ClassDecl cd : classDecls)
-			new InheritanceChecker().visit(cd, null);
+			new TypedInheritanceChecker().visit(cd, null);
 	}
 
 	/**
