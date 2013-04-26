@@ -92,12 +92,16 @@ classDecl returns [ClassDecl node]
 @init{
 	ArrayList<Decl> memberDeclList = new ArrayList<Decl>();
 }
-	:	^( ClassDecl clName=Identifier superName=Identifier body=declList[memberDeclList]? )
+	:	^( ClassDecl clName=Identifier superName=Identifier body=cDeclList[memberDeclList]? )
 		{ $node = new ClassDecl($clName.text, $superName.text, memberDeclList); }
 	;
 
-declList[List<Decl> members]
+cDeclList[List<Decl> members]
 	:	( v=varDecl[$members] | m=methodDecl { $members.add($m.mth); } )+
+	;
+	
+mDeclList[List<Decl> members]
+	:	( v=varDecl[$members] )+
 	;
 
 varDecl[List<Decl> members]
@@ -112,8 +116,8 @@ methodDecl returns [MethodDecl mth]
    ;
 
 methodHeading returns [String returnType, String mthName, List<Pair<String>> formalParams]
-   :	r=type n=Identifier { $returnType = $r.typeName; $mthName = $n.text; $formalParams = emptyList(); }
-   |	r=type n=Identifier { $returnType = $r.typeName; $mthName = $n.text; $formalParams = new ArrayList<Pair<String>>(); } formalParamList[$formalParams]
+   :	r=type? n=Identifier { $returnType = ($r.typeName == null ? "?" : $r.typeName) ; $mthName = $n.text; $formalParams = emptyList(); }
+   |	r=type? n=Identifier { $returnType = ($r.typeName == null ? "?" : $r.typeName) ; $mthName = $n.text; $formalParams = new ArrayList<Pair<String>>(); } formalParamList[$formalParams]
    ;
 
 formalParamList[List<Pair<String>> formalParams]
@@ -131,7 +135,7 @@ methodBodyWithDeclList returns [List<Decl> vars]
 @init{
 	$vars = new ArrayList<Decl>();
 }
-	:	^( Seq declList[$vars]? )
+	:	^( Seq mDeclList[$vars]? )
 	;
 
 // STATEMENTS

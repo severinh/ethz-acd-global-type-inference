@@ -259,14 +259,18 @@ unit
 	;
 	
 classDecl
-	:	classDeclStart='class' Identifier '{' declList? '}'
-		-> ^( ClassDecl[$classDeclStart, "ClassDecl"] Identifier Identifier["Object"] declList? )  // insert implicit supertype node
-	|	classDeclStart='class' Identifier 'extends' Identifier '{' declList? '}'
-		-> ^( ClassDecl[$classDeclStart, "ClassDecl"] Identifier Identifier declList? )
+	:	classDeclStart='class' Identifier '{' classDeclList? '}'
+		-> ^( ClassDecl[$classDeclStart, "ClassDecl"] Identifier Identifier["Object"] classDeclList? )  // insert implicit supertype node
+	|	classDeclStart='class' Identifier 'extends' Identifier '{' classDeclList? '}'
+		-> ^( ClassDecl[$classDeclStart, "ClassDecl"] Identifier Identifier classDeclList? )
 	;
 
-declList
+classDeclList
 	:	( varDecl | methodDecl )+
+	;
+	
+methodDeclList
+	:	varDecl+
 	;
 
 varDecl
@@ -287,8 +291,8 @@ methodDecl
 	;
 	
 methodHeading
-   :	type Identifier '(' formalParamList? ')'
-      -> type Identifier formalParamList?
+   :	type? Identifier '(' formalParamList? ')'
+      -> type? Identifier formalParamList?
    | methSig='void' Identifier '(' formalParamList? ')'
       -> Identifier[$methSig, "void"] Identifier formalParamList?
    ;
@@ -312,8 +316,8 @@ methodBody
 	;
 
 methodBodyWithDeclList
-	:	lb='{' declSeq=declList
-		-> ^( Seq[$declSeq.start, "Seq"] declList )
+	:	lb='{' declSeq=methodDeclList
+		-> ^( Seq[$declSeq.start, "Seq"] methodDeclList )
 	;
 
 // STATEMENTS
