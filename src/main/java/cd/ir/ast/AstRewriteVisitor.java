@@ -1,6 +1,8 @@
-package cd.ir;
+package cd.ir.ast;
 
 import java.util.ListIterator;
+
+import cd.ir.AstVisitor;
 
 public class AstRewriteVisitor<A> extends AstVisitor<Ast, A> {
 

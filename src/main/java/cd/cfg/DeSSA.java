@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import cd.Main;
-import cd.ir.Ast;
-import cd.ir.Ast.Assign;
-import cd.ir.Ast.MethodDecl;
-import cd.ir.Ast.Var;
+import cd.ir.ast.Assign;
+import cd.ir.ast.Ast;
+import cd.ir.ast.Expr;
+import cd.ir.ast.MethodDecl;
+import cd.ir.ast.Var;
 import cd.ir.symbols.VariableSymbol;
 import cd.ir.symbols.VariableSymbol.Kind;
 import cd.ir.BasicBlock;
@@ -124,7 +125,7 @@ public class DeSSA {
 				for (Phi phi : blk.phis.values()) {
 					assert blk.predecessors.size() == phi.rhs.size();
 					DepNode lhsNode = depNodes.get(phi.lhs);
-					Ast.Expr rhsExpr = phi.rhs.get(i);
+					Expr rhsExpr = phi.rhs.get(i);
 					DepNode rhsNode = new ExprVisitor<DepNode, Void>() {
 						@Override
 						public DepNode var(Var ast, Void arg) {

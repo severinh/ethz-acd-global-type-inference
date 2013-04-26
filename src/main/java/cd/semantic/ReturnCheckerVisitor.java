@@ -1,11 +1,11 @@
 package cd.semantic;
 
-import cd.ir.Ast;
-import cd.ir.Ast.IfElse;
-import cd.ir.Ast.ReturnStmt;
-import cd.ir.Ast.Seq;
-import cd.ir.Ast.Stmt;
-import cd.ir.Ast.WhileLoop;
+import cd.ir.ast.Ast;
+import cd.ir.ast.IfElse;
+import cd.ir.ast.ReturnStmt;
+import cd.ir.ast.Seq;
+import cd.ir.ast.Stmt;
+import cd.ir.ast.WhileLoop;
 import cd.ir.AstVisitor;
 
 /**

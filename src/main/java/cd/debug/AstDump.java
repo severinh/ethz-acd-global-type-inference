@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import cd.ir.Ast;
 import cd.ir.AstVisitor;
+import cd.ir.ast.Ast;
 import cd.util.Pair;
 
 public class AstDump {

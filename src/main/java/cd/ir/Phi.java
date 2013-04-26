@@ -3,7 +3,8 @@ package cd.ir;
 import java.util.ArrayList;
 import java.util.List;
 
-import cd.ir.Ast.Expr;
+import cd.ir.ast.Expr;
+import cd.ir.ast.Var;
 import cd.ir.symbols.VariableSymbol;
 
 public class Phi {
@@ -18,7 +19,7 @@ public class Phi {
 		this.v0sym = v0sym;
 		this.lhs = v0sym;
 		for (int i = 0; i < predCount; i++)
-			rhs.add(Ast.Var.withSym(v0sym));
+			rhs.add(Var.withSym(v0sym));
 	}
 
 	@Override

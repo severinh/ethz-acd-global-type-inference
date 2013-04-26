@@ -16,35 +16,35 @@ import java.util.List;
 import cd.Config;
 import cd.Main;
 import cd.debug.AstOneLine;
-import cd.ir.Ast;
-import cd.ir.Ast.Assign;
-import cd.ir.Ast.BinaryOp;
-import cd.ir.Ast.BinaryOp.BOp;
-import cd.ir.Ast.BooleanConst;
-import cd.ir.Ast.BuiltInRead;
-import cd.ir.Ast.BuiltInReadFloat;
-import cd.ir.Ast.BuiltInWrite;
-import cd.ir.Ast.BuiltInWriteFloat;
-import cd.ir.Ast.BuiltInWriteln;
-import cd.ir.Ast.Cast;
-import cd.ir.Ast.ClassDecl;
-import cd.ir.Ast.Expr;
-import cd.ir.Ast.Field;
-import cd.ir.Ast.FloatConst;
-import cd.ir.Ast.IfElse;
-import cd.ir.Ast.Index;
-import cd.ir.Ast.IntConst;
-import cd.ir.Ast.MethodCall;
-import cd.ir.Ast.MethodCallExpr;
-import cd.ir.Ast.MethodDecl;
-import cd.ir.Ast.NewArray;
-import cd.ir.Ast.NewObject;
-import cd.ir.Ast.NullConst;
-import cd.ir.Ast.ReturnStmt;
-import cd.ir.Ast.ThisRef;
-import cd.ir.Ast.UnaryOp;
-import cd.ir.Ast.Var;
-import cd.ir.Ast.WhileLoop;
+import cd.ir.ast.Assign;
+import cd.ir.ast.Ast;
+import cd.ir.ast.BinaryOp;
+import cd.ir.ast.BinaryOp.BOp;
+import cd.ir.ast.BooleanConst;
+import cd.ir.ast.BuiltInRead;
+import cd.ir.ast.BuiltInReadFloat;
+import cd.ir.ast.BuiltInWrite;
+import cd.ir.ast.BuiltInWriteFloat;
+import cd.ir.ast.BuiltInWriteln;
+import cd.ir.ast.Cast;
+import cd.ir.ast.ClassDecl;
+import cd.ir.ast.Expr;
+import cd.ir.ast.Field;
+import cd.ir.ast.FloatConst;
+import cd.ir.ast.IfElse;
+import cd.ir.ast.Index;
+import cd.ir.ast.IntConst;
+import cd.ir.ast.MethodCall;
+import cd.ir.ast.MethodCallExpr;
+import cd.ir.ast.MethodDecl;
+import cd.ir.ast.NewArray;
+import cd.ir.ast.NewObject;
+import cd.ir.ast.NullConst;
+import cd.ir.ast.ReturnStmt;
+import cd.ir.ast.ThisRef;
+import cd.ir.ast.UnaryOp;
+import cd.ir.ast.Var;
+import cd.ir.ast.WhileLoop;
 import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
@@ -205,9 +205,9 @@ public class AstCodeGenerator {
 		emit("ret");
 		// Generate AST for main() method:
 		// new Main().main()
-		Ast.NewObject newMain = new Ast.NewObject("Main");
+		NewObject newMain = new NewObject("Main");
 		newMain.type = main.mainType;
-		Ast.MethodCall callMain = new Ast.MethodCall(newMain, "main",
+		MethodCall callMain = new MethodCall(newMain, "main",
 				Collections.<Expr> emptyList());
 		callMain.sym = main.mainType.getMethod("main");
 
@@ -497,17 +497,16 @@ public class AstCodeGenerator {
 
 		private abstract class OperandsDispatcher {
 
-			public abstract void integerOp(String leftReg, Ast.BinaryOp.BOp op,
+			public abstract void integerOp(String leftReg, BinaryOp.BOp op,
 					String rightReg);
 
-			public abstract void floatOp(String leftReg, Ast.BinaryOp.BOp op,
+			public abstract void floatOp(String leftReg, BinaryOp.BOp op,
 					String rightReg);
 
-			public abstract void floatCmp(String leftReg, Ast.BinaryOp.BOp op,
+			public abstract void floatCmp(String leftReg, BinaryOp.BOp op,
 					String rightReg);
 
-			public void binaryOp(Ast.BinaryOp ast, String leftReg,
-					String rightReg) {
+			public void binaryOp(BinaryOp ast, String leftReg, String rightReg) {
 
 				if (ast.type == main.floatType) {
 					floatOp(leftReg, ast.operator, rightReg);
@@ -545,7 +544,6 @@ public class AstCodeGenerator {
 
 				@Override
 				public void integerOp(String leftReg, BOp op, String rightReg) {
-
 					switch (op) {
 					case B_TIMES:
 						emit("imull", rightReg, leftReg);
@@ -587,7 +585,6 @@ public class AstCodeGenerator {
 						emitCmp("setge", leftReg, rightReg);
 						break;
 					}
-
 				}
 
 				@Override
@@ -616,12 +613,10 @@ public class AstCodeGenerator {
 					}
 
 					emitFloatRegToGprReg(leftReg, FLOAT_REG_0);
-
 				}
 
 				@Override
 				public void floatCmp(String leftReg, BOp op, String rightReg) {
-
 					switch (op) {
 					case B_EQUAL:
 						emitCmpFloat("je", leftReg, rightReg);
@@ -644,7 +639,6 @@ public class AstCodeGenerator {
 					default:
 						break;
 					}
-
 				}
 
 			}.binaryOp(ast, leftReg, rightReg);

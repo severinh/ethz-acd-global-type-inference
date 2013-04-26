@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cd.ir.Ast;
+import cd.ir.ast.MethodDecl;
 
 public class MethodSymbol extends Symbol {
 
-	public final Ast.MethodDecl ast;
+	public final MethodDecl ast;
 	public final Map<String, VariableSymbol> locals = new HashMap<>();
 	public final List<VariableSymbol> parameters = new ArrayList<>();
 	public final ClassSymbol owner;
@@ -18,7 +18,7 @@ public class MethodSymbol extends Symbol {
 	public int vtableIndex = -1;
 	public MethodSymbol overrides;
 
-	public MethodSymbol(Ast.MethodDecl ast, ClassSymbol owner) {
+	public MethodSymbol(MethodDecl ast, ClassSymbol owner) {
 		super(ast.name);
 		this.ast = ast;
 		this.owner = owner;

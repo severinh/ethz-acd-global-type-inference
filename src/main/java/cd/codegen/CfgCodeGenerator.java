@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import cd.Main;
-import cd.ir.Ast;
-import cd.ir.Ast.ClassDecl;
-import cd.ir.Ast.MethodDecl;
+import cd.ir.ast.Ast;
+import cd.ir.ast.ClassDecl;
+import cd.ir.ast.MethodDecl;
 import cd.ir.AstVisitor;
 import cd.ir.BasicBlock;
 import cd.ir.ControlFlowGraph;

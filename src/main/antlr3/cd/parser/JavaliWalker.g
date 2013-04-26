@@ -39,10 +39,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
-import cd.ir.Ast;
-import cd.ir.Ast.*;
-import cd.ir.Ast.UnaryOp.UOp;
-import cd.ir.Ast.BinaryOp.BOp;
+import cd.ir.ast.*;
+import cd.ir.ast.UnaryOp.UOp;
+import cd.ir.ast.BinaryOp.BOp;
 import cd.util.Pair;
 import cd.exceptions.ParseFailure;
 }

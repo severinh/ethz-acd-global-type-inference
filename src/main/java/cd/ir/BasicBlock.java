@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cd.ir.Ast.Expr;
+import cd.ir.ast.Ast;
+import cd.ir.ast.Expr;
 import cd.ir.symbols.VariableSymbol;
 
 /**

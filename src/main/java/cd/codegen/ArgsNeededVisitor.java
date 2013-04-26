@@ -1,18 +1,18 @@
 package cd.codegen;
 
 import cd.Config;
-import cd.ir.Ast;
-import cd.ir.Ast.BuiltInRead;
-import cd.ir.Ast.BuiltInReadFloat;
-import cd.ir.Ast.BuiltInWrite;
-import cd.ir.Ast.BuiltInWriteFloat;
-import cd.ir.Ast.BuiltInWriteln;
-import cd.ir.Ast.Field;
-import cd.ir.Ast.Index;
-import cd.ir.Ast.MethodCall;
-import cd.ir.Ast.MethodCallExpr;
-import cd.ir.Ast.NewArray;
-import cd.ir.Ast.NewObject;
+import cd.ir.ast.Ast;
+import cd.ir.ast.BuiltInRead;
+import cd.ir.ast.BuiltInReadFloat;
+import cd.ir.ast.BuiltInWrite;
+import cd.ir.ast.BuiltInWriteFloat;
+import cd.ir.ast.BuiltInWriteln;
+import cd.ir.ast.Field;
+import cd.ir.ast.Index;
+import cd.ir.ast.MethodCall;
+import cd.ir.ast.MethodCallExpr;
+import cd.ir.ast.NewArray;
+import cd.ir.ast.NewObject;
 import cd.ir.AstVisitor;
 
 /**

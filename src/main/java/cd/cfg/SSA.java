@@ -8,11 +8,11 @@ import java.util.Set;
 import cd.Main;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
-import cd.ir.Ast;
-import cd.ir.Ast.Assign;
-import cd.ir.Ast.Expr;
-import cd.ir.Ast.MethodDecl;
-import cd.ir.Ast.Var;
+import cd.ir.ast.Assign;
+import cd.ir.ast.Ast;
+import cd.ir.ast.Expr;
+import cd.ir.ast.MethodDecl;
+import cd.ir.ast.Var;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.ir.AstVisitor;
@@ -121,7 +121,7 @@ public class SSA {
 			for (Phi phi : succ.phis.values()) {
 				VariableSymbol cursym = currentVersions.get(phi.v0sym);
 				assert cursym != null;
-				phi.rhs.set(predIndex, Ast.Var.withSym(cursym));
+				phi.rhs.set(predIndex, Var.withSym(cursym));
 			}
 		}
 
@@ -150,7 +150,7 @@ public class SSA {
 				renumberAST(ast.right(), currentVersions);
 
 				Ast lhs = ast.left();
-				if (lhs instanceof Ast.Var) {
+				if (lhs instanceof Var) {
 					Var var = (Var) lhs;
 					var.setSymbol(renumberDefinedSymbol(var.sym,
 							currentVersions));
@@ -210,7 +210,7 @@ public class SSA {
 					Phi phi = phiDefs.get(sym);
 					if (phi != null)
 						for (Expr rhs : phi.rhs)
-							expandInto(((Ast.Var) rhs).sym, result);
+							expandInto(((Var) rhs).sym, result);
 				}
 			}
 

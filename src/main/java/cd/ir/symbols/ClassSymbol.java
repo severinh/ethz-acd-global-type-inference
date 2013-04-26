@@ -3,11 +3,11 @@ package cd.ir.symbols;
 import java.util.HashMap;
 import java.util.Map;
 
-import cd.ir.Ast;
+import cd.ir.ast.ClassDecl;
 
 public class ClassSymbol extends TypeSymbol {
 
-	public final Ast.ClassDecl ast;
+	public final ClassDecl ast;
 	public ClassSymbol superClass;
 	public final VariableSymbol thisSymbol = new VariableSymbol("this", this);
 	public final Map<String, VariableSymbol> fields = new HashMap<>();
@@ -17,7 +17,7 @@ public class ClassSymbol extends TypeSymbol {
 	public int totalFields = -1;
 	public int sizeof = -1;
 
-	public ClassSymbol(Ast.ClassDecl ast) {
+	public ClassSymbol(ClassDecl ast) {
 		super(ast.name);
 		this.ast = ast;
 	}
