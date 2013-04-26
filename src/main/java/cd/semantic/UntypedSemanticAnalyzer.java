@@ -32,7 +32,7 @@ public class UntypedSemanticAnalyzer {
 	}
 
 	public void check(List<ClassDecl> classDecls) throws SemanticFailure {
-		main.allTypeSymbols = createSymbols(classDecls);
+		createSymbols(classDecls);
 		checkUntypedInheritance(classDecls);
 	}
 
@@ -43,37 +43,28 @@ public class UntypedSemanticAnalyzer {
 	 * 
 	 * @see SymbolCreator
 	 */
-	private SymbolTable<TypeSymbol> createSymbols(List<ClassDecl> classDecls) {
-		// Start by creating a symbol for all built-in types.
-		SymbolTable<TypeSymbol> typeSymbols = new SymbolTable<>(null);
-
-		typeSymbols.add(main.intType);
-		typeSymbols.add(main.booleanType);
-		typeSymbols.add(main.floatType);
-		typeSymbols.add(main.voidType);
-		typeSymbols.add(main.objectType);
+	private void createSymbols(List<ClassDecl> classDecls) {
+		main.typeSymbols = new TypeSymbolTable();
 
 		// Add symbols for all declared classes.
 		for (ClassDecl ast : classDecls) {
 			// Check for classes named Object
-			if (ast.name.equals(main.objectType.name))
+			if (ast.name.equals(main.typeSymbols.getObjectType().name))
 				throw new SemanticFailure(Cause.OBJECT_CLASS_DEFINED);
 			ast.sym = new ClassSymbol(ast);
-			typeSymbols.add(ast.sym);
+			main.typeSymbols.add(ast.sym);
 		}
 
 		// Create symbols for arrays of each type.
-		for (Symbol sym : new ArrayList<Symbol>(typeSymbols.localSymbols())) {
+		for (Symbol sym : new ArrayList<Symbol>(main.typeSymbols.localSymbols())) {
 			ArrayTypeSymbol array = new ArrayTypeSymbol((TypeSymbol) sym);
-			typeSymbols.add(array);
+			main.typeSymbols.add(array);
 		}
 
 		// For each class, create symbols for each method and field
-		SymbolCreator sc = new SymbolCreator(main, typeSymbols);
+		SymbolCreator sc = new SymbolCreator(main, main.typeSymbols);
 		for (ClassDecl ast : classDecls)
 			sc.createSymbols(ast);
-
-		return typeSymbols;
 	}
 
 	/**

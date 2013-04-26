@@ -127,7 +127,7 @@ public class AstCodeGenerator {
 		}
 
 		// emit vtables
-		for (TypeSymbol ts : main.allTypeSymbols.allSymbols()) {
+		for (TypeSymbol ts : main.typeSymbols.allSymbols()) {
 			emitVtable(ts);
 		}
 
@@ -296,7 +296,7 @@ public class AstCodeGenerator {
 		} else if (ts instanceof ArrayTypeSymbol) {
 			ArrayTypeSymbol as = (ArrayTypeSymbol) ts;
 			emitLabel(vtable(as));
-			emitConstantData(vtable(main.objectType));
+			emitConstantData(vtable(main.typeSymbols.getObjectType()));
 		}
 	}
 
@@ -509,11 +509,11 @@ public class AstCodeGenerator {
 
 			public void binaryOp(BinaryOp ast, String leftReg, String rightReg) {
 
-				if (ast.type == main.floatType) {
+				if (ast.type == main.typeSymbols.getObjectType()) {
 					floatOp(leftReg, ast.operator, rightReg);
 				} else {
 
-					if (ast.left().type == main.floatType) {
+					if (ast.left().type == main.typeSymbols.getFloatType()) {
 						floatCmp(leftReg, ast.operator, rightReg);
 					} else {
 						integerOp(leftReg, ast.operator, rightReg);
@@ -859,7 +859,7 @@ public class AstCodeGenerator {
 				break;
 
 			case U_MINUS: {
-				if (ast.type == main.floatType) {
+				if (ast.type == main.typeSymbols.getFloatType()) {
 					emitGprRegToFloatReg(FLOAT_REG_0, argReg);
 					push("%eax");
 					emit("movd", FLOAT_REG_0, "%eax");
@@ -952,7 +952,7 @@ public class AstCodeGenerator {
 
 			call("*" + reg, reg);
 
-			if (mthSymbol.returnType == main.voidType) {
+			if (mthSymbol.returnType == main.typeSymbols.getVoidType()) {
 				releaseRegister(reg);
 				return null;
 			}

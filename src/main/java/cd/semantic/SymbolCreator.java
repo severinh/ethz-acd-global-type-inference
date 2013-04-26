@@ -76,13 +76,12 @@ public class SymbolCreator extends Object {
 
 		@Override
 		public Void methodDecl(MethodDecl ast, Void arg) {
-
 			ast.sym = new MethodSymbol(ast, classSym);
 			add(classSym.methods, ast.sym);
 
 			// create return type symbol
 			if (ast.returnType.equals("void")) {
-				ast.sym.returnType = main.voidType;
+				ast.sym.returnType = main.typeSymbols.getVoidType();
 			} else {
 				ast.sym.returnType = typesTable.getType(ast.returnType);
 			}

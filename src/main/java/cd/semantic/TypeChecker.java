@@ -1,6 +1,5 @@
 package cd.semantic;
 
-import cd.Main;
 import cd.debug.AstOneLine;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
@@ -43,14 +42,12 @@ import cd.ir.ExprVisitor;
 
 public class TypeChecker {
 
-	private final Main main;
-	private final SymbolTable<TypeSymbol> typeSymbols;
+	private final TypeSymbolTable typeSymbols;
 	private final TypingVisitor visitor = new TypingVisitor();
 
 	private MethodDecl thisMethod;
 
-	public TypeChecker(Main main, SymbolTable<TypeSymbol> typeSymbols) {
-		this.main = main;
+	public TypeChecker(TypeSymbolTable typeSymbols) {
 		this.typeSymbols = typeSymbols;
 	}
 
@@ -80,15 +77,16 @@ public class TypeChecker {
 	}
 
 	public void typeIsPrimitive(TypeSymbol type) {
-		if (type != main.intType && type != main.floatType) {
+		if (type != typeSymbols.getIntType()
+				&& type != typeSymbols.getFloatType()) {
 			throw new SemanticFailure(Cause.TYPE_ERROR,
 					"Expected %s or %s for operands but found type %s",
-					main.intType, main.floatType, type);
+					typeSymbols.getIntType(), typeSymbols.getFloatType(), type);
 		}
 	}
 
 	public void typeIsValidForOperator(TypeSymbol type, BOp operator) {
-		if (operator == BOp.B_MOD && type == main.floatType) {
+		if (operator == BOp.B_MOD && type == typeSymbols.getFloatType()) {
 			throw new SemanticFailure(Cause.TYPE_ERROR,
 					"Operation %s not valid for type %s", operator, type);
 		}
@@ -113,13 +111,13 @@ public class TypeChecker {
 			return null;
 
 		if (sym instanceof ArrayTypeSymbol)
-			return main.objectType;
+			return typeSymbols.getObjectType();
 
 		return ((ClassSymbol) sym).superClass;
 	}
 
 	public boolean subtype(TypeSymbol sup, TypeSymbol sub) {
-		if (sub == main.nullType && sup.isReferenceType())
+		if (sub == typeSymbols.getNullType() && sup.isReferenceType())
 			return true;
 		while (sub != null) {
 			if (sub == sup)
@@ -163,14 +161,14 @@ public class TypeChecker {
 		@Override
 		public Void builtInWrite(BuiltInWrite ast,
 				SymbolTable<VariableSymbol> locals) {
-			checkType(ast.arg(), main.intType, locals);
+			checkType(ast.arg(), typeSymbols.getIntType(), locals);
 			return null;
 		}
 
 		@Override
 		public Void builtInWriteFloat(BuiltInWriteFloat ast,
 				SymbolTable<VariableSymbol> locals) {
-			checkType(ast.arg(), main.floatType, locals);
+			checkType(ast.arg(), typeSymbols.getFloatType(), locals);
 			return null;
 		}
 
@@ -182,7 +180,7 @@ public class TypeChecker {
 
 		@Override
 		public Void ifElse(IfElse ast, SymbolTable<VariableSymbol> locals) {
-			checkType(ast.condition(), main.booleanType, locals);
+			checkType(ast.condition(), typeSymbols.getBooleanType(), locals);
 			visit(ast.then(), locals);
 			if (ast.otherwise() != null)
 				visit(ast.otherwise(), locals);
@@ -221,7 +219,7 @@ public class TypeChecker {
 
 		@Override
 		public Void whileLoop(WhileLoop ast, SymbolTable<VariableSymbol> locals) {
-			checkType(ast.condition(), main.booleanType, locals);
+			checkType(ast.condition(), typeSymbols.getBooleanType(), locals);
 			return visit(ast.body(), locals);
 		}
 
@@ -231,12 +229,13 @@ public class TypeChecker {
 
 			if (ast.arg() == null) {
 
-				if (thisMethod.sym.returnType != main.voidType) {
+				if (thisMethod.sym.returnType != typeSymbols.getVoidType()) {
 
 					throw new SemanticFailure(
 							Cause.TYPE_ERROR,
 							"Return statement has no arguments. Expected %s but type was %s",
-							thisMethod.sym.returnType, main.voidType);
+							thisMethod.sym.returnType, typeSymbols
+									.getVoidType());
 				}
 
 			} else {
@@ -277,16 +276,16 @@ public class TypeChecker {
 
 			case B_AND:
 			case B_OR:
-				checkType(ast.left(), main.booleanType, locals);
-				checkType(ast.right(), main.booleanType, locals);
-				return main.booleanType;
+				checkType(ast.left(), typeSymbols.getBooleanType(), locals);
+				checkType(ast.right(), typeSymbols.getBooleanType(), locals);
+				return typeSymbols.getBooleanType();
 
 			case B_EQUAL:
 			case B_NOT_EQUAL:
 				TypeSymbol left = type(ast.left(), locals);
 				TypeSymbol right = type(ast.right(), locals);
 				if (subtype(left, right) || subtype(right, left))
-					return main.booleanType;
+					return typeSymbols.getBooleanType();
 				throw new SemanticFailure(Cause.TYPE_ERROR,
 						"Types %s and %s could never be equal", left, right);
 
@@ -296,7 +295,7 @@ public class TypeChecker {
 			case B_GREATER_OR_EQUAL: {
 				TypeSymbol type = typeEquality(ast.left(), ast.right(), locals);
 				typeIsPrimitive(type);
-				return main.booleanType;
+				return typeSymbols.getBooleanType();
 			}
 
 			}
@@ -306,19 +305,19 @@ public class TypeChecker {
 		@Override
 		public TypeSymbol booleanConst(BooleanConst ast,
 				SymbolTable<VariableSymbol> arg) {
-			return main.booleanType;
+			return typeSymbols.getBooleanType();
 		}
 
 		@Override
 		public TypeSymbol builtInRead(BuiltInRead ast,
 				SymbolTable<VariableSymbol> arg) {
-			return main.intType;
+			return typeSymbols.getIntType();
 		}
 
 		@Override
 		public TypeSymbol builtInReadFloat(BuiltInReadFloat ast,
 				SymbolTable<VariableSymbol> arg) {
-			return main.floatType;
+			return typeSymbols.getFloatType();
 		}
 
 		@Override
@@ -357,25 +356,25 @@ public class TypeChecker {
 		@Override
 		public TypeSymbol index(Index ast, SymbolTable<VariableSymbol> locals) {
 			ArrayTypeSymbol argType = asArray(type(ast.left(), locals));
-			checkType(ast.right(), main.intType, locals);
+			checkType(ast.right(), typeSymbols.getIntType(), locals);
 			return argType.elementType;
 		}
 
 		@Override
 		public TypeSymbol intConst(IntConst ast, SymbolTable<VariableSymbol> arg) {
-			return main.intType;
+			return typeSymbols.getIntType();
 		}
 
 		@Override
 		public TypeSymbol floatConst(FloatConst ast,
 				SymbolTable<VariableSymbol> arg) {
-			return main.floatType;
+			return typeSymbols.getFloatType();
 		}
 
 		@Override
 		public TypeSymbol newArray(NewArray ast,
 				SymbolTable<VariableSymbol> locals) {
-			checkType(ast.arg(), main.intType, locals);
+			checkType(ast.arg(), typeSymbols.getIntType(), locals);
 			return typeSymbols.getType(ast.typeName);
 		}
 
@@ -388,7 +387,7 @@ public class TypeChecker {
 		@Override
 		public TypeSymbol nullConst(NullConst ast,
 				SymbolTable<VariableSymbol> arg) {
-			return main.nullType;
+			return typeSymbols.getNullType();
 		}
 
 		@Override
@@ -411,8 +410,8 @@ public class TypeChecker {
 			}
 
 			case U_BOOL_NOT:
-				checkType(ast.arg(), main.booleanType, locals);
-				return main.booleanType;
+				checkType(ast.arg(), typeSymbols.getBooleanType(), locals);
+				return typeSymbols.getBooleanType();
 			}
 			throw new RuntimeException("Unknown unary op " + ast.operator);
 		}

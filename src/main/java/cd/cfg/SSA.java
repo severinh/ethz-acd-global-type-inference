@@ -28,7 +28,8 @@ public class SSA {
 
 	public SSA(Main main) {
 		this.main = main;
-		this.uninitSym = new VariableSymbol("__UNINIT__", main.nullType);
+		this.uninitSym = new VariableSymbol("__UNINIT__",
+				main.typeSymbols.getNullType());
 	}
 
 	private MethodSymbol msym;

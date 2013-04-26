@@ -216,9 +216,9 @@ public class Optimizer {
 			private Boolean areEqual(Expr left, Expr right)
 					throws NotConstantException {
 				Boolean boolValue;
-				if (left.type == main.intType)
+				if (left.type == main.typeSymbols.getIntType())
 					boolValue = asInt(left) == asInt(right);
-				else if (left.type == main.booleanType)
+				else if (left.type == main.typeSymbols.getBooleanType())
 					boolValue = asBool(left) == asBool(right);
 				else
 					boolValue = (isNull(left) && isNull(right) ? true : null);

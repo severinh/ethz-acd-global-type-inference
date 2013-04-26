@@ -10,7 +10,6 @@ import cd.ir.ast.MethodDecl;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.Symbol;
-import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 
 /**
@@ -34,8 +33,8 @@ public class TypedSemanticAnalyzer {
 
 	public void check(List<ClassDecl> classDecls) throws SemanticFailure {
 		checkInheritance(classDecls);
-		checkStartPoint(main.allTypeSymbols);
-		checkMethodBodies(main.allTypeSymbols, classDecls);
+		checkStartPoint(main.typeSymbols);
+		checkMethodBodies(main.typeSymbols, classDecls);
 		rewriteMethodBodies(classDecls);
 	}
 
@@ -55,13 +54,13 @@ public class TypedSemanticAnalyzer {
 	 * Guarantee there is a class Main which defines a method main with no
 	 * arguments.
 	 */
-	private void checkStartPoint(SymbolTable<TypeSymbol> typeSymbols) {
+	private void checkStartPoint(TypeSymbolTable typeSymbols) {
 		Symbol mainClass = typeSymbols.get("Main");
 		if (mainClass != null && mainClass instanceof ClassSymbol) {
 			ClassSymbol cs = (ClassSymbol) mainClass;
 			MethodSymbol mainMethod = cs.getMethod("main");
 			if (mainMethod != null && mainMethod.parameters.size() == 0
-					&& mainMethod.returnType == main.voidType) {
+					&& mainMethod.returnType == main.typeSymbols.getVoidType()) {
 				main.mainType = cs;
 				return; // found the main() method!
 			}
@@ -75,12 +74,11 @@ public class TypedSemanticAnalyzer {
 	 * 
 	 * @see TypeChecker
 	 */
-	private void checkMethodBodies(SymbolTable<TypeSymbol> typeSymbols,
+	private void checkMethodBodies(TypeSymbolTable typeSymbols,
 			List<ClassDecl> classDecls) {
-		TypeChecker tc = new TypeChecker(main, typeSymbols);
+		TypeChecker tc = new TypeChecker(typeSymbols);
 
 		for (ClassDecl classd : classDecls) {
-
 			SymbolTable<VariableSymbol> fldTable = new SymbolTable<>(null);
 
 			// add all fields of this class, or any of its super classes
