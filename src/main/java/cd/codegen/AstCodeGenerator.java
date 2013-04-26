@@ -68,10 +68,6 @@ public class AstCodeGenerator {
 		this.main = main;
 	}
 
-	public void debug(String format, Object... args) {
-		this.main.debug(format, args);
-	}
-
 	/**
 	 * The address of the this ptr relative to the BP. Note that the this ptr is
 	 * always the first argument.

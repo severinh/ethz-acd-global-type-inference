@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.rmi.NotBoundException;
@@ -15,8 +14,11 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.List;
 
+import org.codehaus.plexus.util.ExceptionUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cd.Config;
 import cd.Main;
@@ -29,7 +31,8 @@ import cd.util.FileUtil;
 
 abstract public class AbstractTestSamplePrograms {
 
-	protected final static boolean IGNORE_EXTRA_CREDIT_TESTS = true;
+	private static final Logger LOG = LoggerFactory
+			.getLogger(AbstractTestSamplePrograms.class);
 
 	protected File file, sfile, binfile, infile;
 	protected File parserreffile, semanticreffile, execreffile, cfgreffile,
@@ -78,8 +81,6 @@ abstract public class AbstractTestSamplePrograms {
 
 	private void warnAboutDiff(String phase, String exp, String act) {
 		try (PrintStream err = new PrintStream(errfile)) {
-			err.println("Debug information for file: " + this.file);
-			err.println(this.main.debug.toString());
 			err.println(String.format(
 					"Phase %s failed because we expected to see:", phase));
 			err.println(exp);
@@ -107,10 +108,6 @@ abstract public class AbstractTestSamplePrograms {
 		if (new File(file.getAbsolutePath() + ".64bitonly").exists()
 				&& Integer.valueOf(System.getProperty("sun.arch.data.model")) == 32) {
 			System.err.println("--> Ignoring test because it's 64-bit-only");
-		} else if (IGNORE_EXTRA_CREDIT_TESTS
-				&& file.getAbsolutePath().contains("extraCredit")) {
-			System.err
-					.println("--> Ignoring optional test that checks extra-credit parts");
 		} else {
 			boolean hasWellDefinedOutput = !new File(file.getAbsolutePath()
 					+ ".undefinedOutput").exists();
@@ -145,8 +142,6 @@ abstract public class AbstractTestSamplePrograms {
 				throw cf;
 			} catch (Throwable e) {
 				try (PrintStream err = new PrintStream(errfile)) {
-					err.println("Debug information for file: " + this.file);
-					err.println(this.main.debug.toString());
 					err.println("Test failed because an exception was thrown:");
 					err.println("    " + e.getLocalizedMessage());
 					err.println("Stack trace:");
@@ -178,9 +173,9 @@ abstract public class AbstractTestSamplePrograms {
 			parserOut = AstDump.toString(astRoots);
 		} catch (ParseFailure pf) {
 			// Parse errors are ok too.
-			main.debug("");
-			main.debug("");
-			main.debug("%s", pf.toString());
+			LOG.debug("");
+			LOG.debug("");
+			LOG.debug("{}", pf.toString());
 			parserOut = Reference.PARSE_FAILURE;
 		}
 
@@ -205,7 +200,7 @@ abstract public class AbstractTestSamplePrograms {
 			passed = true;
 		} catch (SemanticFailure sf) {
 			result = sf.cause.name();
-			main.debug("Error message: %s", sf.getLocalizedMessage());
+			LOG.debug("Error message: {}", sf.getLocalizedMessage());
 			passed = false;
 		}
 
@@ -331,7 +326,7 @@ abstract public class AbstractTestSamplePrograms {
 			int newline = res.indexOf("\n");
 			String cause = res.substring(newline + 1);
 			if (!cause.equals("") && !cause.equals("\n"))
-				main.debug("Error message from reference is: %s", cause);
+				LOG.debug("Error message from reference is: {}", cause);
 			return res.substring(0, newline); // 1st line
 		} else {
 			return res;
@@ -379,8 +374,8 @@ abstract public class AbstractTestSamplePrograms {
 	private String fragmentBug(Throwable e) {
 		String res = String.format("** BUG IN REFERENCE SOLUTION: %s **",
 				e.toString());
-		main.debug(res);
-		e.printStackTrace(new PrintWriter(main.debug));
+		LOG.debug(res);
+		LOG.debug(ExceptionUtils.getStackTrace(e));
 		return res;
 	}
 

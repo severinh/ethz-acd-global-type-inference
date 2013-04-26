@@ -5,14 +5,20 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cd.Main;
 import cd.ir.BasicBlock;
 import cd.ir.ControlFlowGraph;
+import cd.ir.ast.MethodDecl;
 
 /**
  * Computes dominators and dominator tree of a control-flow graph.
  */
 public class Dominator {
+
+	private static final Logger LOG = LoggerFactory.getLogger(Dominator.class);
 
 	public final Main main;
 
@@ -23,7 +29,11 @@ public class Dominator {
 	private List<BasicBlock> blocksInRevPostOrder;
 	private int[] postOrderIndex;
 
-	public void compute(ControlFlowGraph cfg) {
+	public void compute(MethodDecl mdecl) {
+		ControlFlowGraph cfg = mdecl.cfg;
+
+		LOG.debug("Computing dominators of {}", mdecl.name);
+
 		// Compute the post order information for the control flow graph
 		blocksInRevPostOrder = new ArrayList<>();
 		postOrderIndex = new int[cfg.allBlocks.size()];
@@ -55,12 +65,13 @@ public class Dominator {
 		for (BasicBlock blk : cfg.allBlocks)
 			if (blk.dominatorTreeParent != null)
 				blk.dominatorTreeParent.dominatorTreeChildren.add(blk);
+
 		// Compute dominance frontier
 		for (BasicBlock blk : cfg.allBlocks) {
-			main.debug("blk=%s preds=%s", blk, blk.predecessors);
+			LOG.debug("blk={} preds={}", blk, blk.predecessors);
 
 			for (BasicBlock pblk : blk.predecessors) {
-				main.debug("blk=%s(%s) pblk=%s", blk, blk.dominatorTreeParent,
+				LOG.debug("blk={}({}) pblk={}", blk, blk.dominatorTreeParent,
 						pblk);
 				BasicBlock runner = pblk;
 				while (runner != blk.dominatorTreeParent && runner != null) {
@@ -68,6 +79,10 @@ public class Dominator {
 					runner = runner.dominatorTreeParent;
 				}
 			}
+		}
+
+		for (BasicBlock b : mdecl.cfg.allBlocks) {
+			LOG.debug("blk={} df={} of {}", b, b.dominanceFrontier, mdecl.name);
 		}
 	}
 

@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cd.Main;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
@@ -23,11 +26,11 @@ import cd.util.DepthFirstSearchPreOrder;
 
 public class SSA {
 
-	private final Main main;
+	private static final Logger LOG = LoggerFactory.getLogger(SSA.class);
+
 	private final VariableSymbol uninitSym;
 
 	public SSA(Main main) {
-		this.main = main;
 		this.uninitSym = new VariableSymbol("__UNINIT__",
 				main.typeSymbols.getNullType());
 	}
@@ -38,17 +41,17 @@ public class SSA {
 	public void compute(MethodDecl mdecl) {
 		ControlFlowGraph cfg = mdecl.cfg;
 
-		main.debug("Computing SSA form for %s", mdecl.name);
+		LOG.debug("Computing SSA form for {}", mdecl.name);
 
 		// Phase 1: introduce Phis
 		for (BasicBlock bb : cfg.allBlocks) {
-			main.debug("  Adding Phis for %s of %s", bb, mdecl.name);
+			LOG.debug("  Adding Phis for {} of {}", bb, mdecl.name);
 
 			// Compute iterated dominance frontier for this block 'bb'.
 			Set<BasicBlock> idf = new HashSet<>();
 			computeIteratedDominanceFrontier(bb, idf);
-			main.debug("    df=%s", bb.dominanceFrontier);
-			main.debug("    idf=%s", idf);
+			LOG.debug("    df={}", bb.dominanceFrontier);
+			LOG.debug("    idf={}", idf);
 
 			// Introduce phi blocks.
 			for (Ast ast : bb.instructions)
@@ -89,13 +92,13 @@ public class SSA {
 		}
 
 		private void addPhis(VariableSymbol sym, Set<BasicBlock> idf) {
-			main.debug("Introducing phis for %s at %s", sym, idf);
+			LOG.debug("Introducing phis for {} at {}", sym, idf);
 			for (BasicBlock bb : idf) {
 				if (bb.phis.containsKey(sym))
 					continue; // already has a phi for this symbol
 				Phi phi = new Phi(sym, bb.predecessors.size());
 				bb.phis.put(sym, phi);
-				main.debug("  New phi created %s at %s", phi, bb);
+				LOG.debug("  New phi created {} at {}", phi, bb);
 			}
 		}
 

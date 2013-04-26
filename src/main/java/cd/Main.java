@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -14,6 +13,8 @@ import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cd.cfg.CFGBuilder;
 import cd.cfg.DeSSA;
@@ -27,7 +28,6 @@ import cd.exceptions.ParseFailure;
 import cd.ir.ast.ClassDecl;
 import cd.ir.ast.MethodDecl;
 import cd.ir.symbols.ClassSymbol;
-import cd.ir.BasicBlock;
 import cd.parser.JavaliLexer;
 import cd.parser.JavaliParser;
 import cd.parser.JavaliWalker;
@@ -44,8 +44,7 @@ import cd.semantic.UntypedSemanticAnalyzer;
  */
 public class Main {
 
-	// Set to non-null to write debug info out
-	public Writer debug = null;
+	public static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
 	// Set to non-null to write dump of control flow graph
 	public File cfgdumpbase;
@@ -57,19 +56,7 @@ public class Main {
 	public TypeSymbolTable typeSymbols;
 
 	public Main() {
-	}
 
-	public void debug(String format, Object... args) {
-		if (debug != null) {
-			String result = String.format(format, args);
-			try {
-				debug.write(result);
-				debug.write('\n');
-				debug.flush();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
 	}
 
 	/** Parse command line, invoke compile() routine */
@@ -77,27 +64,20 @@ public class Main {
 		Main m = new Main();
 
 		for (String file : args) {
-			if (file.equals("-d"))
-				m.debug = new OutputStreamWriter(System.err);
-			else {
-				if (m.debug != null)
-					m.cfgdumpbase = new File(file);
+			List<ClassDecl> astRoots;
 
-				List<ClassDecl> astRoots;
+			// Parse
+			try (FileReader fin = new FileReader(file)) {
+				astRoots = m.parse(file, fin, false);
+			}
 
-				// Parse:
-				try (FileReader fin = new FileReader(file)) {
-					astRoots = m.parse(file, fin, false);
-				}
+			// Run the semantic check
+			m.semanticCheck(astRoots);
 
-				// Run the semantic check:
-				m.semanticCheck(astRoots);
-
-				// Generate code:
-				String sFile = file + Config.ASMEXT;
-				try (FileWriter fout = new FileWriter(sFile);) {
-					m.generateCode(astRoots, fout);
-				}
+			// Generate code
+			String sFile = file + Config.ASMEXT;
+			try (FileWriter fout = new FileWriter(sFile);) {
+				m.generateCode(astRoots, fout);
 			}
 		}
 	}
@@ -122,9 +102,7 @@ public class Main {
 
 	public List<ClassDecl> parseWithAntlr(String file, Reader reader)
 			throws IOException {
-
 		try {
-
 			ANTLRReaderStream input = new ANTLRReaderStream(reader);
 			JavaliLexer lexer = new JavaliLexer(input);
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -139,13 +117,11 @@ public class Main {
 
 			JavaliWalker walker = new JavaliWalker(nodes);
 
-			debug("AST Resulting From Parsing Stage:");
+			LOG.debug("AST Resulting From Parsing Stage:");
 			List<ClassDecl> result = walker.unit();
-
-			dumpAst(result);
+			LOG.debug(AstDump.toString(result));
 
 			return result;
-
 		} catch (RecognitionException e) {
 			ParseFailure pf = new ParseFailure(0, "?");
 			pf.initCause(e);
@@ -165,13 +141,8 @@ public class Main {
 
 		// Compute dominators
 		for (ClassDecl cd : astRoots)
-			for (MethodDecl md : cd.methods()) {
-				debug("Computing dominators of %s", md.name);
-				new Dominator(this).compute(md.cfg);
-				for (BasicBlock b : md.cfg.allBlocks) {
-					debug("  %s df %s of %s", b, b.dominanceFrontier, md.name);
-				}
-			}
+			for (MethodDecl md : cd.methods())
+				new Dominator(this).compute(md);
 		CfgDump.toString(astRoots, ".dom", cfgdumpbase, true);
 
 		// Introduce SSA form.
@@ -196,13 +167,6 @@ public class Main {
 	public void generateCode(List<ClassDecl> astRoots, Writer out) {
 		CfgCodeGenerator cg = new CfgCodeGenerator(this, out);
 		cg.go(astRoots);
-	}
-
-	/**
-	 * Dumps the AST to the debug stream
-	 */
-	private void dumpAst(List<ClassDecl> astRoots) {
-		debug(AstDump.toString(astRoots));
 	}
 
 }

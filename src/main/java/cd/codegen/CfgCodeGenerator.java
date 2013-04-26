@@ -23,10 +23,6 @@ public class CfgCodeGenerator {
 		this.cg = new AstCodeGenerator(main, out);
 	}
 
-	public void debug(String format, Object... args) {
-		this.main.debug(format, args);
-	}
-
 	public void go(List<? extends ClassDecl> astRoots) {
 		cg.emitPrefix(astRoots);
 		for (ClassDecl cdecl : astRoots)

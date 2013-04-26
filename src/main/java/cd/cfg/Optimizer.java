@@ -10,6 +10,9 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cd.Main;
 import cd.debug.AstOneLine;
 import cd.debug.CfgDump;
@@ -36,6 +39,8 @@ import cd.util.DepthFirstSearchPreOrder;
 
 public class Optimizer {
 
+	private static final Logger LOG = LoggerFactory.getLogger(Optimizer.class);
+	
 	private static final boolean INTENSE_DEBUG = true;
 	private static final int MAX_INNER = 16, MAX_OUTER = 16;
 
@@ -59,26 +64,26 @@ public class Optimizer {
 			if (INTENSE_DEBUG)
 				CfgDump.toString(md, phase() + ".before", main.cfgdumpbase,
 						false);
-			main.debug("Before phase = %d", overall - 1);
+			LOG.debug("Before phase = {}", overall - 1);
 
 			int inner = 0;
 			do {
 				oldChanges = changes;
 
-				main.debug("Constant Prop, phase %d", overall);
+				LOG.debug("Constant Prop, phase {}", overall);
 				new ConstantPropagation().compute(md);
 				if (INTENSE_DEBUG)
 					CfgDump.toString(md, phase() + ".constant",
 							main.cfgdumpbase, false);
 
-				main.debug("Copy Prop, phase %d", overall);
+				LOG.debug("Copy Prop, phase {}", overall);
 				new CopyPropagation().compute(md);
 				if (INTENSE_DEBUG)
 					CfgDump.toString(md, phase() + ".copyprop",
 							main.cfgdumpbase, false);
 			} while (changes > oldChanges && inner++ < MAX_INNER);
 
-			main.debug("CSE, phase %d", overall);
+			LOG.debug("CSE, phase {}", overall);
 			new CommonSubexpressionElimination().compute(md);
 			if (INTENSE_DEBUG)
 				CfgDump.toString(md, phase() + ".cse", main.cfgdumpbase, false);
@@ -241,7 +246,7 @@ public class Optimizer {
 					// type of the expression does not change:
 					replacement.type = original.type;
 					changes++;
-					main.debug("Constant Prop: Replacing %s with %s", original,
+					LOG.debug("Constant Prop: Replacing {} with {}", original,
 							replacement);
 					return replacement;
 				}
@@ -289,7 +294,7 @@ public class Optimizer {
 					strings.add(AstOneLine.toString(rhs));
 				if (strings.size() == 1) {
 					Expr rhs = phi.rhs.get(0);
-					main.debug("Copy Prop: %s is just a copy of %s", phi.lhs,
+					LOG.debug("Copy Prop: {} is just a copy of {}", phi.lhs,
 							rhs);
 					copiedSymbols.put(phi.lhs, rhs);
 				}
@@ -297,7 +302,7 @@ public class Optimizer {
 
 			// Process instructions and condition:
 			for (Ast instr : blk.instructions) {
-				main.debug("Copy Prop: instr=%s", instr);
+				LOG.debug("Copy Prop: instr={}", instr);
 				vis.visit(instr, null);
 			}
 			if (blk.condition != null)
@@ -329,7 +334,7 @@ public class Optimizer {
 				if (ast.left() instanceof Var) {
 					if (new IsConstantExpr().visit(ast.right(), null)) {
 						VariableSymbol sym = ((Var) ast.left()).sym;
-						main.debug("Copy Prop: %s is just a copy of %s", sym,
+						LOG.debug("Copy Prop: {} is just a copy of {}", sym,
 								ast.right());
 						copiedSymbols.put(sym, ast.right());
 					}
@@ -343,7 +348,7 @@ public class Optimizer {
 				Expr replacement = copiedSymbols.get(ast.sym);
 				if (replacement != null) {
 					changes++;
-					main.debug("Copy Prop: Replacing %s with %s", ast,
+					LOG.debug("Copy Prop: Replacing {} with {}", ast,
 							replacement);
 					return replacement.deepCopy();
 				}
@@ -499,7 +504,7 @@ public class Optimizer {
 		 * identifying duplicate uses
 		 */
 		public BlockData find(BlockData domData, BasicBlock block) {
-			main.debug("CSE.find(%s): gathering exprs", block);
+			LOG.debug("CSE.find({}): gathering exprs", block);
 
 			// Initially, any expressions evaluated by our dominators are in
 			// scope.
@@ -531,7 +536,7 @@ public class Optimizer {
 			final BasicBlock block = data.block;
 			// Process those expressions, extracting duplicates. Note that
 			// the list is reversed so that the largest expressions come first.
-			main.debug("CSE.replace(%s): removing exprs", block);
+			LOG.debug("CSE.replace({}): removing exprs", block);
 			for (Canonical ex : data.canonicalsAppearingInThisBlock) {
 				// If this does not span over at least one subexpression, it's
 				// something like "x", "null", or "this", which are not worth
@@ -550,9 +555,9 @@ public class Optimizer {
 					continue;
 
 				// debug print outs.
-				main.debug("  Expression: %s", ex.key);
-				main.debug("    Appearances: %d", ex.appearances.size());
-				main.debug("    Dead Appearances: %s", ex.deadAppearances);
+				LOG.debug("  Expression: {}", ex.key);
+				LOG.debug("    Appearances: {}", ex.appearances.size());
+				LOG.debug("    Dead Appearances: {}", ex.deadAppearances);
 
 				// Any use of this master expression is also a use of its
 				// subexpressions. (i.e., x+y is also a use of x and y)
@@ -617,7 +622,7 @@ public class Optimizer {
 
 		private void createAssignment(BasicBlock block, int i, Canonical ex,
 				Expr expr1) {
-			main.debug("  inserting assignment to %s at index %d", ex.sym, i);
+			LOG.debug("  inserting assignment to {} at index {}", ex.sym, i);
 			Assign assign = new Assign(Var.withSym(ex.sym), expr1);
 			block.instructions.add(i, assign);
 		}
@@ -667,13 +672,13 @@ public class Optimizer {
 					ex = new Canonical(exprkey, prev1, prev2);
 					data.canonicalsInScope.put(ex.key, ex);
 
-					main.debug("    New expression: %s (from %s)", ex.key, n);
+					LOG.debug("    New expression: {} (from {})", ex.key, n);
 					if (prev1 != null)
-						main.debug("      Prev1: %s", prev1.key);
+						LOG.debug("      Prev1: {}", prev1.key);
 					if (prev2 != null)
-						main.debug("      Prev2: %s", prev2.key);
+						LOG.debug("      Prev2: {}", prev2.key);
 				} else {
-					main.debug("    Old expression: %s (from %s)", ex.key, n);
+					LOG.debug("    Old expression: {} (from {})", ex.key, n);
 				}
 
 				data.canonicalsAppearingInThisBlock.add(ex);
@@ -728,7 +733,7 @@ public class Optimizer {
 				if (arg == null)
 					return null;
 
-				String c = format("(%s)%s", ast.type.name, arg);
+				String c = format("({}){}", ast.type.name, arg);
 				return canonicalize(ast, data, c, arg, null);
 			}
 
@@ -781,7 +786,7 @@ public class Optimizer {
 
 			@Override
 			public Void visit(Ast ast, BlockData arg) {
-				main.debug("  search %s", ast);
+				LOG.debug("  search {}", ast);
 				return super.visit(ast, arg);
 			}
 

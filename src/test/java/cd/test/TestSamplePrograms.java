@@ -1,7 +1,6 @@
 package cd.test;
 
 import java.io.File;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,11 +28,11 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 	/**
 	 * Directory in which to search for test files. If null, then the default is
 	 * the current directory (to include all files). To run only tests in a
-	 * particular directory, use sth. like:
+	 * particular directory, use something like:
 	 * {@code TEST_DIR = new File("javali_tests/A2/")}.
 	 */
-	// public static final File TEST_DIR = new File("javali_tests/test");
-	public static final File TEST_DIR = null;
+	public static final File TEST_DIR = new File(TestSamplePrograms.class
+			.getResource("/").getPath());
 
 	@Parameters
 	public static Collection<Object[]> testFiles() {
@@ -68,7 +67,6 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 		this.optreffile = new File(file.getPath() + ".opt.ref");
 		this.errfile = new File(String.format("%s.err", file.getPath()));
 		this.main = new Main();
-		this.main.debug = new StringWriter();
 		this.main.cfgdumpbase = file;
 	}
 
