@@ -76,7 +76,7 @@ public class SymbolCreator extends Object {
 
 		@Override
 		public Void methodDecl(MethodDecl ast, Void arg) {
-			ast.sym = new MethodSymbol(ast, classSym);
+			ast.sym = new MethodSymbol(ast.name, classSym);
 			add(classSym.methods, ast.sym);
 
 			// create return type symbol

@@ -9,7 +9,6 @@ import cd.ir.ast.ClassDecl;
 
 public class ClassSymbol extends TypeSymbol {
 
-	public final ClassDecl ast;
 	public ClassSymbol superClass;
 	public final VariableSymbol thisSymbol = new VariableSymbol("this", this);
 	public final Map<String, VariableSymbol> fields = new HashMap<>();
@@ -19,9 +18,8 @@ public class ClassSymbol extends TypeSymbol {
 	public int totalFields = -1;
 	public int sizeof = -1;
 
-	public ClassSymbol(ClassDecl ast) {
-		super(ast.name);
-		this.ast = ast;
+	public ClassSymbol(ClassDecl classDecl) {
+		super(classDecl.name);
 	}
 
 	/**
@@ -29,7 +27,6 @@ public class ClassSymbol extends TypeSymbol {
 	 */
 	public ClassSymbol(String name) {
 		super(name);
-		this.ast = null;
 	}
 
 	@Override
