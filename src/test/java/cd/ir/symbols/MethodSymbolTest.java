@@ -25,10 +25,20 @@ public class MethodSymbolTest {
 		methodSymbol.addLocal(new VariableSymbol("foo", classSymbol));
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void testNullLocal() {
+		methodSymbol.addLocal(null);
+	}
+
 	@Test(expected = SemanticFailure.class)
 	public void testParameterDoubleDeclaration() {
 		methodSymbol.addParameter(new VariableSymbol("foo", classSymbol));
 		methodSymbol.addParameter(new VariableSymbol("foo", classSymbol));
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testNullParameter() {
+		methodSymbol.addParameter(null);
 	}
 
 }

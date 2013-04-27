@@ -73,6 +73,10 @@ public class MethodSymbol extends Symbol {
 	 *             in this method
 	 */
 	public void addParameter(VariableSymbol parameter) {
+		if (parameter == null) {
+			throw new NullPointerException("parameter must not be null");
+		}
+
 		// The quadratic complexity of the following check should not be an
 		// issue as methods usually only have few parameters. Furthermore,
 		// adding parameters happens less often than accessing parameters.
