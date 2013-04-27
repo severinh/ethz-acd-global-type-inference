@@ -8,14 +8,6 @@ public class VariableSymbol extends Symbol {
 		PARAM, LOCAL, FIELD
 	}
 
-	/**
-	 * The type of the variable symbol must be modifiable in order to implement
-	 * type inference. However, it must not be modified anymore once type
-	 * checking has taken place.
-	 * 
-	 * @todo Maybe prevent changes after type checking by "freezing" the
-	 *       variable symbol
-	 */
 	private TypeSymbol type;
 
 	private final Kind kind;
@@ -61,6 +53,15 @@ public class VariableSymbol extends Symbol {
 		return type;
 	}
 
+	/**
+	 * Sets the type of the variable symbol.
+	 * 
+	 * It must be modifiable in order to implement type inference. However, it
+	 * must not be modified anymore once type checking has taken place.
+	 * 
+	 * @todo Maybe prevent changes after type checking by "freezing" the
+	 *       variable symbol
+	 */
 	public void setType(TypeSymbol type) {
 		assert (type != null);
 		this.type = type;
