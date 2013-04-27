@@ -91,7 +91,7 @@ public class DeSSA {
 						// variable, as the original symbol will be overwritten.
 						assert tempSym == originalSym;
 						tempSym = new VariableSymbol(String.format(
-								"(de-ssa-%d)", maxTemp++), originalSym.type,
+								"(de-ssa-%d)", maxTemp++), originalSym.getType(),
 								Kind.LOCAL);
 						mdecl.sym.locals.put(tempSym.toString(), tempSym);
 						addToList.add(new Assign(Var.withSym(tempSym), Var

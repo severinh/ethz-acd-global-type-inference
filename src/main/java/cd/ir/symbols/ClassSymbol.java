@@ -1,5 +1,7 @@
 package cd.ir.symbols;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,4 +50,13 @@ public class ClassSymbol extends TypeSymbol {
 			return superClass.getMethod(name);
 		return msym;
 	}
+
+	public Collection<VariableSymbol> getFields() {
+		return Collections.unmodifiableCollection(fields.values());
+	}
+
+	public Collection<MethodSymbol> getMethods() {
+		return Collections.unmodifiableCollection(methods.values());
+	}
+
 }

@@ -388,7 +388,7 @@ public class Optimizer {
 
 				@Override
 				public Boolean var(Var ast, Void arg) {
-					switch (ast.sym.kind) {
+					switch (ast.sym.getKind()) {
 					case LOCAL:
 					case PARAM:
 						return true;
@@ -765,7 +765,7 @@ public class Optimizer {
 			@Override
 			public Canonical var(Var ast, BlockData data) {
 				VariableSymbol varSym = ast.sym;
-				switch (varSym.kind) {
+				switch (varSym.getKind()) {
 				case FIELD: // removed by SemanticAnalyzer
 					break;
 				case LOCAL:

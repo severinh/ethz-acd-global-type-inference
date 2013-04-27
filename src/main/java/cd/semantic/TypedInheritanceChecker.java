@@ -37,12 +37,12 @@ public class TypedInheritanceChecker extends AstVisitor<Void, Void> {
 		if (superSym != null) {
 			for (Pair<VariableSymbol> pair : Pair.zip(sym.parameters,
 					superSym.parameters))
-				if (pair.a.type != pair.b.type)
+				if (pair.a.getType() != pair.b.getType())
 					throw new SemanticFailure(
 							Cause.INVALID_OVERRIDE,
 							"Method parameter %s has type %s, but "
 									+ "corresponding base class parameter %s has type %s",
-							pair.a.name, pair.a.type, pair.b.name, pair.b.type);
+							pair.a.name, pair.a.getType(), pair.b.name, pair.b.getType());
 			if (superSym.returnType != sym.returnType)
 				throw new SemanticFailure(Cause.INVALID_OVERRIDE,
 						"Overridden method %s has return type %s,"

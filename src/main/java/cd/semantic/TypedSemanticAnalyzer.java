@@ -89,16 +89,14 @@ public class TypedSemanticAnalyzer {
 
 			// type check any method bodies and final locals
 			for (MethodDecl md : classd.methods()) {
-
 				boolean hasReturn = new ReturnCheckerVisitor().visit(md.body(),
 						null);
 
-				if (!md.returnType.equals("void") && !hasReturn) {
-
+				if (md.sym.returnType != typeSymbols.getVoidType()
+						&& !hasReturn) {
 					throw new SemanticFailure(Cause.MISSING_RETURN,
 							"Method %s.%s is missing a return statement",
 							classd.name, md.name);
-
 				}
 
 				SymbolTable<VariableSymbol> mthdTable = new SymbolTable<>(
@@ -115,7 +113,6 @@ public class TypedSemanticAnalyzer {
 				}
 
 				tc.checkStmt(md, mthdTable);
-
 			}
 		}
 	}

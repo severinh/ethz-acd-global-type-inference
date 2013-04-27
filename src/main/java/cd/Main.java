@@ -131,6 +131,12 @@ public class Main {
 
 	public void semanticCheck(List<ClassDecl> astRoots) {
 		new UntypedSemanticAnalyzer(this).check(astRoots);
+
+		// Uncomment to erase the existing variable types before type inference
+		// TODO Should be made configurable
+		// GlobalTypeEraser.getInstance().eraseTypesFrom(typeSymbols);
+		// LocalTypeEraser.getInstance().eraseTypesFrom(typeSymbols);
+
 		new TypedSemanticAnalyzer(this).check(astRoots);
 
 		// Build control flow graph
