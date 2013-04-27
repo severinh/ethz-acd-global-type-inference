@@ -7,9 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cd.exceptions.SemanticFailure;
+import cd.exceptions.SemanticFailure.Cause;
+
 public class MethodSymbol extends Symbol {
 
-	public final Map<String, VariableSymbol> locals = new HashMap<>();
+	private final Map<String, VariableSymbol> locals = new HashMap<>();
+
 	public final List<VariableSymbol> parameters = new ArrayList<>();
 	public final ClassSymbol owner;
 
@@ -33,6 +37,17 @@ public class MethodSymbol extends Symbol {
 
 	public List<VariableSymbol> getParameters() {
 		return Collections.unmodifiableList(parameters);
+	}
+
+	public void addLocal(VariableSymbol local) {
+		if (locals.containsKey(local.name)) {
+			throw new SemanticFailure(
+					Cause.DOUBLE_DECLARATION,
+					"Local '%s' was declared twice in the same method '%s' of class '%s'",
+					local.name, name, owner.name);
+		}
+
+		locals.put(local.name, local);
 	}
 
 }

@@ -42,7 +42,8 @@ public class TypedInheritanceChecker extends AstVisitor<Void, Void> {
 							Cause.INVALID_OVERRIDE,
 							"Method parameter %s has type %s, but "
 									+ "corresponding base class parameter %s has type %s",
-							pair.a.name, pair.a.getType(), pair.b.name, pair.b.getType());
+							pair.a.name, pair.a.getType(), pair.b.name, pair.b
+									.getType());
 			if (superSym.returnType != sym.returnType)
 				throw new SemanticFailure(Cause.INVALID_OVERRIDE,
 						"Overridden method %s has return type %s,"

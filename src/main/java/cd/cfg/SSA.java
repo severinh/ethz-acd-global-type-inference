@@ -63,7 +63,7 @@ public class SSA {
 		Map<VariableSymbol, VariableSymbol> currentVersions = new HashMap<>();
 		for (VariableSymbol sym : mdecl.sym.parameters)
 			currentVersions.put(sym, sym);
-		for (VariableSymbol sym : mdecl.sym.locals.values())
+		for (VariableSymbol sym : mdecl.sym.getLocals())
 			currentVersions.put(sym, uninitSym);
 		renumberBlock(cfg.start, currentVersions);
 		// Phase 3: Detect uses of (potentially) uninitialized variables
@@ -187,7 +187,7 @@ public class SSA {
 		int version = maxVersions.get(lhs) + 1;
 		maxVersions.put(lhs, version);
 		VariableSymbol sym = new VariableSymbol(lhs, version);
-		msym.locals.put(sym.toString(), sym);
+		msym.addLocal(sym);
 		currentVersions.put(lhs, sym);
 		return sym;
 	}

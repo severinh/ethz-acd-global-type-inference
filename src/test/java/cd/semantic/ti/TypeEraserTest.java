@@ -33,12 +33,12 @@ public class TypeEraserTest {
 
 		methodSymbol = new MethodSymbol("main", classSymbol);
 		methodSymbol.parameters.add(paramSymbol);
-		methodSymbol.locals.put(localSymbol.name, localSymbol);
+		methodSymbol.addLocal(localSymbol);
 		methodSymbol.returnType = symbolTable.getVoidType();
 
 		classSymbol = new ClassSymbol("Main");
-		classSymbol.methods.put(methodSymbol.name, methodSymbol);
-		classSymbol.fields.put(fieldSymbol.name, fieldSymbol);
+		classSymbol.addMethod(methodSymbol);
+		classSymbol.addField(fieldSymbol);
 
 		symbolTable.add(classSymbol);
 	}

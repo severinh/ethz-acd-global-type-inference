@@ -83,7 +83,7 @@ public class TypedSemanticAnalyzer {
 
 			// add all fields of this class, or any of its super classes
 			for (ClassSymbol p = classd.sym; p != null; p = p.superClass)
-				for (VariableSymbol s : p.fields.values())
+				for (VariableSymbol s : p.getDeclaredFields())
 					if (!fldTable.contains(s.name))
 						fldTable.add(s);
 
@@ -104,11 +104,11 @@ public class TypedSemanticAnalyzer {
 
 				mthdTable.add(classd.sym.thisSymbol);
 
-				for (VariableSymbol p : md.sym.parameters) {
+				for (VariableSymbol p : md.sym.getParameters()) {
 					mthdTable.add(p);
 				}
 
-				for (VariableSymbol l : md.sym.locals.values()) {
+				for (VariableSymbol l : md.sym.getLocals()) {
 					mthdTable.add(l);
 				}
 

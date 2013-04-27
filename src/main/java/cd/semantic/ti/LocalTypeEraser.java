@@ -27,7 +27,7 @@ public class LocalTypeEraser implements TypeEraser {
 	public void eraseTypesFrom(TypeSymbolTable symbolTable) {
 		TypeSymbol bottomType = symbolTable.getBottomType();
 		for (ClassSymbol classSymbol : symbolTable.getClassSymbols()) {
-			for (MethodSymbol methodSymbol : classSymbol.getMethods()) {
+			for (MethodSymbol methodSymbol : classSymbol.getDeclaredMethods()) {
 				for (VariableSymbol localVariable : methodSymbol.getLocals()) {
 					localVariable.setType(bottomType);
 				}

@@ -233,7 +233,7 @@ public class AstCodeGenerator {
 			return sym.totalMethods;
 
 		int index = computeVtableOffsets(sym.superClass);
-		for (MethodSymbol ms : sym.methods.values()) {
+		for (MethodSymbol ms : sym.getDeclaredMethods()) {
 			assert ms.vtableIndex == -1;
 			if (ms.overrides != null)
 				ms.vtableIndex = ms.overrides.vtableIndex;
@@ -255,7 +255,7 @@ public class AstCodeGenerator {
 			return sym.totalFields;
 
 		int index = computeFieldOffsets(sym.superClass);
-		for (VariableSymbol fs : sym.fields.values()) {
+		for (VariableSymbol fs : sym.getDeclaredFields()) {
 			assert fs.offset == -1;
 			// compute offset in bytes; note that 0 is the vtable
 			fs.offset = (index * SIZEOF_PTR) + SIZEOF_PTR;
@@ -269,7 +269,7 @@ public class AstCodeGenerator {
 	private void collectVtable(MethodSymbol[] vtable, ClassSymbol sym) {
 		if (sym.superClass != null)
 			collectVtable(vtable, sym.superClass);
-		for (MethodSymbol ms : sym.methods.values())
+		for (MethodSymbol ms : sym.getDeclaredMethods())
 			vtable[ms.vtableIndex] = ms;
 	}
 
@@ -1330,7 +1330,7 @@ public class AstCodeGenerator {
 
 		// Assign local variable offsets:
 		emitComment(String.format("%-10s   Offset", "Variable"));
-		for (VariableSymbol lcl : ast.sym.locals.values()) {
+		for (VariableSymbol lcl : ast.sym.getLocals()) {
 			lcl.offset = -localSlot;
 			localSlot += Config.SIZEOF_PTR;
 			emitComment(String.format("%-10s   %d", lcl, lcl.offset));
@@ -1373,7 +1373,7 @@ public class AstCodeGenerator {
 	private void emitStackframeSetup(int size) {
 		emit("pushl", "%ebp");
 		emit("movl", "%esp", "%ebp");
-		emit("subl", "$"+Integer.toString(size), "%esp");
+		emit("subl", "$" + Integer.toString(size), "%esp");
 	}
 
 	protected void emitMethodSuffix(boolean returnNull) {

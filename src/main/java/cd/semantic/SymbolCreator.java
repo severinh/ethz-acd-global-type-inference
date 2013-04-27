@@ -1,7 +1,6 @@
 package cd.semantic;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import cd.Main;
@@ -12,7 +11,6 @@ import cd.ir.ast.MethodDecl;
 import cd.ir.ast.VarDecl;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
-import cd.ir.symbols.Symbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.ir.symbols.VariableSymbol.Kind;
@@ -41,19 +39,6 @@ public class SymbolCreator extends Object {
 	}
 
 	/**
-	 * Useful method which adds a symbol to a map, checking to see that there is
-	 * not already an entry with the same name. If a symbol with the same name
-	 * exists, throws an exception.
-	 */
-	public <S extends Symbol> void add(Map<String, S> map, S sym) {
-		if (map.containsKey(sym.name))
-			throw new SemanticFailure(Cause.DOUBLE_DECLARATION,
-					"Symbol '%s' was declared twice in the same scope",
-					sym.name);
-		map.put(sym.name, sym);
-	}
-
-	/**
 	 * Creates symbols for all fields/constants/methods in a class. Uses
 	 * {@link MethodSymbolCreator} to create symbols for all parameters and
 	 * local variables to each method as well. Checks for duplicate members.
@@ -70,14 +55,14 @@ public class SymbolCreator extends Object {
 		public Void varDecl(VarDecl ast, Void arg) {
 			ast.sym = new VariableSymbol(ast.name,
 					typesTable.getType(ast.type), Kind.FIELD);
-			add(classSym.fields, ast.sym);
+			classSym.addField(ast.sym);
 			return null;
 		}
 
 		@Override
 		public Void methodDecl(MethodDecl ast, Void arg) {
 			ast.sym = new MethodSymbol(ast.name, classSym);
-			add(classSym.methods, ast.sym);
+			classSym.addMethod(ast.sym);
 
 			// create return type symbol
 			if (ast.returnType.equals("void")) {
@@ -127,7 +112,7 @@ public class SymbolCreator extends Object {
 		public Void varDecl(VarDecl ast, Void arg) {
 			ast.sym = new VariableSymbol(ast.name,
 					typesTable.getType(ast.type), Kind.LOCAL);
-			add(methodSym.locals, ast.sym);
+			methodSym.addLocal(ast.sym);
 			return null;
 		}
 

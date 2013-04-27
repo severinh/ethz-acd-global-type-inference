@@ -40,7 +40,7 @@ import cd.util.DepthFirstSearchPreOrder;
 public class Optimizer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Optimizer.class);
-	
+
 	private static final boolean INTENSE_DEBUG = true;
 	private static final int MAX_INNER = 16, MAX_OUTER = 16;
 
@@ -575,8 +575,7 @@ public class Optimizer {
 					expr1 = (Expr) ex.appearances.get(0).deepCopy();
 					ex.sym = new VariableSymbol("CSE(" + ex.key + ")",
 							expr1.type);
-					msym.locals.put(ex.sym.toString(), ex.sym);
-
+					msym.addLocal(ex.sym);
 				} else {
 					expr1 = null;
 				}

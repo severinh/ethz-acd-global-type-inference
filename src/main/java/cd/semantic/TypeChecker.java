@@ -211,7 +211,8 @@ public class TypeChecker {
 			// Check that the arguments are of correct type.
 			int i = 0;
 			for (Ast argAst : ast.argumentsWithoutReceiver())
-				checkType((Expr) argAst, mthd.parameters.get(i++).getType(), locals);
+				checkType((Expr) argAst, mthd.parameters.get(i++).getType(),
+						locals);
 
 			return null;
 
@@ -449,7 +450,8 @@ public class TypeChecker {
 			// Check that the arguments are of correct type.
 			int i = 0;
 			for (Ast argAst : ast.argumentsWithoutReceiver())
-				checkType((Expr) argAst, mthd.parameters.get(i++).getType(), locals);
+				checkType((Expr) argAst, mthd.parameters.get(i++).getType(),
+						locals);
 
 			return ast.sym.returnType;
 
