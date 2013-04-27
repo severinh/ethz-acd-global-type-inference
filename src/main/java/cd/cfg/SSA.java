@@ -61,7 +61,7 @@ public class SSA {
 		msym = mdecl.sym;
 		maxVersions = new HashMap<>();
 		Map<VariableSymbol, VariableSymbol> currentVersions = new HashMap<>();
-		for (VariableSymbol sym : mdecl.sym.parameters)
+		for (VariableSymbol sym : mdecl.sym.getParameters())
 			currentVersions.put(sym, sym);
 		for (VariableSymbol sym : mdecl.sym.getLocals())
 			currentVersions.put(sym, uninitSym);

@@ -2,7 +2,7 @@ package cd.ir.symbols;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import cd.exceptions.SemanticFailure;
@@ -14,8 +14,8 @@ public class ClassSymbol extends TypeSymbol {
 	public ClassSymbol superClass;
 	public final VariableSymbol thisSymbol = new VariableSymbol("this", this);
 
-	private final Map<String, VariableSymbol> fields = new HashMap<>();
-	private final Map<String, MethodSymbol> methods = new HashMap<>();
+	private final Map<String, VariableSymbol> fields = new LinkedHashMap<>();
+	private final Map<String, MethodSymbol> methods = new LinkedHashMap<>();
 
 	public int totalMethods = -1;
 	public int totalFields = -1;

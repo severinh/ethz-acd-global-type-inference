@@ -83,7 +83,7 @@ public class SymbolCreator extends Object {
 				pnames.add(argumentName);
 				VariableSymbol vs = new VariableSymbol(argumentName,
 						typesTable.getType(argumentType));
-				ast.sym.parameters.add(vs);
+				ast.sym.addParameter(vs);
 			}
 
 			// create symbols for the local variables

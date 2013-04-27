@@ -59,7 +59,7 @@ public class TypedSemanticAnalyzer {
 		if (mainClass != null && mainClass instanceof ClassSymbol) {
 			ClassSymbol cs = (ClassSymbol) mainClass;
 			MethodSymbol mainMethod = cs.getMethod("main");
-			if (mainMethod != null && mainMethod.parameters.size() == 0
+			if (mainMethod != null && mainMethod.getParameters().isEmpty()
 					&& mainMethod.returnType == main.typeSymbols.getVoidType()) {
 				main.mainType = cs;
 				return; // found the main() method!

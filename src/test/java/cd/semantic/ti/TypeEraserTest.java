@@ -32,7 +32,7 @@ public class TypeEraserTest {
 		localSymbol = new VariableSymbol("local", symbolTable.getBooleanType());
 
 		methodSymbol = new MethodSymbol("main", classSymbol);
-		methodSymbol.parameters.add(paramSymbol);
+		methodSymbol.addParameter(paramSymbol);
 		methodSymbol.addLocal(localSymbol);
 		methodSymbol.returnType = symbolTable.getVoidType();
 

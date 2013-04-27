@@ -35,8 +35,8 @@ public class TypedInheritanceChecker extends AstVisitor<Void, Void> {
 		MethodSymbol sym = ast.sym;
 		MethodSymbol superSym = classSym.superClass.getMethod(ast.name);
 		if (superSym != null) {
-			for (Pair<VariableSymbol> pair : Pair.zip(sym.parameters,
-					superSym.parameters))
+			for (Pair<VariableSymbol> pair : Pair.zip(sym.getParameters(),
+					superSym.getParameters()))
 				if (pair.a.getType() != pair.b.getType())
 					throw new SemanticFailure(
 							Cause.INVALID_OVERRIDE,

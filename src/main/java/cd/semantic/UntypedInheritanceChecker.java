@@ -56,11 +56,12 @@ public class UntypedInheritanceChecker extends AstVisitor<Void, Void> {
 		MethodSymbol superSym = classSym.superClass.getMethod(ast.name);
 		sym.overrides = superSym;
 		if (superSym != null) {
-			if (superSym.parameters.size() != sym.parameters.size())
+			if (superSym.getParameters().size() != sym.getParameters().size())
 				throw new SemanticFailure(Cause.INVALID_OVERRIDE,
 						"Overridden method %s has %d parameters, "
-								+ "but original has %d", ast.name,
-						sym.parameters.size(), superSym.parameters.size());
+								+ "but original has %d", ast.name, sym
+								.getParameters().size(), superSym
+								.getParameters().size());
 		}
 		return null;
 	}

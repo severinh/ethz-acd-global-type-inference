@@ -1347,7 +1347,7 @@ public class Interpreter {
 		StackFrame newFrame = new StackFrame(rcvr);
 		int idx = 0;
 
-		for (VariableSymbol sym : mdecl.sym.parameters) {
+		for (VariableSymbol sym : mdecl.sym.getParameters()) {
 			newFrame.setVar(sym, arguments.get(idx++));
 		}
 

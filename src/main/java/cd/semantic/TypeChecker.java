@@ -201,17 +201,18 @@ public class TypeChecker {
 			ast.sym = mthd;
 
 			// Check that the number of arguments is correct.
-			if (ast.argumentsWithoutReceiver().size() != mthd.parameters.size())
+			if (ast.argumentsWithoutReceiver().size() != mthd.getParameters()
+					.size())
 				throw new SemanticFailure(
 						Cause.WRONG_NUMBER_OF_ARGUMENTS,
 						"Method %s() takes %d arguments, but was invoked with %d",
-						ast.methodName, mthd.parameters.size(), ast
+						ast.methodName, mthd.getParameters().size(), ast
 								.argumentsWithoutReceiver().size());
 
 			// Check that the arguments are of correct type.
 			int i = 0;
 			for (Ast argAst : ast.argumentsWithoutReceiver())
-				checkType((Expr) argAst, mthd.parameters.get(i++).getType(),
+				checkType((Expr) argAst, mthd.getParameter(i++).getType(),
 						locals);
 
 			return null;
@@ -440,18 +441,19 @@ public class TypeChecker {
 			ast.sym = mthd;
 
 			// Check that the number of arguments is correct.
-			if (ast.argumentsWithoutReceiver().size() != mthd.parameters.size())
+			if (ast.argumentsWithoutReceiver().size() != mthd.getParameters()
+					.size())
 				throw new SemanticFailure(
 						Cause.WRONG_NUMBER_OF_ARGUMENTS,
 						"Method %s() takes %d arguments, but was invoked with %d",
-						ast.methodName, mthd.parameters.size(), ast
+						ast.methodName, mthd.getParameters().size(), ast
 								.argumentsWithoutReceiver().size());
 
 			// Check that the arguments are of correct type.
 			int i = 0;
 			for (Ast argAst : ast.argumentsWithoutReceiver())
-				checkType((Expr) argAst, mthd.parameters.get(i++).getType(),
-						locals);
+				checkType((Expr) argAst, mthd.getParameters().get(i++)
+						.getType(), locals);
 
 			return ast.sym.returnType;
 

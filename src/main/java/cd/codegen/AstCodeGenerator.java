@@ -1320,7 +1320,7 @@ public class AstCodeGenerator {
 		// As shown above, these start from 12, since the
 		// first parameter (offset 8) is the this ptr.
 		int paramOffset = Config.SIZEOF_PTR * 3;
-		for (VariableSymbol param : ast.sym.parameters) {
+		for (VariableSymbol param : ast.sym.getParameters()) {
 			param.offset = paramOffset;
 			paramOffset += Config.SIZEOF_PTR;
 		}
