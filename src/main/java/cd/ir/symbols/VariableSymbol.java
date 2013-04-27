@@ -8,8 +8,18 @@ public class VariableSymbol extends Symbol {
 		PARAM, LOCAL, FIELD
 	}
 
-	public final TypeSymbol type;
-	public final VariableSymbol.Kind kind;
+	/**
+	 * The type of the variable symbol must be modifiable in order to implement
+	 * type inference. However, it must not be modified anymore once type
+	 * checking has taken place.
+	 * 
+	 * @todo Use a getter and setter for the type symbol
+	 * @todo Maybe prevent changes after type checking by "freezing" the
+	 *       variable symbol
+	 */
+	public TypeSymbol type;
+
+	public final Kind kind;
 	public final int version;
 
 	/**

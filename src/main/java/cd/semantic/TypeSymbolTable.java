@@ -1,5 +1,8 @@
 package cd.semantic;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.PrimitiveTypeSymbol;
 import cd.ir.symbols.TypeSymbol;
@@ -86,6 +89,24 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 
 	public TypeSymbol getBottomType() {
 		return bottomType;
+	}
+
+	/**
+	 * Returns the list of all class symbols in this symbol table.
+	 * 
+	 * It also includes built-in class symbols like <code>Object</code> and
+	 * <code>null</code>.
+	 * 
+	 * @return the class symbols
+	 */
+	public List<ClassSymbol> getClassSymbols() {
+		List<ClassSymbol> classSymbols = new ArrayList<>();
+		for (TypeSymbol typeSymbol : localSymbols()) {
+			if (typeSymbol instanceof ClassSymbol) {
+				classSymbols.add((ClassSymbol) typeSymbol);
+			}
+		}
+		return classSymbols;
 	}
 
 }
