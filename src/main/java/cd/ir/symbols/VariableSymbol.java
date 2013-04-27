@@ -13,14 +13,13 @@ public class VariableSymbol extends Symbol {
 	 * type inference. However, it must not be modified anymore once type
 	 * checking has taken place.
 	 * 
-	 * @todo Use a getter and setter for the type symbol
 	 * @todo Maybe prevent changes after type checking by "freezing" the
 	 *       variable symbol
 	 */
-	public TypeSymbol type;
+	private TypeSymbol type;
 
-	public final Kind kind;
-	public final int version;
+	private final Kind kind;
+	private final int version;
 
 	/**
 	 * Meaning depends on the kind of variable, but generally refers to the
@@ -36,8 +35,9 @@ public class VariableSymbol extends Symbol {
 
 	public VariableSymbol(VariableSymbol v0sym, int version) {
 		super(v0sym.name + "_" + version);
-		this.type = v0sym.type;
-		this.kind = v0sym.kind;
+
+		this.type = v0sym.getType();
+		this.kind = v0sym.getKind();
 		this.offset = v0sym.offset;
 		this.version = version;
 	}
@@ -48,10 +48,30 @@ public class VariableSymbol extends Symbol {
 
 	public VariableSymbol(String name, TypeSymbol type, VariableSymbol.Kind kind) {
 		super(name);
+
+		assert (type != null);
+		assert (kind != null);
 		this.type = type;
 		this.kind = kind;
 		this.version = 0;
 		this.offset = -1;
+	}
+
+	public TypeSymbol getType() {
+		return type;
+	}
+
+	public void setType(TypeSymbol type) {
+		assert (type != null);
+		this.type = type;
+	}
+
+	public int getVersion() {
+		return version;
+	}
+
+	public Kind getKind() {
+		return kind;
 	}
 
 	@Override

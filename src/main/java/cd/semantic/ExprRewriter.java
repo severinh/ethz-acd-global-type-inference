@@ -15,7 +15,7 @@ public class ExprRewriter extends AstRewriteVisitor<Void> {
 
 	@Override
 	public Ast var(Var ast, Void arg) {
-		switch (ast.sym.kind) {
+		switch (ast.sym.getKind()) {
 		case PARAM:
 		case LOCAL:
 			// Leave params or local variables alone

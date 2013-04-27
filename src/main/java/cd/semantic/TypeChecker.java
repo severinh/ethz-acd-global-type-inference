@@ -211,7 +211,7 @@ public class TypeChecker {
 			// Check that the arguments are of correct type.
 			int i = 0;
 			for (Ast argAst : ast.argumentsWithoutReceiver())
-				checkType((Expr) argAst, mthd.parameters.get(i++).type, locals);
+				checkType((Expr) argAst, mthd.parameters.get(i++).getType(), locals);
 
 			return null;
 
@@ -350,7 +350,7 @@ public class TypeChecker {
 			if (ast.sym == null)
 				throw new SemanticFailure(Cause.NO_SUCH_FIELD,
 						"Type %s has no field %s", argType, ast.fieldName);
-			return ast.sym.type;
+			return ast.sym.getType();
 		}
 
 		@Override
@@ -394,7 +394,7 @@ public class TypeChecker {
 		public TypeSymbol thisRef(ThisRef ast,
 				SymbolTable<VariableSymbol> locals) {
 			VariableSymbol vsym = locals.get("this");
-			return vsym.type;
+			return vsym.getType();
 		}
 
 		@Override
@@ -422,7 +422,7 @@ public class TypeChecker {
 				throw new SemanticFailure(Cause.NO_SUCH_VARIABLE,
 						"No variable %s was found", ast.name);
 			ast.setSymbol(locals.get(ast.name));
-			return ast.sym.type;
+			return ast.sym.getType();
 		}
 
 		@Override
@@ -449,7 +449,7 @@ public class TypeChecker {
 			// Check that the arguments are of correct type.
 			int i = 0;
 			for (Ast argAst : ast.argumentsWithoutReceiver())
-				checkType((Expr) argAst, mthd.parameters.get(i++).type, locals);
+				checkType((Expr) argAst, mthd.parameters.get(i++).getType(), locals);
 
 			return ast.sym.returnType;
 

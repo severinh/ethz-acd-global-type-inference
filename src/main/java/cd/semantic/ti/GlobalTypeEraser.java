@@ -38,12 +38,12 @@ public class GlobalTypeEraser extends LocalTypeEraser {
 		TypeSymbol bottomType = symbolTable.getBottomType();
 		for (ClassSymbol classSymbol : symbolTable.getClassSymbols()) {
 			for (VariableSymbol field : classSymbol.getFields()) {
-				field.type = bottomType;
+				field.setType(bottomType);
 			}
 			for (MethodSymbol method : classSymbol.getMethods()) {
 				method.returnType = bottomType;
 				for (VariableSymbol parameter : method.getParameters()) {
-					parameter.type = bottomType;
+					parameter.setType(bottomType);
 				}
 			}
 		}

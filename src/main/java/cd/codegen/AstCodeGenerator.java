@@ -880,7 +880,7 @@ public class AstCodeGenerator {
 		@Override
 		public String var(Var ast, Void arg) {
 			String reg = getRegister();
-			switch (ast.sym.kind) {
+			switch (ast.sym.getKind()) {
 			case LOCAL:
 			case PARAM:
 				emitLoad(ast.sym.offset, BP, reg);

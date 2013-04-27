@@ -1080,7 +1080,7 @@ public class Interpreter {
 						DynamicError.INTERNAL_ERROR);
 			}
 
-			switch (ast.sym.kind) {
+			switch (ast.sym.getKind()) {
 
 			case LOCAL:
 			case PARAM:
@@ -1090,7 +1090,7 @@ public class Interpreter {
 			}
 
 			throw new DynamicError("Unhandled VariableSymbol kind: "
-					+ ast.sym.kind, DynamicError.INTERNAL_ERROR);
+					+ ast.sym.getKind(), DynamicError.INTERNAL_ERROR);
 
 		}
 

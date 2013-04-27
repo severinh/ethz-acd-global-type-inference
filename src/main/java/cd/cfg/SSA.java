@@ -181,7 +181,7 @@ public class SSA {
 
 	private VariableSymbol renumberDefinedSymbol(VariableSymbol lhs,
 			Map<VariableSymbol, VariableSymbol> currentVersions) {
-		assert lhs.version == 0; // this should be a v0sym
+		assert lhs.getVersion() == 0; // this should be a v0sym
 		if (!maxVersions.containsKey(lhs))
 			maxVersions.put(lhs, 0);
 		int version = maxVersions.get(lhs) + 1;

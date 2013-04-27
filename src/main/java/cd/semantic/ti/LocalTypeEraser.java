@@ -29,7 +29,7 @@ public class LocalTypeEraser implements TypeEraser {
 		for (ClassSymbol classSymbol : symbolTable.getClassSymbols()) {
 			for (MethodSymbol methodSymbol : classSymbol.getMethods()) {
 				for (VariableSymbol localVariable : methodSymbol.getLocals()) {
-					localVariable.type = bottomType;
+					localVariable.setType(bottomType);
 				}
 			}
 		}
