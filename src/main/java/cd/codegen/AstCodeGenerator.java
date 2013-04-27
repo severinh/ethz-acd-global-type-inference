@@ -148,7 +148,7 @@ public class AstCodeGenerator {
 		String faillbl = uniqueLabel();
 		emitCommentSection("checkCast() function");
 		emitLabel(CHECK_CAST);
-		emit("enter", "$8", "$0");
+		emitStackframeSetup(8);
 		emitLoad(SIZEOF_PTR * 2, BP, cls);
 		emitLoad(SIZEOF_PTR * 3, BP, obj);
 		emit("cmpl", "$0", obj);
@@ -170,7 +170,7 @@ public class AstCodeGenerator {
 		String oknulllbl = uniqueLabel();
 		emitCommentSection("checkNull() function");
 		emitLabel(CHECK_NULL);
-		emit("enter", "$8", "$0");
+		emitStackframeSetup(8);
 		emit("cmpl", "$0", o(SIZEOF_PTR * 2, BP));
 		emit("jne", oknulllbl);
 		emitStore(c(4), 0, SP);
@@ -181,7 +181,7 @@ public class AstCodeGenerator {
 		String oknzlbl = uniqueLabel();
 		emitCommentSection("checkNonZero() function");
 		emitLabel(CHECK_NON_ZERO);
-		emit("enter", "$8", "$0");
+		emitStackframeSetup(8);
 		emit("cmpl", "$0", o(SIZEOF_PTR * 2, BP));
 		emit("jne", oknzlbl);
 		emitStore(c(8), 0, SP);
@@ -192,7 +192,7 @@ public class AstCodeGenerator {
 		String okunqlbl = uniqueLabel();
 		emitCommentSection("checkArraySize() function");
 		emitLabel(CHECK_ARRAY_SIZE);
-		emit("enter", "$8", "$0");
+		emitStackframeSetup(8);
 		emit("cmpl", "$0", o(SIZEOF_PTR * 2, BP));
 		emit("jge", okunqlbl);
 		emitStore(c(5), 0, SP);
@@ -213,7 +213,7 @@ public class AstCodeGenerator {
 		emitCommentSection("main() function");
 		emit(".globl " + MAIN);
 		emitLabel(MAIN);
-		emit("enter", "$8", "$0");
+		emitStackframeSetup(8);
 		sdg.gen(callMain);
 		emit("movl", "$0", "%eax"); // normal termination:
 		emit("leave");
@@ -1364,10 +1364,16 @@ public class AstCodeGenerator {
 				"implicit=%d localSlot=%d numParams=%d sum=%d", implicit,
 				localSlot, numParams, implicit + localSlot + numParams));
 
-		emit(String.format("enter $%d, $0", stackSize));
+		emitStackframeSetup(stackSize);
 
 		storeCallSaveRegs();
 
+	}
+
+	private void emitStackframeSetup(int size) {
+		emit("pushl", "%ebp");
+		emit("movl", "%esp", "%ebp");
+		emit("subl", "$"+Integer.toString(size), "%esp");
 	}
 
 	protected void emitMethodSuffix(boolean returnNull) {

@@ -33,6 +33,14 @@ abstract public class AbstractTestSamplePrograms {
 
 	private static final Logger LOG = LoggerFactory
 			.getLogger(AbstractTestSamplePrograms.class);
+	
+
+	private static final boolean RUN_VALGRIND = false;
+	/**
+	 * We let valgrind return a special exit code if it detect a problem. 
+	 * Otherwise valgrind returns the exit code of the simulated program.
+	 */
+	private static final int VALGRIND_ERROR_CODE = 77;
 
 	protected File file, sfile, binfile, infile;
 	protected File parserreffile, semanticreffile, execreffile, cfgreffile,
@@ -271,7 +279,16 @@ abstract public class AbstractTestSamplePrograms {
 		String execOut = FileUtil.runCommand(new File("."),
 				new String[] { binfile.getAbsolutePath() }, new String[] {},
 				inFile, true);
-
+		
+		if (RUN_VALGRIND) {
+			String valgrindOut = FileUtil.runCommand(
+					new File("."),
+					new String[] { "valgrind", "--error-exitcode=" + VALGRIND_ERROR_CODE,
+							binfile.getAbsolutePath() }, new String[] {},
+					inFile, true);
+			Assert.assertTrue(!valgrindOut.contains("Error: "+VALGRIND_ERROR_CODE));
+		}
+		
 		// Compute the output to what we expected to see.
 		if (execRef.equals(execOut))
 			return true;
