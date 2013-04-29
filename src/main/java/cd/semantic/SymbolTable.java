@@ -2,6 +2,7 @@ package cd.semantic;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +12,8 @@ import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.symbols.Symbol;
 
 /**
- * A simple symbol table, with a pointer to the enclosing scope. Used by
- * {@link TypeChecker} to store the various scopes for local, parameter, and
- * field lookup.
+ * A simple symbol table, with a pointer to the enclosing scope. Used to store
+ * the various scopes for local variable, parameter, and field lookup.
  */
 public class SymbolTable<S extends Symbol> {
 
@@ -25,25 +25,25 @@ public class SymbolTable<S extends Symbol> {
 	}
 
 	public void add(S sym) {
-		// check that the symbol is not already declared *at this level*
-		if (containsLocally(sym.name))
+		// Check that the symbol is not already declared *at this level*
+		if (containsLocally(sym.name)) {
 			throw new SemanticFailure(Cause.DOUBLE_DECLARATION);
+		}
 		map.put(sym.name, sym);
 	}
 
 	public List<S> allSymbols() {
 		List<S> result = new ArrayList<>();
-		SymbolTable<S> st = this;
-		while (st != null) {
-			for (S sym : st.map.values())
-				result.add(sym);
-			st = st.parent;
+		SymbolTable<S> currentTable = this;
+		while (currentTable != null) {
+			result.addAll(currentTable.map.values());
+			currentTable = currentTable.parent;
 		}
 		return result;
 	}
 
 	public Collection<S> localSymbols() {
-		return this.map.values();
+		return Collections.unmodifiableCollection(map.values());
 	}
 
 	/**
@@ -56,22 +56,24 @@ public class SymbolTable<S extends Symbol> {
 
 	/**
 	 * True if there is a declaration at THIS level in the symbol table; may
-	 * return {@code false} even if a declaration exists in some enclosing scope
+	 * return {@code false} even if a declaration exists in some enclosing
+	 * scope.
 	 */
 	public boolean containsLocally(String name) {
-		return this.map.containsKey(name);
+		return map.containsKey(name);
 	}
 
 	/**
 	 * Base method: returns {@code null} if no symbol by that name can be found,
-	 * in this table or in its parents
+	 * in this table or in its parents.
 	 */
 	public S get(String name) {
 		S res = map.get(name);
-		if (res != null)
+		if (res != null) {
 			return res;
-		if (parent == null)
+		} else if (parent == null) {
 			return null;
+		}
 		return parent.get(name);
 	}
 
@@ -82,9 +84,10 @@ public class SymbolTable<S extends Symbol> {
 	 */
 	public S getType(String name) {
 		S res = get(name);
-		if (res == null)
+		if (res == null) {
 			throw new SemanticFailure(Cause.NO_SUCH_TYPE,
 					"No type '%s' was found", name);
+		}
 		return res;
 	}
 
