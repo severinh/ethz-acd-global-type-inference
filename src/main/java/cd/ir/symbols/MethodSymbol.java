@@ -8,12 +8,18 @@ import java.util.List;
 import java.util.Map;
 
 import cd.exceptions.SemanticFailure;
-import cd.exceptions.SemanticFailure.Cause;
+import cd.semantic.SymbolTable;
 
 public class MethodSymbol extends Symbol {
 
-	private final Map<String, VariableSymbol> locals = new LinkedHashMap<>();
-	private final List<VariableSymbol> parameters = new ArrayList<>();
+	// TODO: TypedSemanticAnalyzer internally builds a symbol table for each
+	// method on its own. Because such a variable symbol table is also needed
+	// earlier in type inference, build it openly and early in MethodSymbol.
+	// TypedSemanticAnalyzer should eventually reuse this symbol table.
+	private final SymbolTable<VariableSymbol> variableSymbols;
+
+	private final Map<String, VariableSymbol> locals;
+	private final List<VariableSymbol> parameters;
 
 	public final ClassSymbol owner;
 
@@ -23,12 +29,19 @@ public class MethodSymbol extends Symbol {
 
 	public MethodSymbol(String name, ClassSymbol owner) {
 		super(name);
+		this.variableSymbols = new SymbolTable<>(null);
+		this.locals = new LinkedHashMap<>();
+		this.parameters = new ArrayList<>();
 		this.owner = owner;
 	}
 
 	@Override
 	public String toString() {
 		return name + "(...)";
+	}
+
+	public SymbolTable<VariableSymbol> getVariableSymbols() {
+		return variableSymbols;
 	}
 
 	public Collection<VariableSymbol> getLocals() {
@@ -66,13 +79,7 @@ public class MethodSymbol extends Symbol {
 	 *             this method
 	 */
 	public void addLocal(VariableSymbol local) {
-		if (locals.containsKey(local.name)) {
-			throw new SemanticFailure(
-					Cause.DOUBLE_DECLARATION,
-					"Local '%s' was declared twice in the same method '%s' of class '%s'",
-					local.name, name, owner.name);
-		}
-
+		variableSymbols.add(local);
 		locals.put(local.name, local);
 	}
 
@@ -86,22 +93,7 @@ public class MethodSymbol extends Symbol {
 	 *             in this method
 	 */
 	public void addParameter(VariableSymbol parameter) {
-		if (parameter == null) {
-			throw new NullPointerException("parameter must not be null");
-		}
-
-		// The quadratic complexity of the following check should not be an
-		// issue as methods usually only have few parameters. Furthermore,
-		// adding parameters happens less often than accessing parameters.
-		for (VariableSymbol existingParameter : parameters) {
-			if (existingParameter.name.equals(parameter.name)) {
-				throw new SemanticFailure(
-						Cause.DOUBLE_DECLARATION,
-						"Paremeter '%s' was declared twice in the same method '%s' of class '%s'",
-						parameter.name, name, owner.name);
-			}
-		}
-
+		variableSymbols.add(parameter);
 		parameters.add(parameter);
 	}
 
