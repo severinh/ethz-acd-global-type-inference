@@ -35,12 +35,25 @@ public class MethodSymbol extends Symbol {
 		return Collections.unmodifiableCollection(locals.values());
 	}
 
+	public VariableSymbol getLocal(String name) {
+		return locals.get(name);
+	}
+
 	public List<VariableSymbol> getParameters() {
 		return Collections.unmodifiableList(parameters);
 	}
 
 	public VariableSymbol getParameter(int index) {
 		return parameters.get(index);
+	}
+
+	public VariableSymbol getParameter(String name) {
+		for (VariableSymbol parameter : parameters) {
+			if (parameter.name.equals(name)) {
+				return parameter;
+			}
+		}
+		return null;
 	}
 
 	/**

@@ -16,6 +16,13 @@ public class Seq extends Decl {
 			this.rwChildren.addAll(nodes);
 	}
 
+	/**
+	 * Constructs an empty sequence.
+	 */
+	public Seq() {
+		super(-1);
+	}
+
 	/** Grant access to the raw list of children for seq nodes */
 	public List<Ast> rwChildren() {
 		return this.rwChildren;
