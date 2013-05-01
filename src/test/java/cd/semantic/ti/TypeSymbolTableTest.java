@@ -45,12 +45,18 @@ public class TypeSymbolTableTest {
 		TypeSymbol topType = typeSymbols.getTopType();
 		TypeSymbol bottomType = typeSymbols.getBottomType();
 		TypeSymbol objectType = typeSymbols.getObjectType();
+		TypeSymbol nullType = typeSymbols.getNullType();
 		TypeSymbol intType = typeSymbols.getIntType();
 		TypeSymbol floatType = typeSymbols.getFloatType();
 
 		for (TypeSymbol type : typeSymbols.allSymbols()) {
 			assertLCA(type, type, type);
+			assertLCA(topType, topType, type);
 			assertLCA(type, bottomType, type);
+
+			if (type.isReferenceType()) {
+				assertLCA(type, nullType, type);
+			}
 		}
 
 		assertLCA(topType, intType, floatType);
