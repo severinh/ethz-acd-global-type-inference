@@ -32,7 +32,7 @@ public class UntypedSemanticAnalyzer {
 	}
 
 	public void check(List<ClassDecl> classDecls) throws SemanticFailure {
-		createSymbols(classDecls);
+		main.typeSymbols = createSymbols(classDecls);
 		checkUntypedInheritance(classDecls);
 	}
 
@@ -43,28 +43,32 @@ public class UntypedSemanticAnalyzer {
 	 * 
 	 * @see SymbolCreator
 	 */
-	private void createSymbols(List<ClassDecl> classDecls) {
-		main.typeSymbols = new TypeSymbolTable();
+	private TypeSymbolTable createSymbols(List<ClassDecl> classDecls) {
+		TypeSymbolTable typeSymbols = new TypeSymbolTable();
 
 		// Add symbols for all declared classes.
 		for (ClassDecl ast : classDecls) {
 			// Check for classes named Object
-			if (ast.name.equals(main.typeSymbols.getObjectType().name))
+			if (ast.name.equals(typeSymbols.getObjectType().name)) {
 				throw new SemanticFailure(Cause.OBJECT_CLASS_DEFINED);
+			}
 			ast.sym = new ClassSymbol(ast);
-			main.typeSymbols.add(ast.sym);
+			typeSymbols.add(ast.sym);
 		}
 
 		// Create symbols for arrays of each type.
-		for (Symbol sym : new ArrayList<Symbol>(main.typeSymbols.localSymbols())) {
+		for (Symbol sym : new ArrayList<Symbol>(typeSymbols.localSymbols())) {
 			ArrayTypeSymbol array = new ArrayTypeSymbol((TypeSymbol) sym);
-			main.typeSymbols.add(array);
+			typeSymbols.add(array);
 		}
 
 		// For each class, create symbols for each method and field
-		SymbolCreator sc = new SymbolCreator(main, main.typeSymbols);
-		for (ClassDecl ast : classDecls)
-			sc.createSymbols(ast);
+		SymbolCreator sc = new SymbolCreator(typeSymbols);
+		for (ClassDecl classDecl : classDecls) {
+			sc.createSymbols(classDecl);
+		}
+
+		return typeSymbols;
 	}
 
 	/**
@@ -75,8 +79,10 @@ public class UntypedSemanticAnalyzer {
 	 * @see UntypedInheritanceChecker
 	 */
 	private void checkUntypedInheritance(List<ClassDecl> classDecls) {
-		for (ClassDecl cd : classDecls)
-			new UntypedInheritanceChecker().visit(cd, null);
+		UntypedInheritanceChecker inheritanceChecker = new UntypedInheritanceChecker();
+		for (ClassDecl classDecl : classDecls) {
+			inheritanceChecker.check(classDecl);
+		}
 	}
 
 }

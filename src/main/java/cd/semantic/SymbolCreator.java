@@ -3,7 +3,6 @@ package cd.semantic;
 import java.util.HashSet;
 import java.util.Set;
 
-import cd.Main;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.ast.ClassDecl;
@@ -22,11 +21,9 @@ import cd.ir.AstVisitor;
  */
 public class SymbolCreator extends Object {
 
-	private final Main main;
 	private final TypeSymbolTable typeSymbols;
 
-	public SymbolCreator(Main main, TypeSymbolTable typesTable) {
-		this.main = main;
+	public SymbolCreator(TypeSymbolTable typesTable) {
 		this.typeSymbols = typesTable;
 	}
 
@@ -65,7 +62,7 @@ public class SymbolCreator extends Object {
 
 			// create return type symbol
 			if (ast.returnType.equals("void")) {
-				ast.sym.returnType = main.typeSymbols.getVoidType();
+				ast.sym.returnType = typeSymbols.getVoidType();
 			} else {
 				ast.sym.returnType = typeSymbols.getType(ast.returnType);
 			}

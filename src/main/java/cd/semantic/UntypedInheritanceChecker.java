@@ -26,6 +26,10 @@ public class UntypedInheritanceChecker extends AstVisitor<Void, Void> {
 
 	private ClassSymbol classSym;
 
+	public void check(ClassDecl classDecl) {
+		visit(classDecl, null);
+	}
+
 	@Override
 	public Void classDecl(ClassDecl ast, Void arg) {
 		classSym = ast.sym;
