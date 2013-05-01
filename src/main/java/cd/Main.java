@@ -61,23 +61,23 @@ public class Main {
 
 	/** Parse command line, invoke compile() routine */
 	public static void main(String args[]) throws IOException {
-		Main m = new Main();
+		Main main = new Main();
 
 		for (String file : args) {
 			List<ClassDecl> astRoots;
 
 			// Parse
 			try (FileReader fin = new FileReader(file)) {
-				astRoots = m.parse(file, fin, false);
+				astRoots = main.parse(file, fin, false);
 			}
 
 			// Run the semantic check
-			m.semanticCheck(astRoots);
+			main.semanticCheck(astRoots);
 
 			// Generate code
 			String sFile = file + Config.ASMEXT;
 			try (FileWriter fout = new FileWriter(sFile);) {
-				m.generateCode(astRoots, fout);
+				main.generateCode(astRoots, fout);
 			}
 		}
 	}

@@ -5,13 +5,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import cd.Config;
 import cd.Main;
-import cd.util.FileUtil;
 
 @RunWith(Parameterized.class)
 public class TestSamplePrograms extends AbstractTestSamplePrograms {
@@ -37,14 +40,17 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 	@Parameters
 	public static Collection<Object[]> testFiles() {
 		List<Object[]> result = new ArrayList<>();
-		if (JUST_FILE != null)
+		IOFileFilter fileFilter = new SuffixFileFilter(".javali");
+		if (JUST_FILE != null) {
 			result.add(new Object[] { JUST_FILE });
-		else if (TEST_DIR != null) {
-			for (File file : FileUtil.findFiles(TEST_DIR)) {
+		} else if (TEST_DIR != null) {
+			for (File file : FileUtils.listFiles(TEST_DIR, fileFilter,
+					TrueFileFilter.INSTANCE)) {
 				result.add(new Object[] { file });
 			}
 		} else {
-			for (File file : FileUtil.findFiles(new File("."))) {
+			for (File file : FileUtils.listFiles(new File("."), fileFilter,
+					TrueFileFilter.INSTANCE)) {
 				result.add(new Object[] { file });
 			}
 		}

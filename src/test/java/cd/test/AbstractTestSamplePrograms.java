@@ -14,6 +14,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -217,7 +218,8 @@ abstract public class AbstractTestSamplePrograms {
 
 	private void testOptimizer(List<ClassDecl> astRoots) throws IOException {
 		// Determine the input and expected operation counts.
-		String inFile = (infile.exists() ? FileUtil.read(infile) : "");
+		String inFile = (infile.exists() ? FileUtils.readFileToString(infile)
+				: "");
 		String optRef = findOptimizerRef(inFile);
 
 		// Invoke the interpreter. Don't bother to save the output: we already
@@ -249,7 +251,8 @@ abstract public class AbstractTestSamplePrograms {
 	public boolean testCodeGenerator(List<ClassDecl> astRoots,
 			boolean hasWellDefinedOutput) throws IOException {
 		// Determine the input and expected output.
-		String inFile = (infile.exists() ? FileUtil.read(infile) : "");
+		String inFile = (infile.exists() ? FileUtils.readFileToString(infile)
+				: "");
 		String execRef = findExecRef(inFile);
 
 		// Run the code generator:
@@ -302,18 +305,18 @@ abstract public class AbstractTestSamplePrograms {
 		// Check for a .ref file
 		if (parserreffile.exists()
 				&& parserreffile.lastModified() > file.lastModified()) {
-			return FileUtil.read(parserreffile);
+			return FileUtils.readFileToString(parserreffile);
 		}
 
 		// If no file exists, contact reference server
 		String res;
 		Reference ref = openClient();
 		try {
-			res = ref.parserReference(FileUtil.read(this.file));
+			res = ref.parserReference(FileUtils.readFileToString(file));
 		} catch (Throwable e) {
 			return fragmentBug(e);
 		}
-		FileUtil.write(parserreffile, res);
+		FileUtils.writeStringToFile(parserreffile, res);
 		return res;
 	}
 
@@ -327,15 +330,15 @@ abstract public class AbstractTestSamplePrograms {
 		String res;
 		if (semanticreffile.exists()
 				&& semanticreffile.lastModified() > file.lastModified())
-			res = FileUtil.read(semanticreffile);
+			res = FileUtils.readFileToString(semanticreffile);
 		else {
 			Reference ref = openClient();
 			try {
-				res = ref.semanticReference(FileUtil.read(this.file));
+				res = ref.semanticReference(FileUtils.readFileToString(file));
 			} catch (Throwable e) {
 				return fragmentBug(e);
 			}
-			FileUtil.write(semanticreffile, res);
+			FileUtils.writeStringToFile(semanticreffile, res);
 		}
 
 		// Extract the first line: there should always be multiple lines,
@@ -355,18 +358,19 @@ abstract public class AbstractTestSamplePrograms {
 		// Check for a .ref file
 		if (execreffile.exists()
 				&& execreffile.lastModified() > file.lastModified()) {
-			return FileUtil.read(execreffile);
+			return FileUtils.readFileToString(execreffile);
 		}
 
 		// If no file exists, use the interpreter to generate one.
 		Reference ref = openClient();
 		String res;
 		try {
-			res = ref.execReference(FileUtil.read(this.file), inputText);
+			res = ref
+					.execReference(FileUtils.readFileToString(file), inputText);
 		} catch (Throwable e) {
 			return fragmentBug(e);
 		}
-		FileUtil.write(execreffile, res);
+		FileUtils.writeStringToFile(execreffile, res);
 		return res;
 	}
 
@@ -374,18 +378,18 @@ abstract public class AbstractTestSamplePrograms {
 		// Check for a .ref file
 		if (optreffile.exists()
 				&& optreffile.lastModified() > file.lastModified()) {
-			return FileUtil.read(optreffile);
+			return FileUtils.readFileToString(optreffile);
 		}
 
 		// If no file exists, use the interpreter to generate one.
 		Reference ref = openClient();
 		String res;
 		try {
-			res = ref.optReference(FileUtil.read(this.file), inputText);
+			res = ref.optReference(FileUtils.readFileToString(file), inputText);
 		} catch (Throwable e) {
 			return fragmentBug(e);
 		}
-		FileUtil.write(optreffile, res);
+		FileUtils.writeStringToFile(optreffile, res);
 		return res;
 	}
 
