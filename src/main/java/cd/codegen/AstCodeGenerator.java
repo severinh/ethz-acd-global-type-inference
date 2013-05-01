@@ -880,10 +880,10 @@ public class AstCodeGenerator {
 		@Override
 		public String var(Var ast, Void arg) {
 			String reg = getRegister();
-			switch (ast.sym.getKind()) {
+			switch (ast.getSymbol().getKind()) {
 			case LOCAL:
 			case PARAM:
-				emitLoad(ast.sym.offset, BP, reg);
+				emitLoad(ast.getSymbol().offset, BP, reg);
 				break;
 			case FIELD:
 				// These are removed by the ExprRewriter added to the
@@ -1014,7 +1014,7 @@ public class AstCodeGenerator {
 
 				@Override
 				public Void var(Var ast, Void arg) {
-					emitStore(rhsReg, ast.sym.offset, BP);
+					emitStore(rhsReg, ast.getSymbol().offset, BP);
 					return null;
 				}
 

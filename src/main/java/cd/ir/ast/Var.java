@@ -5,8 +5,8 @@ import cd.ir.symbols.VariableSymbol;
 
 public class Var extends LeafExpr {
 
-	public String name;
-	public VariableSymbol sym;
+	private String name;
+	private VariableSymbol symbol;
 
 	/**
 	 * Use this constructor to build an instance of this AST in the parser.
@@ -22,13 +22,13 @@ public class Var extends LeafExpr {
 
 	/**
 	 * Use this static function to build an instance after the semantic phase;
-	 * it fills in the {@link #type} and {@link #sym} fields.
+	 * it fills in the {@link #type} and {@link #symbol} fields.
 	 */
-	public static Var withSym(VariableSymbol sym) {
-		Var v = new Var(sym.name);
-		v.sym = sym;
-		v.type = sym.getType();
-		return v;
+	public static Var withSym(VariableSymbol symbol) {
+		Var var = new Var(symbol.name);
+		var.symbol = symbol;
+		var.type = symbol.getType();
+		return var;
 	}
 
 	@Override
@@ -38,13 +38,29 @@ public class Var extends LeafExpr {
 
 	@Override
 	protected <E extends Expr> E postCopy(E item) {
-		((Var) item).sym = sym;
+		((Var) item).symbol = symbol;
 		return super.postCopy(item);
 	}
 
-	public void setSymbol(VariableSymbol variableSymbol) {
-		sym = variableSymbol;
-		name = sym.toString();
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public VariableSymbol getSymbol() {
+		return symbol;
+	}
+
+	public void getSymbol(VariableSymbol symbol) {
+		this.symbol = symbol;
+	}
+
+	public void setSymbol(VariableSymbol symbol) {
+		this.symbol = symbol;
+		this.name = symbol.toString();
 	}
 
 }

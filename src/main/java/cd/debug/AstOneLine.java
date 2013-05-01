@@ -181,15 +181,15 @@ public class AstOneLine {
 
 		@Override
 		public String var(Var ast, Void arg) {
-			if (ast.sym != null) {
-				String symName = ast.sym.toString();
-				if (ast.name == null || ast.name.equals(symName))
+			if (ast.getSymbol() != null) {
+				String symName = ast.getSymbol().toString();
+				if (ast.getName() == null || ast.getName().equals(symName))
 					return symName;
 
 				// Return something strange to warn about the mismatch here:
-				return String.format("(%s!=%s)", symName, ast.name);
+				return String.format("(%s!=%s)", symName, ast.getName());
 			} else
-				return ast.name;
+				return ast.getName();
 		}
 
 		@Override

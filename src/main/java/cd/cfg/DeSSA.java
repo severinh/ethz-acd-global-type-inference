@@ -129,7 +129,7 @@ public class DeSSA {
 					DepNode rhsNode = new ExprVisitor<DepNode, Void>() {
 						@Override
 						public DepNode var(Var ast, Void arg) {
-							return depNodes.get(ast.sym);
+							return depNodes.get(ast.getSymbol());
 						}
 					}.visit(rhsExpr, null);
 

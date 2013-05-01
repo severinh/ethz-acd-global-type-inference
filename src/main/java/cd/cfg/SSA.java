@@ -85,7 +85,7 @@ public class SSA {
 			Expr lhs = ast.left();
 			if (lhs instanceof Var) {
 				Var var = (Var) lhs;
-				VariableSymbol sym = var.sym;
+				VariableSymbol sym = var.getSymbol();
 				addPhis(sym, idf);
 			}
 			return super.assign(ast, idf);
@@ -156,7 +156,7 @@ public class SSA {
 				Ast lhs = ast.left();
 				if (lhs instanceof Var) {
 					Var var = (Var) lhs;
-					var.setSymbol(renumberDefinedSymbol(var.sym,
+					var.setSymbol(renumberDefinedSymbol(var.getSymbol(),
 							currentVersions));
 				} else {
 					renumberAST(ast.left(), currentVersions);
@@ -170,9 +170,9 @@ public class SSA {
 			 */
 			@Override
 			public Void var(Var ast, Void arg) {
-				assert currentVersions.containsKey(ast.sym);
-				ast.sym = currentVersions.get(ast.sym);
-				ast.name = ast.sym.toString();
+				assert currentVersions.containsKey(ast.getSymbol());
+				ast.setSymbol(currentVersions.get(ast.getSymbol()));
+				ast.setName(ast.getSymbol().toString());
 				return null;
 			}
 
@@ -214,7 +214,7 @@ public class SSA {
 					Phi phi = phiDefs.get(sym);
 					if (phi != null)
 						for (Expr rhs : phi.rhs)
-							expandInto(((Var) rhs).sym, result);
+							expandInto(((Var) rhs).getSymbol(), result);
 				}
 			}
 
@@ -241,11 +241,12 @@ public class SSA {
 			 */
 			@Override
 			public Void var(Var ast, Void arg) {
-				VariableSymbol sym = ast.sym;
+				VariableSymbol sym = ast.getSymbol();
 				Set<VariableSymbol> syms = expand(sym);
 				if (syms.contains(uninitSym))
 					throw new SemanticFailure(Cause.POSSIBLY_UNINITIALIZED,
-							"Variable %s may be used uninitialized!", ast.name);
+							"Variable %s may be used uninitialized!",
+							ast.getName());
 				return null;
 			}
 		};

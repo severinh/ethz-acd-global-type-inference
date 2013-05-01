@@ -333,7 +333,7 @@ public class Optimizer {
 
 				if (ast.left() instanceof Var) {
 					if (new IsConstantExpr().visit(ast.right(), null)) {
-						VariableSymbol sym = ((Var) ast.left()).sym;
+						VariableSymbol sym = ((Var) ast.left()).getSymbol();
 						LOG.debug("Copy Prop: {} is just a copy of {}", sym,
 								ast.right());
 						copiedSymbols.put(sym, ast.right());
@@ -345,7 +345,7 @@ public class Optimizer {
 
 			@Override
 			public Ast var(Var ast, Void arg) {
-				Expr replacement = copiedSymbols.get(ast.sym);
+				Expr replacement = copiedSymbols.get(ast.getSymbol());
 				if (replacement != null) {
 					changes++;
 					LOG.debug("Copy Prop: Replacing {} with {}", ast,
@@ -388,7 +388,7 @@ public class Optimizer {
 
 				@Override
 				public Boolean var(Var ast, Void arg) {
-					switch (ast.sym.getKind()) {
+					switch (ast.getSymbol().getKind()) {
 					case LOCAL:
 					case PARAM:
 						return true;
@@ -763,7 +763,7 @@ public class Optimizer {
 
 			@Override
 			public Canonical var(Var ast, BlockData data) {
-				VariableSymbol varSym = ast.sym;
+				VariableSymbol varSym = ast.getSymbol();
 				switch (varSym.getKind()) {
 				case FIELD: // removed by SemanticAnalyzer
 					break;

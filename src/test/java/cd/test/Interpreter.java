@@ -1075,22 +1075,22 @@ public class Interpreter {
 		@Override
 		public JlValue var(Var ast, StackFrame arg) {
 
-			if (ast.sym == null) {
+			if (ast.getSymbol() == null) {
 				throw new DynamicError("Var node with null symbol",
 						DynamicError.INTERNAL_ERROR);
 			}
 
-			switch (ast.sym.getKind()) {
+			switch (ast.getSymbol().getKind()) {
 
 			case LOCAL:
 			case PARAM:
-				return arg.var(ast.sym);
+				return arg.var(ast.getSymbol());
 			case FIELD:
-				return arg.getThisPointer().field(ast.sym);
+				return arg.getThisPointer().field(ast.getSymbol());
 			}
 
 			throw new DynamicError("Unhandled VariableSymbol kind: "
-					+ ast.sym.getKind(), DynamicError.INTERNAL_ERROR);
+					+ ast.getSymbol().getKind(), DynamicError.INTERNAL_ERROR);
 
 		}
 
@@ -1141,7 +1141,7 @@ public class Interpreter {
 
 				@Override
 				public Void var(Var ast, Void arg) {
-					frame.setVar(ast.sym, val);
+					frame.setVar(ast.getSymbol(), val);
 					return null;
 				}
 

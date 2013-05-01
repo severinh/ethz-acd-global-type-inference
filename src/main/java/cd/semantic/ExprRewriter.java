@@ -15,15 +15,15 @@ public class ExprRewriter extends AstRewriteVisitor<Void> {
 
 	@Override
 	public Ast var(Var ast, Void arg) {
-		switch (ast.sym.getKind()) {
+		switch (ast.getSymbol().getKind()) {
 		case PARAM:
 		case LOCAL:
 			// Leave params or local variables alone
 			return ast;
 		case FIELD:
 			// Convert an implicit field reference to "this.foo"
-			Field f = new Field(new ThisRef(), ast.name);
-			f.sym = ast.sym;
+			Field f = new Field(new ThisRef(), ast.getName());
+			f.sym = ast.getSymbol();
 			f.type = ast.type;
 			return f;
 		}

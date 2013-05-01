@@ -254,12 +254,12 @@ public class ExprTypingVisitor extends
 
 	@Override
 	public TypeSymbol var(Var ast, SymbolTable<VariableSymbol> locals) {
-		if (!locals.contains(ast.name)) {
+		if (!locals.contains(ast.getName())) {
 			throw new SemanticFailure(Cause.NO_SUCH_VARIABLE,
-					"No variable %s was found", ast.name);
+					"No variable %s was found", ast.getName());
 		}
-		ast.setSymbol(locals.get(ast.name));
-		return ast.sym.getType();
+		ast.setSymbol(locals.get(ast.getName()));
+		return ast.getSymbol().getType();
 	}
 
 	@Override
