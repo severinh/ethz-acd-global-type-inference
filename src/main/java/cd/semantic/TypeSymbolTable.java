@@ -147,6 +147,15 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		if (sub == getNullType() && sup.isReferenceType()) {
 			return true;
 		}
+		if (sub == getBottomType()) {
+			return true;
+		}
+		if (sub == getTopType()) {
+			return (sup == sub);
+		}
+		if (sup == getTopType()) {
+			return true;
+		}
 		while (sub != null) {
 			if (sub == sup) {
 				return true;
@@ -154,6 +163,26 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 			sub = getSuperType(sub);
 		}
 		return false;
+	}
+
+	/**
+	 * Returns the least common ancestor type of two types.
+	 * 
+	 * @todo The implementation is currently rather imprecise
+	 */
+	public TypeSymbol getLCA(TypeSymbol first, TypeSymbol second) {
+		if (isSubType(first, second)) {
+			return first;
+		} else if (isSubType(second, first)) {
+			return second;
+		}
+
+		// TODO: Improve this poor man's LCA ;-)
+		if (first.isReferenceType() && second.isReferenceType()) {
+			return getObjectType();
+		} else {
+			return getTopType();
+		}
 	}
 
 }
