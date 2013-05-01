@@ -28,12 +28,12 @@ import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 
-public class TypingVisitor extends
+public class ExprTypingVisitor extends
 		ExprVisitor<TypeSymbol, SymbolTable<VariableSymbol>> {
 
 	private final TypeSymbolTable typeSymbols;
 
-	public TypingVisitor(TypeSymbolTable typeSymbols) {
+	public ExprTypingVisitor(TypeSymbolTable typeSymbols) {
 		this.typeSymbols = typeSymbols;
 	}
 

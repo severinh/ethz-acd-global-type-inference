@@ -26,14 +26,14 @@ import cd.ir.ExprVisitor;
 
 public class TypeChecker {
 
-	final TypeSymbolTable typeSymbols;
-	private final TypingVisitor visitor;
+	private final TypeSymbolTable typeSymbols;
+	private final ExprTypingVisitor visitor;
 
 	private MethodDecl thisMethod;
 
 	public TypeChecker(TypeSymbolTable typeSymbols) {
 		this.typeSymbols = typeSymbols;
-		this.visitor = new TypingVisitor(typeSymbols);
+		this.visitor = new ExprTypingVisitor(typeSymbols);
 	}
 
 	public TypeSymbol type(Expr expr, SymbolTable<VariableSymbol> locals) {
