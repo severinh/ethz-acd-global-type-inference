@@ -17,17 +17,20 @@ import cd.ir.symbols.Symbol;
  */
 public class SymbolTable<S extends Symbol> {
 
-	private final Map<String, S> map = new HashMap<>();
+	private final Map<String, S> map;
 	private final SymbolTable<S> parent;
 
 	public SymbolTable(SymbolTable<S> parent) {
+		this.map = new HashMap<>();
 		this.parent = parent;
 	}
 
 	public void add(S sym) {
 		// Check that the symbol is not already declared *at this level*
 		if (containsLocally(sym.name)) {
-			throw new SemanticFailure(Cause.DOUBLE_DECLARATION);
+			throw new SemanticFailure(Cause.DOUBLE_DECLARATION,
+					"Symbol '%s' was declared twice in the same scope",
+					sym.name);
 		}
 		map.put(sym.name, sym);
 	}
@@ -75,20 +78,6 @@ public class SymbolTable<S extends Symbol> {
 			return null;
 		}
 		return parent.get(name);
-	}
-
-	/**
-	 * Finds the symbol with the given name, or fails with a NO_SUCH_TYPE error.
-	 * Only really makes sense to use this if S == TypeSymbol, but we don't
-	 * strictly forbid it...
-	 */
-	public S getType(String name) {
-		S res = get(name);
-		if (res == null) {
-			throw new SemanticFailure(Cause.NO_SUCH_TYPE,
-					"No type '%s' was found", name);
-		}
-		return res;
 	}
 
 }

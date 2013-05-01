@@ -3,6 +3,8 @@ package cd.semantic;
 import java.util.ArrayList;
 import java.util.List;
 
+import cd.exceptions.SemanticFailure;
+import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.PrimitiveTypeSymbol;
@@ -183,6 +185,18 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		} else {
 			return getTopType();
 		}
+	}
+
+	/**
+	 * Finds the symbol with the given name, or fails with a NO_SUCH_TYPE error.
+	 */
+	public TypeSymbol getType(String name) {
+		TypeSymbol res = get(name);
+		if (res == null) {
+			throw new SemanticFailure(Cause.NO_SUCH_TYPE,
+					"No type '%s' was found", name);
+		}
+		return res;
 	}
 
 }
