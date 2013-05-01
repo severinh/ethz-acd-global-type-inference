@@ -11,7 +11,6 @@ import cd.ir.ast.MethodDecl;
 import cd.ir.ast.VarDecl;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
-import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.ir.symbols.VariableSymbol.Kind;
 import cd.ir.AstVisitor;
@@ -24,17 +23,17 @@ import cd.ir.AstVisitor;
 public class SymbolCreator extends Object {
 
 	private final Main main;
-	private final SymbolTable<TypeSymbol> typesTable;
+	private final TypeSymbolTable typeSymbols;
 
-	public SymbolCreator(Main main, SymbolTable<TypeSymbol> typesTable) {
+	public SymbolCreator(Main main, TypeSymbolTable typesTable) {
 		this.main = main;
-		this.typesTable = typesTable;
+		this.typeSymbols = typesTable;
 	}
 
 	public void createSymbols(ClassDecl cd) {
 		// lookup the super class. the grammar guarantees that this
 		// will refer to a class, if the lookup succeeds.
-		cd.sym.superClass = (ClassSymbol) typesTable.getType(cd.superClass);
+		cd.sym.superClass = (ClassSymbol) typeSymbols.getType(cd.superClass);
 		new ClassSymbolCreator(cd.sym).visitChildren(cd, null);
 	}
 
@@ -54,7 +53,7 @@ public class SymbolCreator extends Object {
 		@Override
 		public Void varDecl(VarDecl ast, Void arg) {
 			ast.sym = new VariableSymbol(ast.name,
-					typesTable.getType(ast.type), Kind.FIELD);
+					typeSymbols.getType(ast.type), Kind.FIELD);
 			classSym.addField(ast.sym);
 			return null;
 		}
@@ -68,7 +67,7 @@ public class SymbolCreator extends Object {
 			if (ast.returnType.equals("void")) {
 				ast.sym.returnType = main.typeSymbols.getVoidType();
 			} else {
-				ast.sym.returnType = typesTable.getType(ast.returnType);
+				ast.sym.returnType = typeSymbols.getType(ast.returnType);
 			}
 
 			// create symbols for each parameter
@@ -82,7 +81,7 @@ public class SymbolCreator extends Object {
 							ast.sym, argumentName);
 				pnames.add(argumentName);
 				VariableSymbol vs = new VariableSymbol(argumentName,
-						typesTable.getType(argumentType));
+						typeSymbols.getType(argumentType));
 				ast.sym.addParameter(vs);
 			}
 
@@ -111,7 +110,7 @@ public class SymbolCreator extends Object {
 		@Override
 		public Void varDecl(VarDecl ast, Void arg) {
 			ast.sym = new VariableSymbol(ast.name,
-					typesTable.getType(ast.type), Kind.LOCAL);
+					typeSymbols.getType(ast.type), Kind.LOCAL);
 			methodSym.addLocal(ast.sym);
 			return null;
 		}
