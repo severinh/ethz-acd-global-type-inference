@@ -3,6 +3,7 @@ package cd.semantic;
 import java.util.ArrayList;
 import java.util.List;
 
+import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.PrimitiveTypeSymbol;
 import cd.ir.symbols.TypeSymbol;
@@ -107,6 +108,52 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 			}
 		}
 		return classSymbols;
+	}
+
+	/**
+	 * Returns the super type of a type, if any.
+	 * 
+	 * @param sym
+	 *            the type symbol
+	 * @return the super type of the given type, or <code>null</code> if there
+	 *         is none
+	 * 
+	 * @todo This method was copied from {@link TypeChecker}. Eventually, it
+	 *       should be turned into a method of {@link TypeSymbol}.
+	 */
+	public TypeSymbol getSuperType(TypeSymbol sym) {
+		if (sym instanceof PrimitiveTypeSymbol) {
+			return null;
+		}
+		if (sym instanceof ArrayTypeSymbol) {
+			return getObjectType();
+		}
+		return ((ClassSymbol) sym).superClass;
+	}
+
+	/**
+	 * Determines whether a type is a sub type of another.
+	 * 
+	 * @param sup
+	 *            the alleged super type
+	 * @param sub
+	 *            the alleged sub type
+	 * @return
+	 * 
+	 * @todo This method was copied from {@link TypeChecker}. Eventually, it
+	 *       should be turned into a method of {@link TypeSymbol}.
+	 */
+	public boolean isSubType(TypeSymbol sup, TypeSymbol sub) {
+		if (sub == getNullType() && sup.isReferenceType()) {
+			return true;
+		}
+		while (sub != null) {
+			if (sub == sup) {
+				return true;
+			}
+			sub = getSuperType(sub);
+		}
+		return false;
 	}
 
 }
