@@ -1,4 +1,4 @@
-package cd.ir.symbols;
+package cd.semantic;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -9,6 +9,8 @@ import cd.ir.ast.Expr;
 import cd.ir.ast.UnaryOp;
 import cd.ir.ast.UnaryOp.UOp;
 import cd.ir.ast.Var;
+import cd.ir.symbols.TypeSymbol;
+import cd.ir.symbols.VariableSymbol;
 import cd.semantic.ExprTypingVisitor;
 import cd.semantic.SymbolTable;
 import cd.semantic.TypeSymbolTable;
