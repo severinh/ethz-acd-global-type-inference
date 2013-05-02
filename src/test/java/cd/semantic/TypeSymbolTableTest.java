@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.semantic.TypeSymbolTable;
@@ -38,6 +39,19 @@ public class TypeSymbolTableTest {
 		// |.......|-- C
 		// |.......|-- D
 		// |-- E
+	}
+
+	@Test
+	public void testArrayTypes() {
+		// Test that for each non-array type, there is a corresponding array
+		// type in the type symbol table
+		for (TypeSymbol elementType : typeSymbols.localSymbols()) {
+			if (!(elementType instanceof ArrayTypeSymbol)) {
+				ArrayTypeSymbol arrayType = typeSymbols
+						.getArrayTypeSymbol(elementType);
+				Assert.assertEquals(elementType, arrayType.elementType);
+			}
+		}
 	}
 
 	@Test
