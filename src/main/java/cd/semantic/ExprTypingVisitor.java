@@ -209,9 +209,16 @@ public class ExprTypingVisitor extends
 
 	@Override
 	public TypeSymbol index(Index index, SymbolTable<VariableSymbol> scope) {
-		ArrayTypeSymbol argType = asArray(type(index.left(), scope));
 		checkType(typeSymbols.getIntType(), index.right(), scope);
-		return argType.elementType;
+
+		TypeSymbol arrayType = type(index.left(), scope);
+		// Do not complain if the type of the array variable is the bottom type.
+		// Instead, return the bottom type as the element type as well
+		if (arrayType == typeSymbols.getBottomType()) {
+			return typeSymbols.getBottomType();
+		} else {
+			return asArray(arrayType).elementType;
+		}
 	}
 
 	@Override

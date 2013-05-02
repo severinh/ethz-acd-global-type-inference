@@ -13,12 +13,14 @@ import cd.ir.ast.BuiltInReadFloat;
 import cd.ir.ast.Cast;
 import cd.ir.ast.Expr;
 import cd.ir.ast.FloatConst;
+import cd.ir.ast.Index;
 import cd.ir.ast.IntConst;
 import cd.ir.ast.NewObject;
 import cd.ir.ast.NullConst;
 import cd.ir.ast.UnaryOp;
 import cd.ir.ast.UnaryOp.UOp;
 import cd.ir.ast.Var;
+import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
@@ -48,6 +50,7 @@ public class ExprTypingVisitorTest {
 	private VariableSymbol objectVariable;
 	private VariableSymbol xVariable;
 	private VariableSymbol zVariable;
+	private VariableSymbol arrayVariable;
 
 	@Before
 	public void setUp() {
@@ -70,6 +73,8 @@ public class ExprTypingVisitorTest {
 		objectVariable = addVariableSymbol("o", types.getObjectType());
 		xVariable = addVariableSymbol("x", xClass);
 		zVariable = addVariableSymbol("z", zClass);
+		arrayVariable = addVariableSymbol("array",
+				types.getArrayTypeSymbol(types.getObjectType()));
 	}
 
 	private Var makeIntVar() {
@@ -102,6 +107,10 @@ public class ExprTypingVisitorTest {
 
 	private Var makeZVar() {
 		return Var.withSym(zVariable);
+	}
+
+	private Var makeArrayVar() {
+		return Var.withSym(arrayVariable);
 	}
 
 	private void assertType(TypeSymbol expectedType, Expr expr) {
@@ -240,6 +249,34 @@ public class ExprTypingVisitorTest {
 	@Test(expected = SemanticFailure.class)
 	public void testIncorrectPrimitiveCast() {
 		type(new Cast(makeIntVar(), types.getFloatType().name));
+	}
+
+	@Test
+	public void testIndex() {
+		for (TypeSymbol elementType : types.allSymbols()) {
+			if (elementType instanceof ArrayTypeSymbol) {
+				continue;
+			}
+			arrayVariable.setType(types.getArrayTypeSymbol(elementType));
+
+			assertType(elementType, new Index(makeArrayVar(), makeIntVar()));
+			assertType(elementType, new Index(makeArrayVar(), makeBottomVar()));
+		}
+	}
+
+	@Test(expected = SemanticFailure.class)
+	public void testIncorrectIndexArg() {
+		type(new Index(makeArrayVar(), makeFloatVar()));
+	}
+
+	@Test(expected = SemanticFailure.class)
+	public void testIncorrectIndexType() {
+		type(new Index(makeFloatVar(), makeFloatVar()));
+	}
+
+	@Test
+	public void testIndexBottomType() {
+		assertBottomType(new Index(makeBottomVar(), makeIntVar()));
 	}
 
 	@Test
