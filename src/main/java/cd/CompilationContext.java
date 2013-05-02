@@ -44,4 +44,12 @@ public class CompilationContext {
 		this.binaryFile = new File(file.getPath() + Config.BINARYEXT);
 		this.cfgDumpBase = file;	
 	}
+
+	public void deleteIntermediateFiles() {
+		// Delete intermediate files from previous runs:
+		if (assemblyFile.exists())
+			assemblyFile.delete();
+		if (binaryFile.exists())
+			binaryFile.delete();		
+	}
 }
