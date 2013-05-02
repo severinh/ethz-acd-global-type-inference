@@ -7,7 +7,7 @@ public class TypeSymbol extends Symbol {
 	}
 
 	public boolean isReferenceType() {
-		throw new IllegalStateException("unknown whether reference type or not");
+		return false;
 	}
 
 	@Override

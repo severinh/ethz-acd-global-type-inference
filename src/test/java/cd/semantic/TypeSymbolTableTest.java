@@ -84,6 +84,10 @@ public class TypeSymbolTableTest {
 		assertLCA(objectType, A, E);
 		assertLCA(A, A, B);
 		assertLCA(B, C, D);
+
+		assertLCA(nullType, nullType, bottomType);
+		assertLCA(topType, nullType, topType);
+		assertLCA(topType, nullType, intType);
 	}
 
 	private void assertLCA(TypeSymbol expectedLCA, TypeSymbol type,
