@@ -91,8 +91,10 @@ public class ExprTypingVisitor extends
 	}
 
 	public void typeIsPrimitive(TypeSymbol type) {
-		if (type != typeSymbols.getIntType()
-				&& type != typeSymbols.getFloatType()) {
+		// TODO: This method should not know the exhaustive list of primitive
+		// numerical types. DRY baby, DRY!
+		if (!typeSymbols.isSubType(typeSymbols.getIntType(), type)
+				&& !typeSymbols.isSubType(typeSymbols.getFloatType(), type)) {
 			throw new SemanticFailure(Cause.TYPE_ERROR,
 					"Expected %s or %s for operands but found type %s",
 					typeSymbols.getIntType(), typeSymbols.getFloatType(), type);
@@ -262,7 +264,7 @@ public class ExprTypingVisitor extends
 			return type;
 		case U_BOOL_NOT:
 			checkType(typeSymbols.getBooleanType(), type);
-			return typeSymbols.getBooleanType();
+			return type;
 		}
 		throw new RuntimeException("Unknown unary op " + unaryOp.operator);
 	}
