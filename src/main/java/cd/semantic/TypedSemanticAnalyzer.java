@@ -79,7 +79,7 @@ public class TypedSemanticAnalyzer {
 		TypeChecker tc = new TypeChecker(typeSymbols);
 
 		for (ClassDecl classd : classDecls) {
-			SymbolTable<VariableSymbol> fldTable = new SymbolTable<>(null);
+			SymbolTable<VariableSymbol> fldTable = new SymbolTable<>();
 
 			// add all fields of this class, or any of its super classes
 			for (ClassSymbol p = classd.sym; p != null; p = p.superClass)

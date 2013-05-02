@@ -27,7 +27,7 @@ public class Var extends LeafExpr {
 	public static Var withSym(VariableSymbol symbol) {
 		Var var = new Var(symbol.name);
 		var.symbol = symbol;
-		var.type = symbol.getType();
+		var.setType(symbol.getType());
 		return var;
 	}
 

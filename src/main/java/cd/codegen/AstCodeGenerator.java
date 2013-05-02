@@ -203,7 +203,7 @@ public class AstCodeGenerator {
 		// Generate AST for main() method:
 		// new Main().main()
 		NewObject newMain = new NewObject("Main");
-		newMain.type = context.mainType;
+		newMain.setType(context.mainType);
 		MethodCall callMain = new MethodCall(newMain, "main",
 				Collections.<Expr> emptyList());
 		callMain.sym = context.mainType.getMethod("main");
@@ -505,11 +505,11 @@ public class AstCodeGenerator {
 
 			public void binaryOp(BinaryOp ast, String leftReg, String rightReg) {
 
-				if (ast.type == context.typeSymbols.getObjectType()) {
+				if (ast.getType() == context.typeSymbols.getObjectType()) {
 					floatOp(leftReg, ast.operator, rightReg);
 				} else {
 
-					if (ast.left().type == context.typeSymbols.getFloatType()) {
+					if (ast.left().getType() == context.typeSymbols.getFloatType()) {
 						floatCmp(leftReg, ast.operator, rightReg);
 					} else {
 						integerOp(leftReg, ast.operator, rightReg);
@@ -804,7 +804,7 @@ public class AstCodeGenerator {
 			// Compute that into reg, store it into the stack as
 			// an argument to malloc(), and then use it to store final
 			// result.
-			ArrayTypeSymbol arrsym = (ArrayTypeSymbol) ast.type;
+			ArrayTypeSymbol arrsym = (ArrayTypeSymbol) ast.getType();
 			String reg = gen(ast.arg());
 			// Check for negative array sizes
 			emitStore(reg, 0, SP);
@@ -819,7 +819,7 @@ public class AstCodeGenerator {
 
 		@Override
 		public String newObject(NewObject ast, Void arg) {
-			ClassSymbol clssym = (ClassSymbol) ast.type;
+			ClassSymbol clssym = (ClassSymbol) ast.getType();
 			String reg = getRegister();
 			emitStore(c(clssym.sizeof), 0, SP);
 			call(Config.MALLOC, reg);
@@ -855,7 +855,7 @@ public class AstCodeGenerator {
 				break;
 
 			case U_MINUS: {
-				if (ast.type == context.typeSymbols.getFloatType()) {
+				if (ast.getType() == context.typeSymbols.getFloatType()) {
 					emitGprRegToFloatReg(FLOAT_REG_0, argReg);
 					push("%eax");
 					emit("movd", FLOAT_REG_0, "%eax");

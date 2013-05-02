@@ -14,7 +14,7 @@ public abstract class Expr extends Ast {
 	/**
 	 * Type that this expression will evaluate to (computed in semantic phase).
 	 */
-	public TypeSymbol type;
+	private TypeSymbol type;
 
 	@Override
 	public <R, A> R accept(AstVisitor<R, A> visitor, A arg) {
@@ -25,8 +25,16 @@ public abstract class Expr extends Ast {
 
 	/** Copies any non-AST fields. */
 	protected <E extends Expr> E postCopy(E item) {
-		item.type = type;
+		item.setType(type);
 		return item;
+	}
+
+	public TypeSymbol getType() {
+		return type;
+	}
+
+	public void setType(TypeSymbol type) {
+		this.type = type;
 	}
 
 }

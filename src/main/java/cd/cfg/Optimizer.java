@@ -223,9 +223,9 @@ public class Optimizer {
 					throws NotConstantException {
 				Boolean boolValue;
 				TypeSymbolTable typeSymbols = compilationContext.getTypeSymbols();
-				if (left.type == typeSymbols.getIntType())
+				if (left.getType() == typeSymbols.getIntType())
 					boolValue = asInt(left) == asInt(right);
-				else if (left.type == typeSymbols.getBooleanType())
+				else if (left.getType() == typeSymbols.getBooleanType())
 					boolValue = asBool(left) == asBool(right);
 				else
 					boolValue = (isNull(left) && isNull(right) ? true : null);
@@ -246,7 +246,7 @@ public class Optimizer {
 
 				if (replacement != null) {
 					// type of the expression does not change:
-					replacement.type = original.type;
+					replacement.setType(original.getType());
 					changes++;
 					LOG.debug("Constant Prop: Replacing {} with {}", original,
 							replacement);
@@ -576,7 +576,7 @@ public class Optimizer {
 					// create a new symbol to use as a temporary
 					expr1 = (Expr) ex.appearances.get(0).deepCopy();
 					ex.sym = new VariableSymbol("CSE(" + ex.key + ")",
-							expr1.type);
+							expr1.getType());
 					msym.addLocal(ex.sym);
 				} else {
 					expr1 = null;
@@ -734,7 +734,7 @@ public class Optimizer {
 				if (arg == null)
 					return null;
 
-				String c = format("({}){}", ast.type.name, arg);
+				String c = format("({}){}", ast.getType().name, arg);
 				return canonicalize(ast, data, c, arg, null);
 			}
 

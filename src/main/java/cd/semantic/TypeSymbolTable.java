@@ -38,7 +38,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	private final TypeSymbol bottomType;
 
 	public TypeSymbolTable() {
-		super(null);
+		super();
 
 		intType = new PrimitiveTypeSymbol("int");
 		floatType = new PrimitiveTypeSymbol("float");

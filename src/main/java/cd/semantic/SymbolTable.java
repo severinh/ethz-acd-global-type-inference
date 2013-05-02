@@ -25,6 +25,13 @@ public class SymbolTable<S extends Symbol> {
 		this.parent = parent;
 	}
 
+	/**
+	 * Constructs a root symbol table, i.e., without a parent.
+	 */
+	public SymbolTable() {
+		this(null);
+	}
+
 	public void add(S sym) {
 		// Check that the symbol is not already declared *at this level*
 		if (containsLocally(sym.name)) {
