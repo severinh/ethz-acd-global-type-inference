@@ -87,4 +87,9 @@ public class SymbolTable<S extends Symbol> {
 		return parent.get(name);
 	}
 
+	@Override
+	public String toString() {
+		return "SymbolTable [" + map.values() + ", parent=" + parent + "]";
+	}
+
 }
