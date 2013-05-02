@@ -75,11 +75,7 @@ public class ExprTypingVisitor extends
 	 * 
 	 * @return the common type of the two expression
 	 */
-	public TypeSymbol typeEquality(Expr leftExpr, Expr rightExpr,
-			SymbolTable<VariableSymbol> scope) {
-		TypeSymbol leftType = type(leftExpr, scope);
-		TypeSymbol rightType = type(rightExpr, scope);
-
+	public TypeSymbol typeEquality(TypeSymbol leftType, TypeSymbol rightType) {
 		if (leftType != rightType) {
 			throw new SemanticFailure(Cause.TYPE_ERROR,
 					"Expected operand types to be equal but found %s, %s",
@@ -89,21 +85,19 @@ public class ExprTypingVisitor extends
 		return leftType;
 	}
 
-	public void typeIsPrimitive(TypeSymbol type) {
-		// TODO: This method should not know the exhaustive list of primitive
-		// numerical types. DRY baby, DRY!
-		if (!typeSymbols.isSubType(typeSymbols.getIntType(), type)
-				&& !typeSymbols.isSubType(typeSymbols.getFloatType(), type)) {
-			throw new SemanticFailure(Cause.TYPE_ERROR,
-					"Expected %s or %s for operands but found type %s",
-					typeSymbols.getIntType(), typeSymbols.getFloatType(), type);
+	public void checkNumericalType(TypeSymbol type) {
+		// The bottom type is also admissible, because it is a sub-type of both
+		// int and float.
+		boolean isNumericalSubType = false;
+		for (TypeSymbol numericalType : typeSymbols.getNumericalTypeSymbols()) {
+			if (typeSymbols.isSubType(numericalType, type)) {
+				isNumericalSubType = true;
+				break;
+			}
 		}
-	}
-
-	public void typeIsValidForOperator(TypeSymbol type, BOp operator) {
-		if (operator == BOp.B_MOD && type == typeSymbols.getFloatType()) {
+		if (!isNumericalSubType) {
 			throw new SemanticFailure(Cause.TYPE_ERROR,
-					"Operation %s not valid for type %s", operator, type);
+					"Expected numerical operand type but found type %s", type);
 		}
 	}
 
@@ -118,45 +112,65 @@ public class ExprTypingVisitor extends
 	@Override
 	public TypeSymbol binaryOp(BinaryOp binaryOp,
 			SymbolTable<VariableSymbol> scope) {
-		switch (binaryOp.operator) {
+		BOp op = binaryOp.operator;
+
+		TypeSymbol leftType = type(binaryOp.left(), scope);
+		TypeSymbol rightType = type(binaryOp.right(), scope);
+		TypeSymbol lcaType = typeSymbols.getLCA(leftType, rightType);
+		TypeSymbol resultType;
+
+		if (lcaType.equals(typeSymbols.getTopType())) {
+			throw new SemanticFailure(Cause.TYPE_ERROR,
+					"LCA of operand types %s and %s is the top type", leftType,
+					rightType);
+		}
+
+		switch (op) {
 		case B_TIMES:
 		case B_DIV:
 		case B_MOD:
 		case B_PLUS:
-		case B_MINUS: {
-			TypeSymbol type = typeEquality(binaryOp.left(), binaryOp.right(),
-					scope);
-			typeIsPrimitive(type);
-			typeIsValidForOperator(type, binaryOp.operator);
-			return type;
-		}
+		case B_MINUS:
+			// Open for debate:
+			// Using the LCA type as the resulting type of a numerical operation
+			// seems quite logical. If for instance, the multiplication of a
+			// float and an integer value is handled in a natural way. The
+			// resulting type is the top type and this directly indicates a
+			// semantic failure.
+			resultType = lcaType;
+
+			if (op == BOp.B_MOD && resultType == typeSymbols.getFloatType()) {
+				throw new SemanticFailure(Cause.TYPE_ERROR,
+						"Operation %s not valid for type %s", op, resultType);
+			}
+			checkNumericalType(resultType);
+			break;
 		case B_AND:
 		case B_OR:
-			checkType(typeSymbols.getBooleanType(), binaryOp.left(), scope);
-			checkType(typeSymbols.getBooleanType(), binaryOp.right(), scope);
-			return typeSymbols.getBooleanType();
-
+			checkType(typeSymbols.getBooleanType(), lcaType);
+			resultType = typeSymbols.getBooleanType();
+			break;
 		case B_EQUAL:
 		case B_NOT_EQUAL:
-			TypeSymbol left = type(binaryOp.left(), scope);
-			TypeSymbol right = type(binaryOp.right(), scope);
-			if (typeSymbols.isSubType(left, right)
-					|| typeSymbols.isSubType(right, left))
-				return typeSymbols.getBooleanType();
-			throw new SemanticFailure(Cause.TYPE_ERROR,
-					"Types %s and %s could never be equal", left, right);
-
+			if (!typeSymbols.isSubType(leftType, rightType)
+					&& !typeSymbols.isSubType(rightType, leftType)) {
+				throw new SemanticFailure(Cause.TYPE_ERROR,
+						"Types %s and %s could never be equal", leftType,
+						rightType);
+			}
+			resultType = typeSymbols.getBooleanType();
+			break;
 		case B_LESS_THAN:
 		case B_LESS_OR_EQUAL:
 		case B_GREATER_THAN:
-		case B_GREATER_OR_EQUAL: {
-			TypeSymbol type = typeEquality(binaryOp.left(), binaryOp.right(),
-					scope);
-			typeIsPrimitive(type);
-			return typeSymbols.getBooleanType();
+		case B_GREATER_OR_EQUAL:
+			checkNumericalType(lcaType);
+			resultType = typeSymbols.getBooleanType();
+			break;
+		default:
+			throw new RuntimeException("Unhandled operator " + op);
 		}
-		}
-		throw new RuntimeException("Unhandled operator " + binaryOp.operator);
+		return resultType;
 	}
 
 	@Override
@@ -259,11 +273,11 @@ public class ExprTypingVisitor extends
 		switch (unaryOp.operator) {
 		case U_PLUS:
 		case U_MINUS:
-			typeIsPrimitive(type);
+			checkNumericalType(type);
 			return type;
 		case U_BOOL_NOT:
 			checkType(typeSymbols.getBooleanType(), type);
-			return type;
+			return typeSymbols.getBooleanType();
 		}
 		throw new RuntimeException("Unknown unary op " + unaryOp.operator);
 	}
