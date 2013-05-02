@@ -56,12 +56,16 @@ public class ExprTypingVisitor extends
 	 *       the type symbol table anymore, it should be possible to get rid of
 	 *       this redundancy again
 	 */
-	public void checkType(Expr ast, TypeSymbol expected,
+	public void checkType(Expr ast, TypeSymbol expectedType,
 			SymbolTable<VariableSymbol> scope) {
-		TypeSymbol actual = type(ast, scope);
-		if (!typeSymbols.isSubType(expected, actual)) {
+		TypeSymbol actualType = type(ast, scope);
+		checkType(expectedType, actualType);
+	}
+
+	public void checkType(TypeSymbol expectedType, TypeSymbol actualType) {
+		if (!typeSymbols.isSubType(expectedType, actualType)) {
 			throw new SemanticFailure(Cause.TYPE_ERROR,
-					"Expected %s but type was %s", expected, actual);
+					"Expected %s but type was %s", expectedType, actualType);
 		}
 	}
 
@@ -250,14 +254,14 @@ public class ExprTypingVisitor extends
 
 	@Override
 	public TypeSymbol unaryOp(UnaryOp unaryOp, SymbolTable<VariableSymbol> scope) {
+		TypeSymbol type = type(unaryOp.arg(), scope);
 		switch (unaryOp.operator) {
 		case U_PLUS:
 		case U_MINUS:
-			TypeSymbol type = type(unaryOp.arg(), scope);
 			typeIsPrimitive(type);
 			return type;
 		case U_BOOL_NOT:
-			checkType(unaryOp.arg(), typeSymbols.getBooleanType(), scope);
+			checkType(typeSymbols.getBooleanType(), type);
 			return typeSymbols.getBooleanType();
 		}
 		throw new RuntimeException("Unknown unary op " + unaryOp.operator);
