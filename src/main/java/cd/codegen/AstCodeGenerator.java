@@ -232,7 +232,7 @@ public class AstCodeGenerator {
 		if (sym.totalMethods != -1)
 			return sym.totalMethods;
 
-		int index = computeVtableOffsets(sym.superClass);
+		int index = computeVtableOffsets(sym.getSuperClass());
 		for (MethodSymbol ms : sym.getDeclaredMethods()) {
 			assert ms.vtableIndex == -1;
 			if (ms.overrides != null)
@@ -254,7 +254,7 @@ public class AstCodeGenerator {
 		if (sym.totalFields != -1)
 			return sym.totalFields;
 
-		int index = computeFieldOffsets(sym.superClass);
+		int index = computeFieldOffsets(sym.getSuperClass());
 		for (VariableSymbol fs : sym.getDeclaredFields()) {
 			assert fs.offset == -1;
 			// compute offset in bytes; note that 0 is the vtable
@@ -267,8 +267,8 @@ public class AstCodeGenerator {
 	}
 
 	private void collectVtable(MethodSymbol[] vtable, ClassSymbol sym) {
-		if (sym.superClass != null)
-			collectVtable(vtable, sym.superClass);
+		if (sym.getSuperClass() != null)
+			collectVtable(vtable, sym.getSuperClass());
 		for (MethodSymbol ms : sym.getDeclaredMethods())
 			vtable[ms.vtableIndex] = ms;
 	}
@@ -283,8 +283,8 @@ public class AstCodeGenerator {
 
 			// Emit vtable for this class:
 			emitLabel(vtable(cs));
-			if (cs.superClass != null)
-				emitConstantData(vtable(cs.superClass));
+			if (cs.getSuperClass() != null)
+				emitConstantData(vtable(cs.getSuperClass()));
 			else
 				emitConstantData("0");
 			for (int i = 0; i < cs.totalMethods; i++)
@@ -509,7 +509,8 @@ public class AstCodeGenerator {
 					floatOp(leftReg, ast.operator, rightReg);
 				} else {
 
-					if (ast.left().getType() == context.typeSymbols.getFloatType()) {
+					if (ast.left().getType() == context.typeSymbols
+							.getFloatType()) {
 						floatCmp(leftReg, ast.operator, rightReg);
 					} else {
 						integerOp(leftReg, ast.operator, rightReg);

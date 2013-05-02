@@ -28,9 +28,6 @@ public class SymbolCreator extends Object {
 	}
 
 	public void createSymbols(ClassDecl cd) {
-		// lookup the super class. the grammar guarantees that this
-		// will refer to a class, if the lookup succeeds.
-		cd.sym.superClass = (ClassSymbol) typeSymbols.getType(cd.superClass);
 		new ClassSymbolCreator(cd.sym).visitChildren(cd, null);
 	}
 

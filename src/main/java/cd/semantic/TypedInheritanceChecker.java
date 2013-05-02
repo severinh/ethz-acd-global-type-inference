@@ -33,7 +33,7 @@ public class TypedInheritanceChecker extends AstVisitor<Void, Void> {
 		// check that methods overridden from a parent class agree
 		// on number/type of parameters
 		MethodSymbol sym = ast.sym;
-		MethodSymbol superSym = classSym.superClass.getMethod(ast.name);
+		MethodSymbol superSym = classSym.getSuperClass().getMethod(ast.name);
 		if (superSym != null) {
 			for (Pair<VariableSymbol> pair : Pair.zip(sym.getParameters(),
 					superSym.getParameters()))

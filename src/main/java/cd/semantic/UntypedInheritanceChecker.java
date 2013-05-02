@@ -1,8 +1,5 @@
 package cd.semantic;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.ast.ClassDecl;
@@ -33,22 +30,7 @@ public class UntypedInheritanceChecker extends AstVisitor<Void, Void> {
 	@Override
 	public Void classDecl(ClassDecl ast, Void arg) {
 		classSym = ast.sym;
-
-		// check for cycles in the inheritance hierarchy:
-		Set<ClassSymbol> supers = new HashSet<>();
-		ClassSymbol sc = classSym.superClass;
-		supers.add(classSym);
-		while (sc != null) {
-			if (supers.contains(sc))
-				throw new SemanticFailure(Cause.CIRCULAR_INHERITANCE,
-						"Class %s has %s as a superclass twice", ast.name,
-						sc.name);
-			supers.add(sc);
-			sc = sc.superClass;
-		}
-
-		this.visitChildren(ast, null);
-
+		visitChildren(ast, null);
 		return null;
 	}
 
@@ -57,15 +39,16 @@ public class UntypedInheritanceChecker extends AstVisitor<Void, Void> {
 		// check that methods overridden from a parent class agree
 		// on number/type of parameters
 		MethodSymbol sym = ast.sym;
-		MethodSymbol superSym = classSym.superClass.getMethod(ast.name);
+		MethodSymbol superSym = classSym.getSuperClass().getMethod(ast.name);
 		sym.overrides = superSym;
 		if (superSym != null) {
-			if (superSym.getParameters().size() != sym.getParameters().size())
+			if (superSym.getParameters().size() != sym.getParameters().size()) {
 				throw new SemanticFailure(Cause.INVALID_OVERRIDE,
 						"Overridden method %s has %d parameters, "
 								+ "but original has %d", ast.name, sym
 								.getParameters().size(), superSym
 								.getParameters().size());
+			}
 		}
 		return null;
 	}

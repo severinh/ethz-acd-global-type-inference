@@ -1,7 +1,11 @@
 package cd.semantic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 import cd.CompilationContext;
 import cd.exceptions.SemanticFailure;
@@ -46,14 +50,53 @@ public class UntypedSemanticAnalyzer {
 	private TypeSymbolTable createSymbols(List<ClassDecl> classDecls) {
 		TypeSymbolTable typeSymbols = new TypeSymbolTable();
 
-		// Add symbols for all declared classes.
-		for (ClassDecl ast : classDecls) {
+		// Create the ClassSymbols in the "right" order, meaning that a class is
+		// always created before its subclasses. This allows us to pass the
+		// superclass to the ClassSymbol constructor. Furthermore, the taken
+		// approach allows us to cheaply detect cycles in the subtype hierarchy.
+
+		// Map each class to the list of its subclasses
+		Map<String, List<ClassDecl>> subclassMap = new HashMap<>();
+		for (ClassDecl classDecl : classDecls) {
 			// Check for classes named Object
-			if (ast.name.equals(typeSymbols.getObjectType().name)) {
+			if (classDecl.name.equals(typeSymbols.getObjectType().name)) {
 				throw new SemanticFailure(Cause.OBJECT_CLASS_DEFINED);
 			}
-			ast.sym = new ClassSymbol(ast);
-			typeSymbols.add(ast.sym);
+
+			String superClassName = classDecl.superClass;
+			List<ClassDecl> siblings = subclassMap.get(superClassName);
+			if (siblings == null) {
+				siblings = new ArrayList<>();
+				subclassMap.put(superClassName, siblings);
+			}
+			siblings.add(classDecl);
+		}
+
+		// The queue of classes whose symbol has already been created, but not
+		// for their subclasses
+		Queue<ClassSymbol> workList = new LinkedList<>();
+		workList.add(typeSymbols.getObjectType());
+
+		while (!workList.isEmpty()) {
+			ClassSymbol superClass = workList.remove();
+			List<ClassDecl> subClassDecls = subclassMap.remove(superClass.name);
+			if (subClassDecls != null) {
+				for (ClassDecl subClassDecl : subClassDecls) {
+					ClassSymbol subClass = new ClassSymbol(subClassDecl.name,
+							superClass);
+					subClassDecl.sym = subClass;
+					workList.add(subClass);
+					typeSymbols.add(subClass);
+				}
+			}
+		}
+
+		// Check if there are any classes that are not subclasses of Object.
+		// This happens if and only if there is a cycle in the hierarchy.
+		if (!subclassMap.isEmpty()) {
+			ClassDecl classDecl = subclassMap.values().iterator().next().get(0);
+			throw new SemanticFailure(Cause.CIRCULAR_INHERITANCE,
+					"Class %s is part of a subtyping cycle", classDecl.name);
 		}
 
 		// Create symbols for arrays of each type.

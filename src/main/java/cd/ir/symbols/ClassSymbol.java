@@ -7,11 +7,10 @@ import java.util.Map;
 
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
-import cd.ir.ast.ClassDecl;
 
 public class ClassSymbol extends TypeSymbol {
 
-	public ClassSymbol superClass;
+	private final ClassSymbol superClass;
 	public final VariableSymbol thisSymbol = new VariableSymbol("this", this);
 
 	private final Map<String, VariableSymbol> fields = new LinkedHashMap<>();
@@ -21,15 +20,17 @@ public class ClassSymbol extends TypeSymbol {
 	public int totalFields = -1;
 	public int sizeof = -1;
 
-	public ClassSymbol(ClassDecl classDecl) {
-		super(classDecl.name);
+	public ClassSymbol(String name, ClassSymbol superClass) {
+		super(name);
+		this.superClass = superClass;
 	}
 
-	/**
-	 * Used to create the default {@code Object} and {@code <null>} types
-	 */
 	public ClassSymbol(String name) {
-		super(name);
+		this(name, null);
+	}
+
+	public ClassSymbol getSuperClass() {
+		return superClass;
 	}
 
 	@Override

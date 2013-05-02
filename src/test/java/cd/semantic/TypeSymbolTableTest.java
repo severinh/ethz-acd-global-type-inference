@@ -20,17 +20,17 @@ public class TypeSymbolTableTest {
 	public void setUp() {
 		typeSymbols = new TypeSymbolTable();
 
-		A = new ClassSymbol("A");
-		B = new ClassSymbol("B");
-		C = new ClassSymbol("C");
-		D = new ClassSymbol("D");
-		E = new ClassSymbol("E");
+		A = new ClassSymbol("A", typeSymbols.getObjectType());
+		B = new ClassSymbol("B", A);
+		C = new ClassSymbol("C", B);
+		D = new ClassSymbol("D", B);
+		E = new ClassSymbol("E", typeSymbols.getObjectType());
 
-		A.superClass = typeSymbols.getObjectType();
-		B.superClass = A;
-		C.superClass = B;
-		D.superClass = B;
-		E.superClass = typeSymbols.getObjectType();
+		typeSymbols.add(A);
+		typeSymbols.add(B);
+		typeSymbols.add(C);
+		typeSymbols.add(D);
+		typeSymbols.add(E);
 
 		// Object
 		// |-- A

@@ -7,10 +7,19 @@ import org.junit.Test;
 import cd.exceptions.SemanticFailure;
 import cd.ir.ast.BinaryOp;
 import cd.ir.ast.BinaryOp.BOp;
+import cd.ir.ast.BooleanConst;
+import cd.ir.ast.BuiltInRead;
+import cd.ir.ast.BuiltInReadFloat;
+import cd.ir.ast.Cast;
 import cd.ir.ast.Expr;
+import cd.ir.ast.FloatConst;
+import cd.ir.ast.IntConst;
+import cd.ir.ast.NewObject;
+import cd.ir.ast.NullConst;
 import cd.ir.ast.UnaryOp;
 import cd.ir.ast.UnaryOp.UOp;
 import cd.ir.ast.Var;
+import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.semantic.ExprTypingVisitor;
@@ -19,10 +28,15 @@ import cd.semantic.TypeSymbolTable;
 
 /**
  * Tests {@link ExprTypingVisitor}.
+ * 
+ * @todo Test all methods
  */
 public class ExprTypingVisitorTest {
 
 	private TypeSymbolTable types;
+	private ClassSymbol xClass;
+	private ClassSymbol zClass;
+
 	private ExprTypingVisitor visitor;
 	private SymbolTable<VariableSymbol> scope;
 
@@ -32,10 +46,19 @@ public class ExprTypingVisitorTest {
 	private VariableSymbol topVariable;
 	private VariableSymbol bottomVariable;
 	private VariableSymbol objectVariable;
+	private VariableSymbol xVariable;
+	private VariableSymbol zVariable;
 
 	@Before
 	public void setUp() {
 		types = new TypeSymbolTable();
+
+		xClass = new ClassSymbol("X", types.getObjectType());
+		zClass = new ClassSymbol("Z", types.getObjectType());
+
+		types.add(xClass);
+		types.add(zClass);
+
 		visitor = new ExprTypingVisitor(types);
 		scope = new SymbolTable<>();
 
@@ -45,6 +68,8 @@ public class ExprTypingVisitorTest {
 		topVariable = addVariableSymbol("top", types.getTopType());
 		bottomVariable = addVariableSymbol("bottom", types.getBottomType());
 		objectVariable = addVariableSymbol("o", types.getObjectType());
+		xVariable = addVariableSymbol("x", xClass);
+		zVariable = addVariableSymbol("z", zClass);
 	}
 
 	private Var makeIntVar() {
@@ -71,6 +96,14 @@ public class ExprTypingVisitorTest {
 		return Var.withSym(objectVariable);
 	}
 
+	private Var makeXVar() {
+		return Var.withSym(xVariable);
+	}
+
+	private Var makeZVar() {
+		return Var.withSym(zVariable);
+	}
+
 	private void assertType(TypeSymbol expectedType, Expr expr) {
 		TypeSymbol actualType = type(expr);
 		Assert.assertEquals(expectedType, actualType);
@@ -91,6 +124,10 @@ public class ExprTypingVisitorTest {
 
 	private void assertBottomType(Expr expr) {
 		assertType(types.getBottomType(), expr);
+	}
+
+	private void assertObjectType(Expr expr) {
+		assertType(types.getObjectType(), expr);
 	}
 
 	@Test
@@ -119,6 +156,15 @@ public class ExprTypingVisitorTest {
 			assertBooleanType(new BinaryOp(makeBottomVar(), op, makeBottomVar()));
 			assertBooleanType(new BinaryOp(makeBottomVar(), op, makeIntVar()));
 			assertBooleanType(new BinaryOp(makeObjectVar(), op, makeObjectVar()));
+			assertBooleanType(new BinaryOp(makeXVar(), op, makeXVar()));
+			assertBooleanType(new BinaryOp(makeXVar(), op, makeObjectVar()));
+		}
+
+		for (BOp op : new BOp[] { BOp.B_LESS_THAN, BOp.B_LESS_OR_EQUAL,
+				BOp.B_GREATER_THAN, BOp.B_GREATER_OR_EQUAL }) {
+			assertBooleanType(new BinaryOp(makeIntVar(), op, makeIntVar()));
+			assertBooleanType(new BinaryOp(makeIntVar(), op, makeBottomVar()));
+			assertBooleanType(new BinaryOp(makeBottomVar(), op, makeBottomVar()));
 		}
 	}
 
@@ -148,8 +194,73 @@ public class ExprTypingVisitorTest {
 	}
 
 	@Test(expected = SemanticFailure.class)
-	public void testIncorrectBinaryOpEqualityUnrelatedTypes() {
+	public void testIncorrectBinaryOpEqualityUnrelatedPrimitiveTypes() {
 		type(new BinaryOp(makeIntVar(), BOp.B_EQUAL, makeFloatVar()));
+	}
+
+	@Test(expected = SemanticFailure.class)
+	public void testIncorrectBinaryOpEqualityUnrelatedReferenceTypes() {
+		type(new BinaryOp(makeXVar(), BOp.B_EQUAL, makeZVar()));
+	}
+
+	@Test(expected = SemanticFailure.class)
+	public void testIncorrectBinaryOpInequalityUnrelatedTypes() {
+		type(new BinaryOp(makeIntVar(), BOp.B_LESS_OR_EQUAL, makeFloatVar()));
+	}
+
+	@Test
+	public void testBooleanConst() {
+		assertBooleanType(new BooleanConst(true));
+	}
+
+	@Test
+	public void testBuiltInRead() {
+		assertIntType(new BuiltInRead());
+	}
+
+	@Test
+	public void testBuiltInReadFloat() {
+		assertFloatType(new BuiltInReadFloat());
+	}
+
+	@Test
+	public void testCast() {
+		assertObjectType(new Cast(makeObjectVar(), types.getObjectType().name));
+		assertType(xClass, new Cast(makeObjectVar(), xClass.name));
+		assertObjectType(new Cast(makeXVar(), types.getObjectType().name));
+		assertObjectType(new Cast(makeBottomVar(), types.getObjectType().name));
+		assertIntType(new Cast(makeIntVar(), types.getIntType().name));
+	}
+
+	@Test(expected = SemanticFailure.class)
+	public void testIncorrectReferenceCast() {
+		type(new Cast(makeZVar(), xClass.name));
+	}
+
+	@Test(expected = SemanticFailure.class)
+	public void testIncorrectPrimitiveCast() {
+		type(new Cast(makeIntVar(), types.getFloatType().name));
+	}
+
+	@Test
+	public void testIntConst() {
+		assertIntType(new IntConst(42));
+	}
+
+	@Test
+	public void testFloatConst() {
+		assertFloatType(new FloatConst(42.0f));
+	}
+
+	@Test
+	public void testNewObject() {
+		assertObjectType(new NewObject(types.getObjectType().name));
+		assertType(xClass, new NewObject(xClass.name));
+	}
+
+	@Test
+	public void testNullConst() {
+		assertType(types.getNullType(), new NullConst());
 	}
 
 	@Test
