@@ -7,8 +7,9 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.NameFileFilter;
+import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -37,21 +38,22 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 	public static final File TEST_DIR = new File(TestSamplePrograms.class
 			.getResource("/").getPath());
 
-	@Parameters
+	@Parameters(name="{index}: {0}")
 	public static Collection<Object[]> testFiles() {
 		List<Object[]> result = new ArrayList<>();
 		IOFileFilter fileFilter = new SuffixFileFilter(".javali");
+		IOFileFilter dirFilter = new NotFileFilter(new NameFileFilter("newsyntax"));
 		if (JUST_FILE != null) {
-			result.add(new Object[] { JUST_FILE });
+			result.add(new Object[] { JUST_FILE.getName(), JUST_FILE });
 		} else if (TEST_DIR != null) {
 			for (File file : FileUtils.listFiles(TEST_DIR, fileFilter,
-					TrueFileFilter.INSTANCE)) {
-				result.add(new Object[] { file });
+					dirFilter)) {
+				result.add(new Object[] { file.getName(),  file });
 			}
 		} else {
 			for (File file : FileUtils.listFiles(new File("."), fileFilter,
-					TrueFileFilter.INSTANCE)) {
-				result.add(new Object[] { file });
+					dirFilter)) {
+				result.add(new Object[] { file.getName(), file });
 			}
 		}
 		return result;
@@ -61,7 +63,7 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 	 * @param file
 	 *            The javali file to test.
 	 */
-	public TestSamplePrograms(File file) {
+	public TestSamplePrograms(String testName, File file) {
 		this.compilation = new CompilationContext(file);
 		this.referenceData = new TestReferenceData(file);
 		this.infile = new File(file.getPath() + ".in");

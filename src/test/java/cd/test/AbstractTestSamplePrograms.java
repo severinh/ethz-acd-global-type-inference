@@ -108,7 +108,7 @@ abstract public class AbstractTestSamplePrograms {
 
 	@Test
 	public void test() throws Throwable {
-		System.err.println("[" + counter++ + " = " + compilation.sourceFile + "]");
+		LOG.debug("Testing " + compilation.sourceFile);
 
 		// ignore 64-bit-only tests when running 32-bit Java
 		if (new File(compilation.sourceFile.getAbsolutePath() + ".64bitonly").exists()
@@ -122,11 +122,7 @@ abstract public class AbstractTestSamplePrograms {
 				// Load the input and reference results:
 				// Note: this may use the network if no .ref files exist.
 
-				// Delete intermediate files from previous runs:
-				if (compilation.assemblyFile.exists())
-					compilation.assemblyFile.delete();
-				if (compilation.binaryFile.exists())
-					compilation.binaryFile.delete();
+				compilation.deleteIntermediateFiles();
 
 				// Parse the file and check that the generated AST is correct,
 				// or if the parser failed that the correct message was
@@ -169,7 +165,7 @@ abstract public class AbstractTestSamplePrograms {
 		String parserOut;
 		boolean parserDebug;
 
-		// CUP's debug output is NOT relevant to this assignment.
+		// parser's debug output is NOT relevant to this assignment.
 		// Change to TRUE if you'd like to see it for some reason.
 		parserDebug = false;
 		try {
