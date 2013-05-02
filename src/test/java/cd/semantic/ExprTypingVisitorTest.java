@@ -12,6 +12,7 @@ import cd.ir.ast.BuiltInRead;
 import cd.ir.ast.BuiltInReadFloat;
 import cd.ir.ast.Cast;
 import cd.ir.ast.Expr;
+import cd.ir.ast.Field;
 import cd.ir.ast.FloatConst;
 import cd.ir.ast.Index;
 import cd.ir.ast.IntConst;
@@ -51,6 +52,7 @@ public class ExprTypingVisitorTest {
 	private VariableSymbol xVariable;
 	private VariableSymbol zVariable;
 	private VariableSymbol arrayVariable;
+	private VariableSymbol xClassField;
 
 	@Before
 	public void setUp() {
@@ -75,6 +77,9 @@ public class ExprTypingVisitorTest {
 		zVariable = addVariableSymbol("z", zClass);
 		arrayVariable = addVariableSymbol("array",
 				types.getArrayTypeSymbol(types.getObjectType()));
+
+		xClassField = new VariableSymbol("field", types.getIntType());
+		xClass.addField(xClassField);
 	}
 
 	private Var makeIntVar() {
@@ -249,6 +254,22 @@ public class ExprTypingVisitorTest {
 	@Test(expected = SemanticFailure.class)
 	public void testIncorrectPrimitiveCast() {
 		type(new Cast(makeIntVar(), types.getFloatType().name));
+	}
+
+	@Test
+	public void testField() {
+		assertIntType(new Field(makeXVar(), xClassField.name));
+		assertBottomType(new Field(makeBottomVar(), "something"));
+	}
+
+	@Test(expected = SemanticFailure.class)
+	public void testFieldUnknownName() {
+		type(new Field(makeXVar(), "unknown"));
+	}
+
+	@Test(expected = SemanticFailure.class)
+	public void testFieldPrimitiveArgType() {
+		type(new Field(makeIntVar(), "unknown"));
 	}
 
 	@Test

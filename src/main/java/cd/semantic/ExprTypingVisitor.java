@@ -197,14 +197,21 @@ public class ExprTypingVisitor extends
 
 	@Override
 	public TypeSymbol field(Field field, SymbolTable<VariableSymbol> scope) {
-		// Class of the receiver of the field access
-		ClassSymbol argType = TypeChecker.asClass(type(field.arg(), scope));
-		field.sym = argType.getField(field.fieldName);
-		if (field.sym == null) {
-			throw new SemanticFailure(Cause.NO_SUCH_FIELD,
-					"Type %s has no field %s", argType, field.fieldName);
+		TypeSymbol argType = type(field.arg(), scope);
+
+		if (argType == typeSymbols.getBottomType()) {
+			return typeSymbols.getBottomType();
+		} else {
+			// Class of the receiver of the field access
+			ClassSymbol argClass = TypeChecker.asClass(argType);
+			VariableSymbol fieldSymbol = argClass.getField(field.fieldName);
+			if (fieldSymbol == null) {
+				throw new SemanticFailure(Cause.NO_SUCH_FIELD,
+						"Type %s has no field %s", argClass, field.fieldName);
+			}
+			field.sym = fieldSymbol;
+			return fieldSymbol.getType();
 		}
-		return field.sym.getType();
 	}
 
 	@Override
