@@ -32,7 +32,9 @@ import cd.semantic.TypeSymbolTable;
 /**
  * Tests {@link ExprTypingVisitor}.
  * 
- * @todo Test all methods
+ * @todo Test remaining methods
+ *       {@link ExprTypingVisitor#thisRef(cd.ir.ast.ThisRef, SymbolTable)} and
+ *       {@link ExprTypingVisitor#methodCall(cd.ir.ast.MethodCallExpr, SymbolTable)}
  */
 public class ExprTypingVisitorTest {
 
