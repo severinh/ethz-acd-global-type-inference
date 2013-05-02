@@ -12,7 +12,7 @@ public class MethodCallExpr extends Expr {
 	public final String methodName;
 	public MethodSymbol sym;
 
-	public MethodCallExpr(Expr rcvr, String methodName, List<Expr> arguments) {
+	public MethodCallExpr(Expr rcvr, String methodName, List<? extends Expr> arguments) {
 		super(-1);
 		assert rcvr != null && methodName != null && arguments != null;
 		this.methodName = methodName;

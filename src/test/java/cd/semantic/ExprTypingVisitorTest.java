@@ -1,5 +1,8 @@
 package cd.semantic;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,34 +19,35 @@ import cd.ir.ast.Field;
 import cd.ir.ast.FloatConst;
 import cd.ir.ast.Index;
 import cd.ir.ast.IntConst;
+import cd.ir.ast.MethodCall;
+import cd.ir.ast.MethodCallExpr;
 import cd.ir.ast.NewObject;
 import cd.ir.ast.NullConst;
+import cd.ir.ast.ThisRef;
 import cd.ir.ast.UnaryOp;
 import cd.ir.ast.UnaryOp.UOp;
 import cd.ir.ast.Var;
 import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
+import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
-import cd.semantic.ExprTypingVisitor;
-import cd.semantic.SymbolTable;
-import cd.semantic.TypeSymbolTable;
 
 /**
  * Tests {@link ExprTypingVisitor}.
  * 
- * @todo Test remaining methods
- *       {@link ExprTypingVisitor#thisRef(cd.ir.ast.ThisRef, SymbolTable)} and
- *       {@link ExprTypingVisitor#methodCall(cd.ir.ast.MethodCallExpr, SymbolTable)}
  */
 public class ExprTypingVisitorTest {
 
 	private TypeSymbolTable types;
 	private ClassSymbol xClass;
 	private ClassSymbol zClass;
+	private MethodSymbol xClassMethod;
+
 
 	private ExprTypingVisitor visitor;
 	private SymbolTable<VariableSymbol> scope;
+	private SymbolTable<VariableSymbol> methodScope;
 
 	private VariableSymbol intVariable;
 	private VariableSymbol floatVariable;
@@ -62,6 +66,10 @@ public class ExprTypingVisitorTest {
 
 		xClass = new ClassSymbol("X", types.getObjectType());
 		zClass = new ClassSymbol("Z", types.getObjectType());
+		
+		xClassMethod = new MethodSymbol("m", xClass);
+		methodScope = xClassMethod.getScope();
+		
 
 		types.add(xClass);
 		types.add(zClass);
@@ -82,6 +90,9 @@ public class ExprTypingVisitorTest {
 
 		xClassField = new VariableSymbol("field", types.getIntType());
 		xClass.addField(xClassField);
+		xClass.addMethod(xClassMethod);
+		xClassMethod.addParameter(xVariable);
+		xClassMethod.returnType = types.getIntType();
 	}
 
 	private Var makeIntVar() {
@@ -122,6 +133,12 @@ public class ExprTypingVisitorTest {
 
 	private void assertType(TypeSymbol expectedType, Expr expr) {
 		TypeSymbol actualType = type(expr);
+		Assert.assertEquals(expectedType, actualType);
+		Assert.assertEquals(expectedType, expr.getType());
+	}
+	
+	private void assertTypeInScope(TypeSymbol expectedType, Expr expr, SymbolTable<VariableSymbol> currentScope) {
+		TypeSymbol actualType = typeWithScope(expr, currentScope);
 		Assert.assertEquals(expectedType, actualType);
 		Assert.assertEquals(expectedType, expr.getType());
 	}
@@ -296,6 +313,30 @@ public class ExprTypingVisitorTest {
 	public void testIncorrectIndexType() {
 		type(new Index(makeFloatVar(), makeFloatVar()));
 	}
+	
+	@Test
+	public void testThisRef() {
+		assertTypeInScope(xClass, new ThisRef(), methodScope);
+	}
+	
+	@Test(expected = SemanticFailure.class)
+	public void testInvalidMethodReceiver() {
+		type(new MethodCallExpr(makeZVar(), xClassMethod.name, Collections.<Expr>emptyList()));
+	}
+	
+	@Test(expected = SemanticFailure.class)
+	public void testInvalidMethodArgumentsNumber() {
+		type(new MethodCallExpr(makeXVar(), xClassMethod.name, Arrays.asList(makeXVar(), makeZVar())));
+	}
+	
+	@Test(expected = SemanticFailure.class)
+	public void testInvalidMethodArgumentType() {
+		type(new MethodCallExpr(makeXVar(), xClassMethod.name, Arrays.asList(makeZVar())));
+	}
+	
+	public void testMethodCall() {
+		assertIntType(new MethodCallExpr(makeXVar(), xClassMethod.name, Arrays.asList(makeXVar())));
+	}
 
 	@Test
 	public void testIndexBottomType() {
@@ -375,6 +416,10 @@ public class ExprTypingVisitorTest {
 
 	private TypeSymbol type(Expr expr) {
 		return visitor.type(expr, scope);
+	}
+	
+	private TypeSymbol typeWithScope(Expr expr, SymbolTable<VariableSymbol> currentScope) {
+		return visitor.type(expr, currentScope);
 	}
 
 }
