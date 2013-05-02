@@ -69,22 +69,6 @@ public class ExprTypingVisitor extends
 		}
 	}
 
-	/**
-	 * Checks whether two expressions have the same type and throws an exception
-	 * if not.
-	 * 
-	 * @return the common type of the two expression
-	 */
-	public TypeSymbol typeEquality(TypeSymbol leftType, TypeSymbol rightType) {
-		if (leftType != rightType) {
-			throw new SemanticFailure(Cause.TYPE_ERROR,
-					"Expected operand types to be equal but found %s, %s",
-					leftType, rightType);
-		}
-
-		return leftType;
-	}
-
 	public void checkNumericalType(TypeSymbol type) {
 		// The bottom type is also admissible, because it is a sub-type of both
 		// int and float.
