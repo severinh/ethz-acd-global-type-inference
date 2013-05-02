@@ -11,10 +11,7 @@ import cd.CompilationContext;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.ast.ClassDecl;
-import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
-import cd.ir.symbols.Symbol;
-import cd.ir.symbols.TypeSymbol;
 
 /**
  * Creates the symbol table for an AST with potentially missing types and
@@ -97,12 +94,6 @@ public class UntypedSemanticAnalyzer {
 			ClassDecl classDecl = subclassMap.values().iterator().next().get(0);
 			throw new SemanticFailure(Cause.CIRCULAR_INHERITANCE,
 					"Class %s is part of a subtyping cycle", classDecl.name);
-		}
-
-		// Create symbols for arrays of each type.
-		for (Symbol sym : new ArrayList<Symbol>(typeSymbols.localSymbols())) {
-			ArrayTypeSymbol array = new ArrayTypeSymbol((TypeSymbol) sym);
-			typeSymbols.add(array);
 		}
 
 		// For each class, create symbols for each method and field

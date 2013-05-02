@@ -15,6 +15,9 @@ import cd.ir.symbols.TypeSymbol;
  * Table that holds all type symbols of the program.
  * 
  * All type symbols in this table can be used from anywhere in the program.
+ * 
+ * The class automatically creates a corresponding array type for every type
+ * added to the symbol table using {@link #add(TypeSymbol)}.
  */
 public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 
@@ -93,6 +96,17 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 
 	public TypeSymbol getBottomType() {
 		return bottomType;
+	}
+
+	@Override
+	public void add(TypeSymbol typeSymbol) {
+		super.add(typeSymbol);
+
+		// Automatically create a the corresponding array type for each type
+		// TODO: Overriding the method is a bit fragile, because it assumes that
+		// the 'add' method is the only way of adding a symbol to the symbol
+		// table.
+		super.add(new ArrayTypeSymbol(typeSymbol));
 	}
 
 	/**
