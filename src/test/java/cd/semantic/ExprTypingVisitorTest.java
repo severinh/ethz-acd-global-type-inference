@@ -7,6 +7,10 @@ import org.junit.Test;
 import cd.exceptions.SemanticFailure;
 import cd.ir.ast.BinaryOp;
 import cd.ir.ast.BinaryOp.BOp;
+import cd.ir.ast.BooleanConst;
+import cd.ir.ast.BuiltInRead;
+import cd.ir.ast.BuiltInReadFloat;
+import cd.ir.ast.Cast;
 import cd.ir.ast.Expr;
 import cd.ir.ast.UnaryOp;
 import cd.ir.ast.UnaryOp.UOp;
@@ -24,6 +28,9 @@ import cd.semantic.TypeSymbolTable;
 public class ExprTypingVisitorTest {
 
 	private TypeSymbolTable types;
+	private ClassSymbol xClass;
+	private ClassSymbol zClass;
+
 	private ExprTypingVisitor visitor;
 	private SymbolTable<VariableSymbol> scope;
 
@@ -40,9 +47,9 @@ public class ExprTypingVisitorTest {
 	public void setUp() {
 		types = new TypeSymbolTable();
 
-		ClassSymbol xClass = new ClassSymbol("X");
+		xClass = new ClassSymbol("X");
 		xClass.superClass = types.getObjectType();
-		ClassSymbol zClass = new ClassSymbol("Z");
+		zClass = new ClassSymbol("Z");
 		zClass.superClass = types.getObjectType();
 
 		types.add(xClass);
@@ -115,6 +122,10 @@ public class ExprTypingVisitorTest {
 		assertType(types.getBottomType(), expr);
 	}
 
+	private void assertObjectType(Expr expr) {
+		assertType(types.getObjectType(), expr);
+	}
+
 	@Test
 	public void testBinaryOp() {
 		for (BOp op : new BOp[] { BOp.B_TIMES, BOp.B_DIV, BOp.B_MOD,
@@ -143,6 +154,13 @@ public class ExprTypingVisitorTest {
 			assertBooleanType(new BinaryOp(makeObjectVar(), op, makeObjectVar()));
 			assertBooleanType(new BinaryOp(makeXVar(), op, makeXVar()));
 			assertBooleanType(new BinaryOp(makeXVar(), op, makeObjectVar()));
+		}
+
+		for (BOp op : new BOp[] { BOp.B_LESS_THAN, BOp.B_LESS_OR_EQUAL,
+				BOp.B_GREATER_THAN, BOp.B_GREATER_OR_EQUAL }) {
+			assertBooleanType(new BinaryOp(makeIntVar(), op, makeIntVar()));
+			assertBooleanType(new BinaryOp(makeIntVar(), op, makeBottomVar()));
+			assertBooleanType(new BinaryOp(makeBottomVar(), op, makeBottomVar()));
 		}
 	}
 
@@ -179,6 +197,39 @@ public class ExprTypingVisitorTest {
 	@Test(expected = SemanticFailure.class)
 	public void testIncorrectBinaryOpEqualityUnrelatedReferenceTypes() {
 		type(new BinaryOp(makeXVar(), BOp.B_EQUAL, makeZVar()));
+	}
+
+	@Test(expected = SemanticFailure.class)
+	public void testIncorrectBinaryOpInequalityUnrelatedTypes() {
+		type(new BinaryOp(makeIntVar(), BOp.B_LESS_OR_EQUAL, makeFloatVar()));
+	}
+
+	@Test
+	public void testBooleanConst() {
+		assertBooleanType(new BooleanConst(true));
+	}
+
+	@Test
+	public void testBuiltInRead() {
+		assertIntType(new BuiltInRead());
+	}
+
+	@Test
+	public void testBuiltInReadFloat() {
+		assertFloatType(new BuiltInReadFloat());
+	}
+
+	@Test
+	public void testCast() {
+		assertObjectType(new Cast(makeObjectVar(), types.getObjectType().name));
+		assertType(xClass, new Cast(makeObjectVar(), xClass.name));
+		assertObjectType(new Cast(makeXVar(), types.getObjectType().name));
+		assertObjectType(new Cast(makeBottomVar(), types.getObjectType().name));
+	}
+
+	@Test(expected = SemanticFailure.class)
+	public void testIncorrectCast() {
+		type(new Cast(makeZVar(), xClass.name));
 	}
 
 	@Test
