@@ -85,14 +85,19 @@ public class ExprTypingVisitor extends
 		return leftType;
 	}
 
-	public void typeIsPrimitive(TypeSymbol type) {
-		// TODO: This method should not know the exhaustive list of primitive
-		// numerical types. DRY baby, DRY!
-		if (!typeSymbols.isSubType(typeSymbols.getIntType(), type)
-				&& !typeSymbols.isSubType(typeSymbols.getFloatType(), type)) {
+	public void checkNumericalType(TypeSymbol type) {
+		// The bottom type is also admissible, because it is a sub-type of both
+		// int and float.
+		boolean isNumericalSubType = false;
+		for (TypeSymbol numericalType : typeSymbols.getNumericalTypeSymbols()) {
+			if (typeSymbols.isSubType(numericalType, type)) {
+				isNumericalSubType = true;
+				break;
+			}
+		}
+		if (!isNumericalSubType) {
 			throw new SemanticFailure(Cause.TYPE_ERROR,
-					"Expected %s or %s for operands but found type %s",
-					typeSymbols.getIntType(), typeSymbols.getFloatType(), type);
+					"Expected numerical operand type but found type %s", type);
 		}
 	}
 
@@ -138,7 +143,7 @@ public class ExprTypingVisitor extends
 				throw new SemanticFailure(Cause.TYPE_ERROR,
 						"Operation %s not valid for type %s", op, resultType);
 			}
-			typeIsPrimitive(resultType);
+			checkNumericalType(resultType);
 			break;
 		case B_AND:
 		case B_OR:
@@ -159,7 +164,7 @@ public class ExprTypingVisitor extends
 		case B_LESS_OR_EQUAL:
 		case B_GREATER_THAN:
 		case B_GREATER_OR_EQUAL:
-			typeIsPrimitive(lcaType);
+			checkNumericalType(lcaType);
 			resultType = typeSymbols.getBooleanType();
 			break;
 		default:
@@ -268,7 +273,7 @@ public class ExprTypingVisitor extends
 		switch (unaryOp.operator) {
 		case U_PLUS:
 		case U_MINUS:
-			typeIsPrimitive(type);
+			checkNumericalType(type);
 			return type;
 		case U_BOOL_NOT:
 			checkType(typeSymbols.getBooleanType(), type);

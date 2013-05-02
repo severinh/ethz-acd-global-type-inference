@@ -1,6 +1,7 @@
 package cd.semantic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import cd.exceptions.SemanticFailure;
@@ -110,6 +111,16 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 			}
 		}
 		return classSymbols;
+	}
+
+	/**
+	 * Returns a list of all type symbols that represent primitive numerical
+	 * types.
+	 * 
+	 * @return the list of numerical type symbols
+	 */
+	public List<PrimitiveTypeSymbol> getNumericalTypeSymbols() {
+		return Arrays.asList(getIntType(), getFloatType());
 	}
 
 	/**
