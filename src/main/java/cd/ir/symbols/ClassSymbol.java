@@ -7,14 +7,16 @@ import java.util.Map;
 
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
+import cd.semantic.SymbolTable;
 
 public class ClassSymbol extends TypeSymbol {
 
 	private final ClassSymbol superClass;
-	public final VariableSymbol thisSymbol = new VariableSymbol("this", this);
+	public final VariableSymbol thisSymbol;
 
-	private final Map<String, VariableSymbol> fields = new LinkedHashMap<>();
-	private final Map<String, MethodSymbol> methods = new LinkedHashMap<>();
+	private final SymbolTable<VariableSymbol> scope;
+	private final Map<String, VariableSymbol> fields;
+	private final Map<String, MethodSymbol> methods;
 
 	public int totalMethods = -1;
 	public int totalFields = -1;
@@ -22,7 +24,17 @@ public class ClassSymbol extends TypeSymbol {
 
 	public ClassSymbol(String name, ClassSymbol superClass) {
 		super(name);
+
+		SymbolTable<VariableSymbol> superScope = null;
+		if (superClass != null) {
+			superScope = superClass.getScope();
+		}
+
 		this.superClass = superClass;
+		this.thisSymbol = new VariableSymbol("this", this);
+		this.scope = new SymbolTable<>(superScope);
+		this.fields = new LinkedHashMap<>();
+		this.methods = new LinkedHashMap<>();
 	}
 
 	public ClassSymbol(String name) {
@@ -36,6 +48,10 @@ public class ClassSymbol extends TypeSymbol {
 	@Override
 	public boolean isReferenceType() {
 		return true;
+	}
+
+	public SymbolTable<VariableSymbol> getScope() {
+		return scope;
 	}
 
 	public VariableSymbol getField(String name) {
@@ -99,12 +115,7 @@ public class ClassSymbol extends TypeSymbol {
 	 *             if there is already a field with the same name in this class
 	 */
 	public void addField(VariableSymbol field) {
-		if (fields.containsKey(field.name)) {
-			throw new SemanticFailure(Cause.DOUBLE_DECLARATION,
-					"Field '%s' was declared twice in the same class '%s'",
-					field.name, name);
-		}
-
+		scope.add(field);
 		fields.put(field.name, field);
 	}
 

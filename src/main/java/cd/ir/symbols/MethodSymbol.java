@@ -16,7 +16,7 @@ public class MethodSymbol extends Symbol {
 	// method on its own. Because such a variable symbol table is also needed
 	// earlier in type inference, build it openly and early in MethodSymbol.
 	// TypedSemanticAnalyzer should eventually reuse this symbol table.
-	private final SymbolTable<VariableSymbol> variableSymbols;
+	private final SymbolTable<VariableSymbol> scope;
 
 	private final Map<String, VariableSymbol> locals;
 	private final List<VariableSymbol> parameters;
@@ -29,8 +29,8 @@ public class MethodSymbol extends Symbol {
 
 	public MethodSymbol(String name, ClassSymbol owner) {
 		super(name);
-		this.variableSymbols = new SymbolTable<>();
-		this.variableSymbols.add(owner.thisSymbol);
+		this.scope = new SymbolTable<>();
+		this.scope.add(owner.thisSymbol);
 		this.locals = new LinkedHashMap<>();
 		this.parameters = new ArrayList<>();
 		this.owner = owner;
@@ -41,8 +41,8 @@ public class MethodSymbol extends Symbol {
 		return name + "(...)";
 	}
 
-	public SymbolTable<VariableSymbol> getVariableSymbols() {
-		return variableSymbols;
+	public SymbolTable<VariableSymbol> getScope() {
+		return scope;
 	}
 
 	public Collection<VariableSymbol> getLocals() {
@@ -80,7 +80,7 @@ public class MethodSymbol extends Symbol {
 	 *             this method
 	 */
 	public void addLocal(VariableSymbol local) {
-		variableSymbols.add(local);
+		scope.add(local);
 		locals.put(local.name, local);
 	}
 
@@ -94,7 +94,7 @@ public class MethodSymbol extends Symbol {
 	 *             in this method
 	 */
 	public void addParameter(VariableSymbol parameter) {
-		variableSymbols.add(parameter);
+		scope.add(parameter);
 		parameters.add(parameter);
 	}
 
