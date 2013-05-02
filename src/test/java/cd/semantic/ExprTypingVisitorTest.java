@@ -31,6 +31,7 @@ public class ExprTypingVisitorTest {
 	private VariableSymbol booleanVariable;
 	private VariableSymbol topVariable;
 	private VariableSymbol bottomVariable;
+	private VariableSymbol objectVariable;
 
 	@Before
 	public void setUp() {
@@ -43,6 +44,7 @@ public class ExprTypingVisitorTest {
 		booleanVariable = addVariableSymbol("b", types.getBooleanType());
 		topVariable = addVariableSymbol("top", types.getTopType());
 		bottomVariable = addVariableSymbol("bottom", types.getBottomType());
+		objectVariable = addVariableSymbol("o", types.getObjectType());
 	}
 
 	private Var makeIntVar() {
@@ -53,7 +55,7 @@ public class ExprTypingVisitorTest {
 		return Var.withSym(floatVariable);
 	}
 
-	private Var makeBooleanVar() {
+	private Var makeBoolVar() {
 		return Var.withSym(booleanVariable);
 	}
 
@@ -63,6 +65,10 @@ public class ExprTypingVisitorTest {
 
 	private Var makeBottomVar() {
 		return Var.withSym(bottomVariable);
+	}
+
+	private Var makeObjectVar() {
+		return Var.withSym(objectVariable);
 	}
 
 	private void assertType(TypeSymbol expectedType, Expr expr) {
@@ -89,14 +95,30 @@ public class ExprTypingVisitorTest {
 
 	@Test
 	public void testBinaryOp() {
-		for (BOp bOp : new BOp[] { BOp.B_TIMES, BOp.B_DIV, BOp.B_MOD,
+		for (BOp op : new BOp[] { BOp.B_TIMES, BOp.B_DIV, BOp.B_MOD,
 				BOp.B_PLUS, BOp.B_MINUS }) {
-			assertIntType(new BinaryOp(makeIntVar(), bOp, makeIntVar()));
+			assertIntType(new BinaryOp(makeIntVar(), op, makeIntVar()));
 
-			if (!bOp.equals(BOp.B_MOD)) {
-				assertFloatType(new BinaryOp(makeFloatVar(), bOp,
-						makeFloatVar()));
+			if (!op.equals(BOp.B_MOD)) {
+				assertFloatType(new BinaryOp(makeFloatVar(), op, makeFloatVar()));
 			}
+
+			assertIntType(new BinaryOp(makeIntVar(), op, makeBottomVar()));
+			assertBottomType(new BinaryOp(makeBottomVar(), op, makeBottomVar()));
+		}
+
+		for (BOp op : new BOp[] { BOp.B_AND, BOp.B_OR }) {
+			assertBooleanType(new BinaryOp(makeBoolVar(), op, makeBoolVar()));
+			assertBooleanType(new BinaryOp(makeBoolVar(), op, makeBottomVar()));
+			assertBooleanType(new BinaryOp(makeBottomVar(), op, makeBottomVar()));
+		}
+
+		for (BOp op : new BOp[] { BOp.B_EQUAL, BOp.B_NOT_EQUAL }) {
+			assertBooleanType(new BinaryOp(makeIntVar(), op, makeIntVar()));
+			assertBooleanType(new BinaryOp(makeBoolVar(), op, makeBoolVar()));
+			assertBooleanType(new BinaryOp(makeBottomVar(), op, makeBottomVar()));
+			assertBooleanType(new BinaryOp(makeBottomVar(), op, makeIntVar()));
+			assertBooleanType(new BinaryOp(makeObjectVar(), op, makeObjectVar()));
 		}
 	}
 
@@ -106,13 +128,13 @@ public class ExprTypingVisitorTest {
 	}
 
 	@Test(expected = SemanticFailure.class)
-	public void testIncorrectBinaryOpMixedTypes() {
+	public void testIncorrectBinaryOpNumericMixedTypes() {
 		type(new BinaryOp(makeIntVar(), BOp.B_PLUS, makeFloatVar()));
 	}
 
 	@Test(expected = SemanticFailure.class)
 	public void testIncorrectBinaryOpNumericWithBooleans() {
-		type(new BinaryOp(makeBooleanVar(), BOp.B_PLUS, makeBooleanVar()));
+		type(new BinaryOp(makeBoolVar(), BOp.B_PLUS, makeBoolVar()));
 	}
 
 	@Test(expected = SemanticFailure.class)
@@ -120,9 +142,19 @@ public class ExprTypingVisitorTest {
 		type(new BinaryOp(makeTopVar(), BOp.B_PLUS, makeIntVar()));
 	}
 
+	@Test(expected = SemanticFailure.class)
+	public void testIncorrectBinaryOpLogical() {
+		type(new BinaryOp(makeIntVar(), BOp.B_AND, makeBoolVar()));
+	}
+
+	@Test(expected = SemanticFailure.class)
+	public void testIncorrectBinaryOpEqualityUnrelatedTypes() {
+		type(new BinaryOp(makeIntVar(), BOp.B_EQUAL, makeFloatVar()));
+	}
+
 	@Test
 	public void testUnaryOp() {
-		assertBooleanType(new UnaryOp(UOp.U_BOOL_NOT, makeBooleanVar()));
+		assertBooleanType(new UnaryOp(UOp.U_BOOL_NOT, makeBoolVar()));
 		assertIntType(new UnaryOp(UOp.U_PLUS, makeIntVar()));
 		assertFloatType(new UnaryOp(UOp.U_MINUS, makeFloatVar()));
 	}
@@ -139,7 +171,7 @@ public class ExprTypingVisitorTest {
 
 	@Test(expected = SemanticFailure.class)
 	public void testIncorrectUnaryOpPlus() {
-		type(new UnaryOp(UOp.U_PLUS, makeBooleanVar()));
+		type(new UnaryOp(UOp.U_PLUS, makeBoolVar()));
 	}
 
 	@Test(expected = SemanticFailure.class)
@@ -149,12 +181,9 @@ public class ExprTypingVisitorTest {
 
 	@Test
 	public void testUnaryOpBottom() {
-		// Given an expression of bottom type, the typing visitor cannot know
-		// yet whether applying the unary operator will yield an boolean,
-		// integer or float value or a semantic failure
-		for (UOp uOp : UOp.values()) {
-			assertBottomType(new UnaryOp(uOp, makeBottomVar()));
-		}
+		assertBooleanType(new UnaryOp(UOp.U_BOOL_NOT, makeBottomVar()));
+		assertBottomType(new UnaryOp(UOp.U_MINUS, makeBottomVar()));
+		assertBottomType(new UnaryOp(UOp.U_PLUS, makeBottomVar()));
 	}
 
 	@Test
