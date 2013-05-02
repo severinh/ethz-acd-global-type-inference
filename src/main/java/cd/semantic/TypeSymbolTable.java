@@ -150,6 +150,45 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	}
 
 	/**
+	 * Returns a list of all primitive type symbols in this symbol table.
+	 */
+	public List<PrimitiveTypeSymbol> getPrimitiveTypeSymbols() {
+		List<PrimitiveTypeSymbol> result = new ArrayList<>();
+		for (TypeSymbol typeSymbol : localSymbols()) {
+			if (typeSymbol instanceof PrimitiveTypeSymbol) {
+				result.add((PrimitiveTypeSymbol) typeSymbol);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Returns a list of all reference type symbols in this symbol table.
+	 */
+	public List<TypeSymbol> getReferenceTypeSymbols() {
+		List<TypeSymbol> result = new ArrayList<>();
+		for (TypeSymbol typeSymbol : localSymbols()) {
+			if (typeSymbol.isReferenceType()) {
+				result.add(typeSymbol);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Returns a list of all array type symbols in this symbol table.
+	 */
+	public List<ArrayTypeSymbol> getArrayTypeSymbols() {
+		List<ArrayTypeSymbol> result = new ArrayList<>();
+		for (TypeSymbol typeSymbol : localSymbols()) {
+			if (typeSymbol instanceof ArrayTypeSymbol) {
+				result.add((ArrayTypeSymbol) typeSymbol);
+			}
+		}
+		return result;
+	}
+
+	/**
 	 * Returns the super type of a type, if any.
 	 * 
 	 * @param sym

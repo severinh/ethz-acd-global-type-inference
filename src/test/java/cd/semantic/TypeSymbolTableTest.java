@@ -1,5 +1,7 @@
 package cd.semantic;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,9 +62,6 @@ public class TypeSymbolTableTest {
 		TypeSymbol bottomType = typeSymbols.getBottomType();
 		TypeSymbol objectType = typeSymbols.getObjectType();
 		TypeSymbol nullType = typeSymbols.getNullType();
-		TypeSymbol intType = typeSymbols.getIntType();
-		TypeSymbol floatType = typeSymbols.getFloatType();
-		TypeSymbol booleanType = typeSymbols.getBooleanType();
 
 		for (TypeSymbol type : typeSymbols.allSymbols()) {
 			assertLCA(type, type, type);
@@ -74,20 +73,37 @@ public class TypeSymbolTableTest {
 			}
 		}
 
-		assertLCA(topType, intType, booleanType);
-		assertLCA(topType, intType, floatType);
-		assertLCA(topType, intType, topType);
-		assertLCA(topType, intType, objectType);
-		assertLCA(topType, objectType, topType);
+		for (TypeSymbol primitiveType : typeSymbols.getPrimitiveTypeSymbols()) {
+			assertLCA(topType, nullType, primitiveType);
+
+			for (TypeSymbol otherType : typeSymbols.allSymbols()) {
+				// The LCA of a primitive type and any other type one that is
+				// not the bottom type, is the top type
+				if (otherType != primitiveType && otherType != bottomType) {
+					assertLCA(topType, primitiveType, otherType);
+				}
+			}
+		}
+
+		// Assert that arrays are invariant
+		List<ArrayTypeSymbol> arrayTypes = typeSymbols.getArrayTypeSymbols();
+		for (ArrayTypeSymbol arrayType : arrayTypes) {
+			for (ArrayTypeSymbol otherArrayType : arrayTypes) {
+				if (arrayType != otherArrayType) {
+					assertLCA(objectType, arrayType, otherArrayType);
+				}
+			}
+		}
 
 		assertLCA(objectType, A, objectType);
 		assertLCA(objectType, A, E);
 		assertLCA(A, A, B);
 		assertLCA(B, C, D);
 
+		// TODO: Once the null type is actually part of the type symbol table,
+		// the following two assertions will be redundant
 		assertLCA(nullType, nullType, bottomType);
 		assertLCA(topType, nullType, topType);
-		assertLCA(topType, nullType, intType);
 	}
 
 	private void assertLCA(TypeSymbol expectedLCA, TypeSymbol type,
