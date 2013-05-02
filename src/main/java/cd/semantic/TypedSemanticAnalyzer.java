@@ -104,7 +104,7 @@ public class TypedSemanticAnalyzer {
 				SymbolTable<VariableSymbol> mthdTable = new SymbolTable<>(
 						fldTable);
 
-				mthdTable.add(classd.sym.thisSymbol);
+				mthdTable.add(classd.sym.getThisSymbol());
 
 				for (VariableSymbol p : md.sym.getParameters()) {
 					mthdTable.add(p);

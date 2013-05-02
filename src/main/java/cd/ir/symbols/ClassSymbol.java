@@ -12,7 +12,7 @@ import cd.semantic.SymbolTable;
 public class ClassSymbol extends TypeSymbol {
 
 	private final ClassSymbol superClass;
-	public final VariableSymbol thisSymbol;
+	private final VariableSymbol thisSymbol;
 
 	private final SymbolTable<VariableSymbol> scope;
 	private final Map<String, VariableSymbol> fields;
@@ -52,6 +52,10 @@ public class ClassSymbol extends TypeSymbol {
 
 	public SymbolTable<VariableSymbol> getScope() {
 		return scope;
+	}
+
+	public VariableSymbol getThisSymbol() {
+		return thisSymbol;
 	}
 
 	public VariableSymbol getField(String name) {

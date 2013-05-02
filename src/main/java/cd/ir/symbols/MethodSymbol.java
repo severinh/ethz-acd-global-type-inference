@@ -30,7 +30,7 @@ public class MethodSymbol extends Symbol {
 	public MethodSymbol(String name, ClassSymbol owner) {
 		super(name);
 		this.scope = new SymbolTable<>(owner.getScope());
-		this.scope.add(owner.thisSymbol);
+		this.scope.add(owner.getThisSymbol());
 		this.locals = new LinkedHashMap<>();
 		this.parameters = new ArrayList<>();
 		this.owner = owner;
