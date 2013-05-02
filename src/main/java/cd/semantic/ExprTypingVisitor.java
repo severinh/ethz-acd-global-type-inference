@@ -39,8 +39,9 @@ public class ExprTypingVisitor extends
 
 	@Override
 	public TypeSymbol visit(Expr ast, SymbolTable<VariableSymbol> locals) {
-		ast.type = super.visit(ast, locals);
-		return ast.type;
+		TypeSymbol type = super.visit(ast, locals);
+		ast.setType(type);
+		return type;
 	}
 
 	/**
@@ -58,9 +59,10 @@ public class ExprTypingVisitor extends
 	public void checkType(Expr ast, TypeSymbol expected,
 			SymbolTable<VariableSymbol> locals) {
 		TypeSymbol actual = type(ast, locals);
-		if (!typeSymbols.isSubType(expected, actual))
+		if (!typeSymbols.isSubType(expected, actual)) {
 			throw new SemanticFailure(Cause.TYPE_ERROR,
 					"Expected %s but type was %s", expected, actual);
+		}
 	}
 
 	/**
@@ -101,8 +103,9 @@ public class ExprTypingVisitor extends
 	}
 
 	public ArrayTypeSymbol asArray(TypeSymbol type) {
-		if (type instanceof ArrayTypeSymbol)
+		if (type instanceof ArrayTypeSymbol) {
 			return (ArrayTypeSymbol) type;
+		}
 		throw new SemanticFailure(Cause.TYPE_ERROR,
 				"An array type was required, but %s was found", type);
 	}

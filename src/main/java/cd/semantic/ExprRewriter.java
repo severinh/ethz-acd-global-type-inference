@@ -24,7 +24,7 @@ public class ExprRewriter extends AstRewriteVisitor<Void> {
 			// Convert an implicit field reference to "this.foo"
 			Field f = new Field(new ThisRef(), ast.getName());
 			f.sym = ast.getSymbol();
-			f.type = ast.type;
+			f.setType(ast.getType());
 			return f;
 		}
 		throw new RuntimeException("Unknown kind of var");
