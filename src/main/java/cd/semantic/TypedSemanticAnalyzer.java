@@ -10,7 +10,6 @@ import cd.ir.ast.MethodDecl;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.Symbol;
-import cd.ir.symbols.VariableSymbol;
 
 /**
  * Performs semantic checks on a fully typed AST, based on the already
@@ -81,15 +80,6 @@ public class TypedSemanticAnalyzer {
 		TypeChecker tc = new TypeChecker(typeSymbols);
 
 		for (ClassDecl classd : classDecls) {
-			SymbolTable<VariableSymbol> fldTable = new SymbolTable<>();
-
-			// add all fields of this class, or any of its super classes
-			for (ClassSymbol p = classd.sym; p != null; p = p.getSuperClass())
-				for (VariableSymbol s : p.getDeclaredFields())
-					if (!fldTable.contains(s.name))
-						fldTable.add(s);
-
-			// type check any method bodies and final locals
 			for (MethodDecl md : classd.methods()) {
 				boolean hasReturn = new ReturnCheckerVisitor().visit(md.body(),
 						null);
@@ -101,20 +91,7 @@ public class TypedSemanticAnalyzer {
 							classd.name, md.name);
 				}
 
-				SymbolTable<VariableSymbol> mthdTable = new SymbolTable<>(
-						fldTable);
-
-				mthdTable.add(classd.sym.getThisSymbol());
-
-				for (VariableSymbol p : md.sym.getParameters()) {
-					mthdTable.add(p);
-				}
-
-				for (VariableSymbol l : md.sym.getLocals()) {
-					mthdTable.add(l);
-				}
-
-				tc.checkStmt(md, mthdTable);
+				tc.checkStmt(md, md.sym.getScope());
 			}
 		}
 	}
