@@ -98,6 +98,18 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		return bottomType;
 	}
 
+	/**
+	 * Returns the array type symbol corresponding to a given element type.
+	 * 
+	 * @param elementType
+	 *            the type of elements in the array
+	 * @return the array type symbol or <code>null</code> if it cannot be found
+	 */
+	public ArrayTypeSymbol getArrayTypeSymbol(TypeSymbol elementType) {
+		String name = ArrayTypeSymbol.makeNameFromElementType(elementType);
+		return (ArrayTypeSymbol) get(name);
+	}
+
 	@Override
 	public void add(TypeSymbol typeSymbol) {
 		super.add(typeSymbol);
