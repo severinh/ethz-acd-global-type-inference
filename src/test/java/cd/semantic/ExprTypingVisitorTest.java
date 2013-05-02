@@ -11,6 +11,7 @@ import cd.ir.ast.Expr;
 import cd.ir.ast.UnaryOp;
 import cd.ir.ast.UnaryOp.UOp;
 import cd.ir.ast.Var;
+import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.semantic.ExprTypingVisitor;
@@ -32,10 +33,21 @@ public class ExprTypingVisitorTest {
 	private VariableSymbol topVariable;
 	private VariableSymbol bottomVariable;
 	private VariableSymbol objectVariable;
+	private VariableSymbol xVariable;
+	private VariableSymbol zVariable;
 
 	@Before
 	public void setUp() {
 		types = new TypeSymbolTable();
+
+		ClassSymbol xClass = new ClassSymbol("X");
+		xClass.superClass = types.getObjectType();
+		ClassSymbol zClass = new ClassSymbol("Z");
+		zClass.superClass = types.getObjectType();
+
+		types.add(xClass);
+		types.add(zClass);
+
 		visitor = new ExprTypingVisitor(types);
 		scope = new SymbolTable<>();
 
@@ -45,6 +57,8 @@ public class ExprTypingVisitorTest {
 		topVariable = addVariableSymbol("top", types.getTopType());
 		bottomVariable = addVariableSymbol("bottom", types.getBottomType());
 		objectVariable = addVariableSymbol("o", types.getObjectType());
+		xVariable = addVariableSymbol("x", xClass);
+		zVariable = addVariableSymbol("z", zClass);
 	}
 
 	private Var makeIntVar() {
@@ -69,6 +83,14 @@ public class ExprTypingVisitorTest {
 
 	private Var makeObjectVar() {
 		return Var.withSym(objectVariable);
+	}
+
+	private Var makeXVar() {
+		return Var.withSym(xVariable);
+	}
+
+	private Var makeZVar() {
+		return Var.withSym(zVariable);
 	}
 
 	private void assertType(TypeSymbol expectedType, Expr expr) {
@@ -119,6 +141,8 @@ public class ExprTypingVisitorTest {
 			assertBooleanType(new BinaryOp(makeBottomVar(), op, makeBottomVar()));
 			assertBooleanType(new BinaryOp(makeBottomVar(), op, makeIntVar()));
 			assertBooleanType(new BinaryOp(makeObjectVar(), op, makeObjectVar()));
+			assertBooleanType(new BinaryOp(makeXVar(), op, makeXVar()));
+			assertBooleanType(new BinaryOp(makeXVar(), op, makeObjectVar()));
 		}
 	}
 
@@ -148,8 +172,13 @@ public class ExprTypingVisitorTest {
 	}
 
 	@Test(expected = SemanticFailure.class)
-	public void testIncorrectBinaryOpEqualityUnrelatedTypes() {
+	public void testIncorrectBinaryOpEqualityUnrelatedPrimitiveTypes() {
 		type(new BinaryOp(makeIntVar(), BOp.B_EQUAL, makeFloatVar()));
+	}
+
+	@Test(expected = SemanticFailure.class)
+	public void testIncorrectBinaryOpEqualityUnrelatedReferenceTypes() {
+		type(new BinaryOp(makeXVar(), BOp.B_EQUAL, makeZVar()));
 	}
 
 	@Test
