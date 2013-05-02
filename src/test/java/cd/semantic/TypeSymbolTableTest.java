@@ -1,4 +1,4 @@
-package cd.semantic.ti;
+package cd.semantic;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,6 +48,7 @@ public class TypeSymbolTableTest {
 		TypeSymbol nullType = typeSymbols.getNullType();
 		TypeSymbol intType = typeSymbols.getIntType();
 		TypeSymbol floatType = typeSymbols.getFloatType();
+		TypeSymbol booleanType = typeSymbols.getBooleanType();
 
 		for (TypeSymbol type : typeSymbols.allSymbols()) {
 			assertLCA(type, type, type);
@@ -59,6 +60,7 @@ public class TypeSymbolTableTest {
 			}
 		}
 
+		assertLCA(topType, intType, booleanType);
 		assertLCA(topType, intType, floatType);
 		assertLCA(topType, intType, topType);
 		assertLCA(topType, intType, objectType);
