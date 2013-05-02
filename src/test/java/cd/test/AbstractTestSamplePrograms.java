@@ -108,7 +108,7 @@ abstract public class AbstractTestSamplePrograms {
 
 	@Test
 	public void test() throws Throwable {
-		System.err.println("[" + counter++ + " = " + compilation.sourceFile + "]");
+		LOG.debug("Testing " + compilation.sourceFile);
 
 		// ignore 64-bit-only tests when running 32-bit Java
 		if (new File(compilation.sourceFile.getAbsolutePath() + ".64bitonly").exists()
