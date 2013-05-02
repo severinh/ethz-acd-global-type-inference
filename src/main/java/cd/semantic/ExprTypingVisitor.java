@@ -56,7 +56,7 @@ public class ExprTypingVisitor extends
 	 *       the type symbol table anymore, it should be possible to get rid of
 	 *       this redundancy again
 	 */
-	public void checkType(Expr ast, TypeSymbol expectedType,
+	public void checkType(TypeSymbol expectedType, Expr ast,
 			SymbolTable<VariableSymbol> scope) {
 		TypeSymbol actualType = type(ast, scope);
 		checkType(expectedType, actualType);
@@ -87,7 +87,6 @@ public class ExprTypingVisitor extends
 		}
 
 		return leftType;
-
 	}
 
 	public void typeIsPrimitive(TypeSymbol type) {
@@ -133,8 +132,8 @@ public class ExprTypingVisitor extends
 		}
 		case B_AND:
 		case B_OR:
-			checkType(binaryOp.left(), typeSymbols.getBooleanType(), scope);
-			checkType(binaryOp.right(), typeSymbols.getBooleanType(), scope);
+			checkType(typeSymbols.getBooleanType(), binaryOp.left(), scope);
+			checkType(typeSymbols.getBooleanType(), binaryOp.right(), scope);
 			return typeSymbols.getBooleanType();
 
 		case B_EQUAL:
@@ -213,7 +212,7 @@ public class ExprTypingVisitor extends
 	@Override
 	public TypeSymbol index(Index index, SymbolTable<VariableSymbol> scope) {
 		ArrayTypeSymbol argType = asArray(type(index.left(), scope));
-		checkType(index.right(), typeSymbols.getIntType(), scope);
+		checkType(typeSymbols.getIntType(), index.right(), scope);
 		return argType.elementType;
 	}
 
@@ -232,7 +231,7 @@ public class ExprTypingVisitor extends
 	@Override
 	public TypeSymbol newArray(NewArray newArray,
 			SymbolTable<VariableSymbol> scope) {
-		checkType(newArray.arg(), typeSymbols.getIntType(), scope);
+		checkType(typeSymbols.getIntType(), newArray.arg(), scope);
 		return typeSymbols.getType(newArray.typeName);
 	}
 
@@ -306,7 +305,7 @@ public class ExprTypingVisitor extends
 		// Check that the arguments are of correct type.
 		int i = 0;
 		for (Ast argAst : methodCall.argumentsWithoutReceiver()) {
-			checkType((Expr) argAst, mthd.getParameters().get(i++).getType(),
+			checkType(mthd.getParameters().get(i++).getType(), (Expr) argAst,
 					scope);
 		}
 

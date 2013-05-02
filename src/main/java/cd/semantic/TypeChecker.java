@@ -47,7 +47,7 @@ public class TypeChecker {
 				"A class type was required, but %s was found", type);
 	}
 
-	public void checkType(Expr ast, TypeSymbol expected,
+	public void checkType(TypeSymbol expected, Expr ast,
 			SymbolTable<VariableSymbol> locals) {
 		TypeSymbol actual = type(ast, locals);
 		if (!typeSymbols.isSubType(expected, actual))
@@ -81,14 +81,14 @@ public class TypeChecker {
 		@Override
 		public Void builtInWrite(BuiltInWrite ast,
 				SymbolTable<VariableSymbol> locals) {
-			checkType(ast.arg(), typeSymbols.getIntType(), locals);
+			checkType(typeSymbols.getIntType(), ast.arg(), locals);
 			return null;
 		}
 
 		@Override
 		public Void builtInWriteFloat(BuiltInWriteFloat ast,
 				SymbolTable<VariableSymbol> locals) {
-			checkType(ast.arg(), typeSymbols.getFloatType(), locals);
+			checkType(typeSymbols.getFloatType(), ast.arg(), locals);
 			return null;
 		}
 
@@ -100,7 +100,7 @@ public class TypeChecker {
 
 		@Override
 		public Void ifElse(IfElse ast, SymbolTable<VariableSymbol> locals) {
-			checkType(ast.condition(), typeSymbols.getBooleanType(), locals);
+			checkType(typeSymbols.getBooleanType(), ast.condition(), locals);
 			visit(ast.then(), locals);
 			if (ast.otherwise() != null)
 				visit(ast.otherwise(), locals);
@@ -132,7 +132,7 @@ public class TypeChecker {
 			// Check that the arguments are of correct type.
 			int i = 0;
 			for (Ast argAst : ast.argumentsWithoutReceiver())
-				checkType((Expr) argAst, mthd.getParameter(i++).getType(),
+				checkType(mthd.getParameter(i++).getType(), (Expr) argAst,
 						locals);
 
 			return null;
@@ -141,7 +141,7 @@ public class TypeChecker {
 
 		@Override
 		public Void whileLoop(WhileLoop ast, SymbolTable<VariableSymbol> locals) {
-			checkType(ast.condition(), typeSymbols.getBooleanType(), locals);
+			checkType(typeSymbols.getBooleanType(), ast.condition(), locals);
 			return visit(ast.body(), locals);
 		}
 
@@ -161,7 +161,7 @@ public class TypeChecker {
 				}
 
 			} else {
-				checkType(ast.arg(), thisMethod.sym.returnType, locals);
+				checkType(thisMethod.sym.returnType, ast.arg(), locals);
 			}
 
 			return null;
