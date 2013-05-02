@@ -32,6 +32,8 @@ import cd.parser.JavaliParser;
 import cd.parser.JavaliWalker;
 import cd.semantic.TypedSemanticAnalyzer;
 import cd.semantic.UntypedSemanticAnalyzer;
+import cd.semantic.ti.LocalTypeEraser;
+import cd.semantic.ti.LocalTypeInference;
 
 /**
  * The main entrypoint for the compiler. Consists of a series of routines which
@@ -51,7 +53,7 @@ public class Main {
 		for (String file : args) {
 			CompilationContext compilation = new CompilationContext();
 			compilation.sourceFile = new File(file);
-			
+
 			// Parse
 			try (FileReader fin = new FileReader(file)) {
 				compilation.astRoots = main.parse(file, fin, false);
@@ -121,11 +123,16 @@ public class Main {
 
 		// Uncomment to erase the existing variable types before type inference
 		// TODO Should be made configurable
-		// GlobalTypeEraser.getInstance().eraseTypesFrom(typeSymbols);
-		// LocalTypeEraser.getInstance().eraseTypesFrom(typeSymbols);
+		// GlobalTypeEraser.getInstance().eraseTypesFrom(context.typeSymbols);
+		
+//		LocalTypeEraser.getInstance().eraseTypesFrom(context.typeSymbols);
+//
+//		for (ClassDecl cd : astRoots)
+//			for (MethodDecl md : cd.methods())
+//				new LocalTypeInference(context.typeSymbols).inferTypes(md);
 
 		new TypedSemanticAnalyzer(context).check(astRoots);
-		
+
 		File cfgDumpBase = context.cfgDumpBase;
 
 		// Build control flow graph

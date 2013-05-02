@@ -12,12 +12,7 @@ import cd.semantic.SymbolTable;
 
 public class MethodSymbol extends Symbol {
 
-	// TODO: TypedSemanticAnalyzer internally builds a symbol table for each
-	// method on its own. Because such a variable symbol table is also needed
-	// earlier in type inference, build it openly and early in MethodSymbol.
-	// TypedSemanticAnalyzer should eventually reuse this symbol table.
 	private final SymbolTable<VariableSymbol> scope;
-
 	private final Map<String, VariableSymbol> locals;
 	private final List<VariableSymbol> parameters;
 
