@@ -59,8 +59,10 @@ public class TypedSemanticAnalyzer {
 		if (mainClass != null && mainClass instanceof ClassSymbol) {
 			ClassSymbol cs = (ClassSymbol) mainClass;
 			MethodSymbol mainMethod = cs.getMethod("main");
-			if (mainMethod != null && mainMethod.getParameters().isEmpty()
-					&& mainMethod.returnType == context.typeSymbols.getVoidType()) {
+			if (mainMethod != null
+					&& mainMethod.getParameters().isEmpty()
+					&& mainMethod.returnType == context.typeSymbols
+							.getVoidType()) {
 				context.mainType = cs;
 				return; // found the main() method!
 			}
@@ -82,7 +84,7 @@ public class TypedSemanticAnalyzer {
 			SymbolTable<VariableSymbol> fldTable = new SymbolTable<>();
 
 			// add all fields of this class, or any of its super classes
-			for (ClassSymbol p = classd.sym; p != null; p = p.superClass)
+			for (ClassSymbol p = classd.sym; p != null; p = p.getSuperClass())
 				for (VariableSymbol s : p.getDeclaredFields())
 					if (!fldTable.contains(s.name))
 						fldTable.add(s);

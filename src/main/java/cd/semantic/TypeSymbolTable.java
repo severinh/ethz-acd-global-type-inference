@@ -141,7 +141,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		if (sym instanceof ArrayTypeSymbol) {
 			return getObjectType();
 		}
-		return ((ClassSymbol) sym).superClass;
+		return ((ClassSymbol) sym).getSuperClass();
 	}
 
 	/**

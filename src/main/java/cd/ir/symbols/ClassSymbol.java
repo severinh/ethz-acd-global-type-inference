@@ -11,7 +11,7 @@ import cd.ir.ast.ClassDecl;
 
 public class ClassSymbol extends TypeSymbol {
 
-	public ClassSymbol superClass;
+	private ClassSymbol superClass;
 	public final VariableSymbol thisSymbol = new VariableSymbol("this", this);
 
 	private final Map<String, VariableSymbol> fields = new LinkedHashMap<>();
@@ -30,6 +30,14 @@ public class ClassSymbol extends TypeSymbol {
 	 */
 	public ClassSymbol(String name) {
 		super(name);
+	}
+
+	public ClassSymbol getSuperClass() {
+		return superClass;
+	}
+
+	public void setSuperClass(ClassSymbol superClass) {
+		this.superClass = superClass;
 	}
 
 	@Override

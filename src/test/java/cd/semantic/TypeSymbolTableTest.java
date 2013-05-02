@@ -26,11 +26,11 @@ public class TypeSymbolTableTest {
 		D = new ClassSymbol("D");
 		E = new ClassSymbol("E");
 
-		A.superClass = typeSymbols.getObjectType();
-		B.superClass = A;
-		C.superClass = B;
-		D.superClass = B;
-		E.superClass = typeSymbols.getObjectType();
+		A.setSuperClass(typeSymbols.getObjectType());
+		B.setSuperClass(A);
+		C.setSuperClass(B);
+		D.setSuperClass(B);
+		E.setSuperClass(typeSymbols.getObjectType());
 
 		// Object
 		// |-- A

@@ -36,7 +36,7 @@ public class UntypedInheritanceChecker extends AstVisitor<Void, Void> {
 
 		// check for cycles in the inheritance hierarchy:
 		Set<ClassSymbol> supers = new HashSet<>();
-		ClassSymbol sc = classSym.superClass;
+		ClassSymbol sc = classSym.getSuperClass();
 		supers.add(classSym);
 		while (sc != null) {
 			if (supers.contains(sc))
@@ -44,7 +44,7 @@ public class UntypedInheritanceChecker extends AstVisitor<Void, Void> {
 						"Class %s has %s as a superclass twice", ast.name,
 						sc.name);
 			supers.add(sc);
-			sc = sc.superClass;
+			sc = sc.getSuperClass();
 		}
 
 		this.visitChildren(ast, null);
@@ -57,7 +57,7 @@ public class UntypedInheritanceChecker extends AstVisitor<Void, Void> {
 		// check that methods overridden from a parent class agree
 		// on number/type of parameters
 		MethodSymbol sym = ast.sym;
-		MethodSymbol superSym = classSym.superClass.getMethod(ast.name);
+		MethodSymbol superSym = classSym.getSuperClass().getMethod(ast.name);
 		sym.overrides = superSym;
 		if (superSym != null) {
 			if (superSym.getParameters().size() != sym.getParameters().size())

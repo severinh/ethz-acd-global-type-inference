@@ -54,9 +54,9 @@ public class ExprTypingVisitorTest {
 		types = new TypeSymbolTable();
 
 		xClass = new ClassSymbol("X");
-		xClass.superClass = types.getObjectType();
+		xClass.setSuperClass(types.getObjectType());
 		zClass = new ClassSymbol("Z");
-		zClass.superClass = types.getObjectType();
+		zClass.setSuperClass(types.getObjectType());
 
 		types.add(xClass);
 		types.add(zClass);
