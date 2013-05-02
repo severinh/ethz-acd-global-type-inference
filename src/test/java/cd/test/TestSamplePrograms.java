@@ -63,7 +63,7 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 	 */
 	public TestSamplePrograms(File file) {
 		this.compilation = new CompilationContext(file);
-		this.testReferenceData = new TestReferenceData(file);
+		this.referenceData = new TestReferenceData(file);
 		this.infile = new File(file.getPath() + ".in");
 		this.errfile = new File(String.format("%s.err", file.getPath()));
 		this.main = new Main();

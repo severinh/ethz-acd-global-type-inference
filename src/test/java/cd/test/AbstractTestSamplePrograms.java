@@ -8,14 +8,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.codehaus.plexus.util.ExceptionUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -48,7 +43,7 @@ abstract public class AbstractTestSamplePrograms {
 	protected File infile;
 	protected File errfile;
 
-	protected TestReferenceData testReferenceData = new TestReferenceData();
+	protected TestReferenceData referenceData = new TestReferenceData();
 	protected Main main;
 
 	public void assertEquals(String phase, String exp, String act) {
@@ -169,7 +164,7 @@ abstract public class AbstractTestSamplePrograms {
 
 	/** Run the parser and compare the output against the reference results */
 	public List<ClassDecl> testParser() throws Exception {
-		String parserRef = findParserRef();
+		String parserRef = referenceData.findParserRef();
 		List<ClassDecl> astRoots = null;
 		String parserOut;
 		boolean parserDebug;
@@ -200,7 +195,7 @@ abstract public class AbstractTestSamplePrograms {
 
 	public boolean testSemanticAnalyzer()
 			throws IOException {
-		String semanticRef = findSemanticRef();
+		String semanticRef = referenceData.findSemanticRef();
 
 		boolean passed;
 		String result;
@@ -222,7 +217,7 @@ abstract public class AbstractTestSamplePrograms {
 		// Determine the input and expected operation counts.
 		String inFile = (infile.exists() ? FileUtils.readFileToString(infile)
 				: "");
-		String optRef = findOptimizerRef(inFile);
+		String optRef = referenceData.findOptimizerRef(inFile);
 
 		// Invoke the interpreter. Don't bother to save the output: we already
 		// verified that in testCodeGenerator().
@@ -254,7 +249,7 @@ abstract public class AbstractTestSamplePrograms {
 		// Determine the input and expected output.
 		String inFile = (infile.exists() ? FileUtils.readFileToString(infile)
 				: "");
-		String execRef = findExecRef(inFile);
+		String execRef = referenceData.findExecRef(inFile);
 
 		// Run the code generator:
 		try (FileWriter fw = new FileWriter(this.compilation.assemblyFile)) {
@@ -302,125 +297,6 @@ abstract public class AbstractTestSamplePrograms {
 		return false;
 	}
 
-	public String findParserRef() throws IOException {
-		// Check for a .ref file
-		if (testReferenceData.parserreffile.exists()
-				&& testReferenceData.parserreffile.lastModified() > compilation.sourceFile.lastModified()) {
-			return FileUtils.readFileToString(testReferenceData.parserreffile);
-		}
 
-		// If no file exists, contact reference server
-		String res;
-		Reference ref = openClient();
-		try {
-			res = ref.parserReference(FileUtils.readFileToString(compilation.sourceFile));
-		} catch (Throwable e) {
-			return fragmentBug(e);
-		}
-		FileUtils.writeStringToFile(testReferenceData.parserreffile, res);
-		return res;
-	}
-
-	public String findSemanticRef() throws IOException {
-		// Semantic ref file is a little different. It consists
-		// of 2 lines, but only the first line is significant.
-		// The second one contains additional information that we log
-		// to the debug file.
-
-		// Read in the result
-		String res;
-		if (testReferenceData.semanticreffile.exists()
-				&& testReferenceData.semanticreffile.lastModified() > compilation.sourceFile.lastModified())
-			res = FileUtils.readFileToString(testReferenceData.semanticreffile);
-		else {
-			Reference ref = openClient();
-			try {
-				res = ref.semanticReference(FileUtils.readFileToString(compilation.sourceFile));
-			} catch (Throwable e) {
-				return fragmentBug(e);
-			}
-			FileUtils.writeStringToFile(testReferenceData.semanticreffile, res);
-		}
-
-		// Extract the first line: there should always be multiple lines,
-		// but someone may have tinkered with the file or something
-		if (res.contains("\n")) {
-			int newline = res.indexOf("\n");
-			String cause = res.substring(newline + 1);
-			if (!cause.equals("") && !cause.equals("\n"))
-				LOG.debug("Error message from reference is: {}", cause);
-			return res.substring(0, newline); // 1st line
-		} else {
-			return res;
-		}
-	}
-
-	public String findExecRef(String inputText) throws IOException {
-		// Check for a .ref file
-		if (testReferenceData.execreffile.exists()
-				&& testReferenceData.execreffile.lastModified() > compilation.sourceFile.lastModified()) {
-			return FileUtils.readFileToString(testReferenceData.execreffile);
-		}
-
-		// If no file exists, use the interpreter to generate one.
-		Reference ref = openClient();
-		String res;
-		try {
-			res = ref
-					.execReference(FileUtils.readFileToString(compilation.sourceFile), inputText);
-		} catch (Throwable e) {
-			return fragmentBug(e);
-		}
-		FileUtils.writeStringToFile(testReferenceData.execreffile, res);
-		return res;
-	}
-
-	private String findOptimizerRef(String inputText) throws IOException {
-		// Check for a .ref file
-		if (testReferenceData.optreffile.exists()
-				&& testReferenceData.optreffile.lastModified() > compilation.sourceFile.lastModified()) {
-			return FileUtils.readFileToString(testReferenceData.optreffile);
-		}
-
-		// If no file exists, use the interpreter to generate one.
-		Reference ref = openClient();
-		String res;
-		try {
-			res = ref.optReference(FileUtils.readFileToString(compilation.sourceFile), inputText);
-		} catch (Throwable e) {
-			return fragmentBug(e);
-		}
-		FileUtils.writeStringToFile(testReferenceData.optreffile, res);
-		return res;
-	}
-
-	private String fragmentBug(Throwable e) {
-		String res = String.format("** BUG IN REFERENCE SOLUTION: %s **",
-				e.toString());
-		LOG.debug(res);
-		LOG.debug(ExceptionUtils.getStackTrace(e));
-		return res;
-	}
-
-	/**
-	 * Connects to {@code niko.inf.ethz.ch} and returns a Reference instance.
-	 * This uses Java RMI to obtain the expected answer for various stages.
-	 * Generally, this is only invoked if no appropriate .ref file is found.
-	 */
-	public static Reference openClient() {
-		Registry registry;
-		try {
-			registry = LocateRegistry.getRegistry("beholder.inf.ethz.ch");
-			Reference ref = (Reference) registry.lookup(Reference.class
-					.getName());
-			return ref;
-		} catch (RemoteException e) {
-			// No network connectivity or server not running?
-			throw new RuntimeException(e);
-		} catch (NotBoundException e) {
-			// Server not running on niko.inf.ethz.ch?
-			throw new RuntimeException(e);
-		}
-	}
 
 }
