@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
-import cd.Main;
+import cd.CompilationContext;
 import cd.ir.ast.Ast;
 import cd.ir.ast.ClassDecl;
 import cd.ir.ast.MethodDecl;
@@ -37,9 +37,9 @@ public class TypeInferenceEvaluationVisitorTest {
 		classDecl = new ClassDecl("Main", "Object", Arrays.asList(methodDecl,
 				fieldDecl));
 
-		Main main = new Main();
-		new UntypedSemanticAnalyzer(main).check(Arrays.asList(classDecl));
-		typeSymbols = main.typeSymbols;
+		CompilationContext context = new CompilationContext();
+		new UntypedSemanticAnalyzer(context).check(Arrays.asList(classDecl));
+		typeSymbols = context.typeSymbols;
 	}
 
 	@Test

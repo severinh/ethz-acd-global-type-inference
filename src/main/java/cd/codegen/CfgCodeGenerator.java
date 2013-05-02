@@ -5,22 +5,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cd.Main;
-import cd.ir.ast.Ast;
-import cd.ir.ast.ClassDecl;
-import cd.ir.ast.MethodDecl;
+import cd.CompilationContext;
 import cd.ir.AstVisitor;
 import cd.ir.BasicBlock;
 import cd.ir.ControlFlowGraph;
+import cd.ir.ast.Ast;
+import cd.ir.ast.ClassDecl;
+import cd.ir.ast.MethodDecl;
 
 public class CfgCodeGenerator {
 
-	private final Main main;
+	private final CompilationContext context;
 	private final AstCodeGenerator cg;
 
-	public CfgCodeGenerator(Main main, Writer out) {
-		this.main = main;
-		this.cg = new AstCodeGenerator(main, out);
+	public CfgCodeGenerator(CompilationContext context, Writer out) {
+		this.context = context;
+		this.cg = new AstCodeGenerator(context, out);
 	}
 
 	public void go(List<? extends ClassDecl> astRoots) {
@@ -84,7 +84,7 @@ public class CfgCodeGenerator {
 			}
 
 			cg.emitLabel(exitLabel);
-			if (ast.sym.returnType.equals(main.typeSymbols.getVoidType())) {
+			if (ast.sym.returnType.equals(context.typeSymbols.getVoidType())) {
 				cg.emitMethodSuffix(true);
 			} else {
 				cg.emitMethodSuffix(true);

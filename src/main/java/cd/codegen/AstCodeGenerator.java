@@ -13,9 +13,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import cd.CompilationContext;
 import cd.Config;
-import cd.Main;
 import cd.debug.AstOneLine;
+import cd.ir.AstVisitor;
+import cd.ir.ExprVisitor;
 import cd.ir.ast.Assign;
 import cd.ir.ast.Ast;
 import cd.ir.ast.BinaryOp;
@@ -50,8 +52,6 @@ import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
-import cd.ir.AstVisitor;
-import cd.ir.ExprVisitor;
 import cd.util.Pair;
 
 public class AstCodeGenerator {
@@ -60,12 +60,12 @@ public class AstCodeGenerator {
 	protected final ExprGenerator eg = new ExprGenerator();
 	protected final StmtDeclGenerator sdg = new StmtDeclGenerator();
 	protected final Writer out;
-	protected final Main main;
+	protected final CompilationContext context;
 
-	public AstCodeGenerator(Main main, Writer out) {
+	public AstCodeGenerator(CompilationContext context, Writer out) {
 		initRegisters();
 		this.out = out;
-		this.main = main;
+		this.context = context;
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class AstCodeGenerator {
 		}
 
 		// emit vtables
-		for (TypeSymbol ts : main.typeSymbols.allSymbols()) {
+		for (TypeSymbol ts : context.typeSymbols.allSymbols()) {
 			emitVtable(ts);
 		}
 
@@ -203,10 +203,10 @@ public class AstCodeGenerator {
 		// Generate AST for main() method:
 		// new Main().main()
 		NewObject newMain = new NewObject("Main");
-		newMain.type = main.mainType;
+		newMain.type = context.mainType;
 		MethodCall callMain = new MethodCall(newMain, "main",
 				Collections.<Expr> emptyList());
-		callMain.sym = main.mainType.getMethod("main");
+		callMain.sym = context.mainType.getMethod("main");
 
 		// Emit the main() method:
 		// new Main().main();
@@ -292,7 +292,7 @@ public class AstCodeGenerator {
 		} else if (ts instanceof ArrayTypeSymbol) {
 			ArrayTypeSymbol as = (ArrayTypeSymbol) ts;
 			emitLabel(vtable(as));
-			emitConstantData(vtable(main.typeSymbols.getObjectType()));
+			emitConstantData(vtable(context.typeSymbols.getObjectType()));
 		}
 	}
 
@@ -505,11 +505,11 @@ public class AstCodeGenerator {
 
 			public void binaryOp(BinaryOp ast, String leftReg, String rightReg) {
 
-				if (ast.type == main.typeSymbols.getObjectType()) {
+				if (ast.type == context.typeSymbols.getObjectType()) {
 					floatOp(leftReg, ast.operator, rightReg);
 				} else {
 
-					if (ast.left().type == main.typeSymbols.getFloatType()) {
+					if (ast.left().type == context.typeSymbols.getFloatType()) {
 						floatCmp(leftReg, ast.operator, rightReg);
 					} else {
 						integerOp(leftReg, ast.operator, rightReg);
@@ -855,7 +855,7 @@ public class AstCodeGenerator {
 				break;
 
 			case U_MINUS: {
-				if (ast.type == main.typeSymbols.getFloatType()) {
+				if (ast.type == context.typeSymbols.getFloatType()) {
 					emitGprRegToFloatReg(FLOAT_REG_0, argReg);
 					push("%eax");
 					emit("movd", FLOAT_REG_0, "%eax");
@@ -948,7 +948,7 @@ public class AstCodeGenerator {
 
 			call("*" + reg, reg);
 
-			if (mthSymbol.returnType == main.typeSymbols.getVoidType()) {
+			if (mthSymbol.returnType == context.typeSymbols.getVoidType()) {
 				releaseRegister(reg);
 				return null;
 			}

@@ -2,7 +2,7 @@ package cd.semantic;
 
 import java.util.List;
 
-import cd.Main;
+import cd.CompilationContext;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.ast.ClassDecl;
@@ -25,16 +25,16 @@ import cd.ir.symbols.VariableSymbol;
  */
 public class TypedSemanticAnalyzer {
 
-	private final Main main;
+	private final CompilationContext context;
 
-	public TypedSemanticAnalyzer(Main main) {
-		this.main = main;
+	public TypedSemanticAnalyzer(CompilationContext context) {
+		this.context = context;
 	}
 
 	public void check(List<ClassDecl> classDecls) throws SemanticFailure {
 		checkInheritance(classDecls);
-		checkStartPoint(main.typeSymbols);
-		checkMethodBodies(main.typeSymbols, classDecls);
+		checkStartPoint(context.typeSymbols);
+		checkMethodBodies(context.typeSymbols, classDecls);
 		rewriteMethodBodies(classDecls);
 	}
 
@@ -60,8 +60,8 @@ public class TypedSemanticAnalyzer {
 			ClassSymbol cs = (ClassSymbol) mainClass;
 			MethodSymbol mainMethod = cs.getMethod("main");
 			if (mainMethod != null && mainMethod.getParameters().isEmpty()
-					&& mainMethod.returnType == main.typeSymbols.getVoidType()) {
-				main.mainType = cs;
+					&& mainMethod.returnType == context.typeSymbols.getVoidType()) {
+				context.mainType = cs;
 				return; // found the main() method!
 			}
 		}

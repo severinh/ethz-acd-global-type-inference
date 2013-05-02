@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import cd.Config;
+import cd.CompilationContext;
 import cd.Main;
 
 @RunWith(Parameterized.class)
@@ -62,18 +62,11 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 	 *            The javali file to test.
 	 */
 	public TestSamplePrograms(File file) {
-		this.file = file;
-		this.sfile = new File(file.getPath() + Config.ASMEXT);
-		this.binfile = new File(file.getPath() + Config.BINARYEXT);
+		this.compilation = new CompilationContext(file);
+		this.testReferenceData = new TestReferenceData(file);
 		this.infile = new File(file.getPath() + ".in");
-		this.parserreffile = new File(file.getPath() + ".parser.ref");
-		this.semanticreffile = new File(file.getPath() + ".semantic.ref");
-		this.execreffile = new File(file.getPath() + ".exec.ref");
-		this.cfgreffile = new File(file.getPath() + ".cfg.dot.ref");
-		this.optreffile = new File(file.getPath() + ".opt.ref");
 		this.errfile = new File(String.format("%s.err", file.getPath()));
 		this.main = new Main();
-		this.main.cfgdumpbase = file;
 	}
 
 }

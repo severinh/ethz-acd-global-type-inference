@@ -8,9 +8,13 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cd.Main;
+import cd.CompilationContext;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
+import cd.ir.AstVisitor;
+import cd.ir.BasicBlock;
+import cd.ir.ControlFlowGraph;
+import cd.ir.Phi;
 import cd.ir.ast.Assign;
 import cd.ir.ast.Ast;
 import cd.ir.ast.Expr;
@@ -18,10 +22,6 @@ import cd.ir.ast.MethodDecl;
 import cd.ir.ast.Var;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.VariableSymbol;
-import cd.ir.AstVisitor;
-import cd.ir.BasicBlock;
-import cd.ir.ControlFlowGraph;
-import cd.ir.Phi;
 import cd.util.DepthFirstSearchPreOrder;
 
 public class SSA {
@@ -30,9 +30,9 @@ public class SSA {
 
 	private final VariableSymbol uninitSym;
 
-	public SSA(Main main) {
+	public SSA(CompilationContext context) {
 		this.uninitSym = new VariableSymbol("__UNINIT__",
-				main.typeSymbols.getNullType());
+				context.typeSymbols.getNullType());
 	}
 
 	private MethodSymbol msym;

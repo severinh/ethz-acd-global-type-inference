@@ -13,9 +13,13 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cd.Main;
+import cd.CompilationContext;
 import cd.debug.AstOneLine;
 import cd.debug.CfgDump;
+import cd.ir.AstVisitor;
+import cd.ir.BasicBlock;
+import cd.ir.ExprVisitor;
+import cd.ir.Phi;
 import cd.ir.ast.Assign;
 import cd.ir.ast.Ast;
 import cd.ir.ast.AstRewriteVisitor;
@@ -31,10 +35,7 @@ import cd.ir.ast.UnaryOp;
 import cd.ir.ast.Var;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.VariableSymbol;
-import cd.ir.AstVisitor;
-import cd.ir.BasicBlock;
-import cd.ir.ExprVisitor;
-import cd.ir.Phi;
+import cd.semantic.TypeSymbolTable;
 import cd.util.DepthFirstSearchPreOrder;
 
 public class Optimizer {
@@ -44,13 +45,13 @@ public class Optimizer {
 	private static final boolean INTENSE_DEBUG = true;
 	private static final int MAX_INNER = 16, MAX_OUTER = 16;
 
-	private final Main main;
+	private final CompilationContext compilationContext;
 	private int changes = 0;
 
 	private static int overall;
 
-	public Optimizer(Main main) {
-		this.main = main;
+	public Optimizer(CompilationContext context) {
+		this.compilationContext = context;
 	}
 
 	private String phase() {
@@ -62,7 +63,7 @@ public class Optimizer {
 		do {
 
 			if (INTENSE_DEBUG)
-				CfgDump.toString(md, phase() + ".before", main.cfgdumpbase,
+				CfgDump.toString(md, phase() + ".before", compilationContext.getCfgDumpBase(),
 						false);
 			LOG.debug("Before phase = {}", overall - 1);
 
@@ -74,19 +75,19 @@ public class Optimizer {
 				new ConstantPropagation().compute(md);
 				if (INTENSE_DEBUG)
 					CfgDump.toString(md, phase() + ".constant",
-							main.cfgdumpbase, false);
+							compilationContext.getCfgDumpBase(), false);
 
 				LOG.debug("Copy Prop, phase {}", overall);
 				new CopyPropagation().compute(md);
 				if (INTENSE_DEBUG)
 					CfgDump.toString(md, phase() + ".copyprop",
-							main.cfgdumpbase, false);
+							compilationContext.getCfgDumpBase(), false);
 			} while (changes > oldChanges && inner++ < MAX_INNER);
 
 			LOG.debug("CSE, phase {}", overall);
 			new CommonSubexpressionElimination().compute(md);
 			if (INTENSE_DEBUG)
-				CfgDump.toString(md, phase() + ".cse", main.cfgdumpbase, false);
+				CfgDump.toString(md, phase() + ".cse", compilationContext.getCfgDumpBase(), false);
 
 		} while (changes > oldChanges && outer++ < MAX_OUTER);
 	}
@@ -221,9 +222,10 @@ public class Optimizer {
 			private Boolean areEqual(Expr left, Expr right)
 					throws NotConstantException {
 				Boolean boolValue;
-				if (left.type == main.typeSymbols.getIntType())
+				TypeSymbolTable typeSymbols = compilationContext.getTypeSymbols();
+				if (left.type == typeSymbols.getIntType())
 					boolValue = asInt(left) == asInt(right);
-				else if (left.type == main.typeSymbols.getBooleanType())
+				else if (left.type == typeSymbols.getBooleanType())
 					boolValue = asBool(left) == asBool(right);
 				else
 					boolValue = (isNull(left) && isNull(right) ? true : null);

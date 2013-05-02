@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cd.CompilationContext;
 import cd.Config;
 import cd.Main;
 import cd.debug.AstDump;
@@ -42,10 +43,12 @@ abstract public class AbstractTestSamplePrograms {
 	 */
 	private static final int VALGRIND_ERROR_CODE = 77;
 
-	protected File file, sfile, binfile, infile;
-	protected File parserreffile, semanticreffile, execreffile, cfgreffile,
-			optreffile;
+	protected CompilationContext compilation;
+
+	protected File infile;
 	protected File errfile;
+
+	protected TestReferenceData testReferenceData = new TestReferenceData();
 	protected Main main;
 
 	public void assertEquals(String phase, String exp, String act) {
@@ -102,7 +105,7 @@ abstract public class AbstractTestSamplePrograms {
 			exc.printStackTrace();
 		}
 		Assert.assertEquals(
-				String.format("Phase %s for %s failed!", phase, file.getPath()),
+				String.format("Phase %s for %s failed!", phase, compilation.sourceFile.getPath()),
 				exp, act);
 	}
 
@@ -110,14 +113,14 @@ abstract public class AbstractTestSamplePrograms {
 
 	@Test
 	public void test() throws Throwable {
-		System.err.println("[" + counter++ + " = " + file + "]");
+		System.err.println("[" + counter++ + " = " + compilation.sourceFile + "]");
 
 		// ignore 64-bit-only tests when running 32-bit Java
-		if (new File(file.getAbsolutePath() + ".64bitonly").exists()
+		if (new File(compilation.sourceFile.getAbsolutePath() + ".64bitonly").exists()
 				&& Integer.valueOf(System.getProperty("sun.arch.data.model")) == 32) {
 			System.err.println("--> Ignoring test because it's 64-bit-only");
 		} else {
-			boolean hasWellDefinedOutput = !new File(file.getAbsolutePath()
+			boolean hasWellDefinedOutput = !new File(compilation.sourceFile.getAbsolutePath()
 					+ ".undefinedOutput").exists();
 
 			try {
@@ -125,25 +128,24 @@ abstract public class AbstractTestSamplePrograms {
 				// Note: this may use the network if no .ref files exist.
 
 				// Delete intermediate files from previous runs:
-				if (sfile.exists())
-					sfile.delete();
-				if (binfile.exists())
-					binfile.delete();
+				if (compilation.assemblyFile.exists())
+					compilation.assemblyFile.delete();
+				if (compilation.binaryFile.exists())
+					compilation.binaryFile.delete();
 
 				// Parse the file and check that the generated AST is correct,
 				// or if the parser failed that the correct message was
 				// generated:
-				List<ClassDecl> astRoots = testParser();
-				if (astRoots != null) {
+				compilation.astRoots = testParser();
+				if (compilation.astRoots != null) {
 					// Run the semantic check and check that errors
 					// are detected correctly, etc.
-					boolean passedSemanticAnalysis = testSemanticAnalyzer(astRoots);
+					boolean passedSemanticAnalysis = testSemanticAnalyzer();
 					if (passedSemanticAnalysis) {
-						boolean passedCodeGen = testCodeGenerator(astRoots,
-								hasWellDefinedOutput);
+						boolean passedCodeGen = testCodeGenerator(hasWellDefinedOutput);
 
 						if (passedCodeGen)
-							testOptimizer(astRoots);
+							testOptimizer();
 					}
 				}
 			} catch (org.junit.ComparisonFailure cf) {
@@ -176,8 +178,8 @@ abstract public class AbstractTestSamplePrograms {
 		// Change to TRUE if you'd like to see it for some reason.
 		parserDebug = false;
 		try {
-			astRoots = main.parse(file.getAbsolutePath(), new FileReader(
-					this.file), parserDebug);
+			astRoots = main.parse(compilation.sourceFile.getAbsolutePath(), new FileReader(
+					this.compilation.sourceFile), parserDebug);
 			parserOut = AstDump.toString(astRoots);
 		} catch (ParseFailure pf) {
 			// Parse errors are ok too.
@@ -196,14 +198,14 @@ abstract public class AbstractTestSamplePrograms {
 		return astRoots;
 	}
 
-	public boolean testSemanticAnalyzer(List<ClassDecl> astRoots)
+	public boolean testSemanticAnalyzer()
 			throws IOException {
 		String semanticRef = findSemanticRef();
 
 		boolean passed;
 		String result;
 		try {
-			main.semanticCheck(astRoots);
+			main.semanticCheck(compilation);
 			result = "OK";
 			passed = true;
 		} catch (SemanticFailure sf) {
@@ -216,7 +218,7 @@ abstract public class AbstractTestSamplePrograms {
 		return passed;
 	}
 
-	private void testOptimizer(List<ClassDecl> astRoots) throws IOException {
+	private void testOptimizer() throws IOException {
 		// Determine the input and expected operation counts.
 		String inFile = (infile.exists() ? FileUtils.readFileToString(infile)
 				: "");
@@ -224,7 +226,7 @@ abstract public class AbstractTestSamplePrograms {
 
 		// Invoke the interpreter. Don't bother to save the output: we already
 		// verified that in testCodeGenerator().
-		Interpreter interp = new Interpreter(astRoots,
+		Interpreter interp = new Interpreter(compilation.astRoots,
 				new StringReader(inFile), new StringWriter());
 
 		// Hacky: refactor this try/catch along with the one in ReferenceServer
@@ -248,16 +250,15 @@ abstract public class AbstractTestSamplePrograms {
 	 * Run the code generator, assemble the resulting .s file, and (if the
 	 * output is well-defined) compare against the expected output.
 	 */
-	public boolean testCodeGenerator(List<ClassDecl> astRoots,
-			boolean hasWellDefinedOutput) throws IOException {
+	public boolean testCodeGenerator(boolean hasWellDefinedOutput) throws IOException {
 		// Determine the input and expected output.
 		String inFile = (infile.exists() ? FileUtils.readFileToString(infile)
 				: "");
 		String execRef = findExecRef(inFile);
 
 		// Run the code generator:
-		try (FileWriter fw = new FileWriter(this.sfile)) {
-			main.generateCode(astRoots, fw);
+		try (FileWriter fw = new FileWriter(this.compilation.assemblyFile)) {
+			main.generateCode(compilation, fw);
 		}
 
 		// At this point, we have generated a .s file and we have to compile
@@ -266,20 +267,20 @@ abstract public class AbstractTestSamplePrograms {
 		String asmOutput = FileUtil.runCommand(
 				Config.ASM_DIR,
 				Config.ASM,
-				new String[] { binfile.getAbsolutePath(),
-						sfile.getAbsolutePath() }, null, false);
+				new String[] { compilation.binaryFile.getAbsolutePath(),
+						compilation.assemblyFile.getAbsolutePath() }, null, false);
 
 		// To check if gcc succeeded, check if the binary file exists.
 		// We could use the return code instead, but this seems more
 		// portable to other compilers / make systems.
-		if (!binfile.exists())
+		if (!compilation.binaryFile.exists())
 			throw new AssemblyFailedException(asmOutput);
 
 		// Execute the binary file, providing input if relevant, and
 		// capturing the output. Check the error code so see if the
 		// code signaled dynamic errors.
 		String execOut = FileUtil.runCommand(new File("."),
-				new String[] { binfile.getAbsolutePath() }, new String[] {},
+				new String[] { compilation.binaryFile.getAbsolutePath() }, new String[] {},
 				inFile, true);
 
 		if (RUN_VALGRIND) {
@@ -287,7 +288,7 @@ abstract public class AbstractTestSamplePrograms {
 					new File("."),
 					new String[] { "valgrind",
 							"--error-exitcode=" + VALGRIND_ERROR_CODE,
-							binfile.getAbsolutePath() }, new String[] {},
+							compilation.binaryFile.getAbsolutePath() }, new String[] {},
 					inFile, true);
 			Assert.assertTrue(!valgrindOut.contains("Error: "
 					+ VALGRIND_ERROR_CODE));
@@ -303,20 +304,20 @@ abstract public class AbstractTestSamplePrograms {
 
 	public String findParserRef() throws IOException {
 		// Check for a .ref file
-		if (parserreffile.exists()
-				&& parserreffile.lastModified() > file.lastModified()) {
-			return FileUtils.readFileToString(parserreffile);
+		if (testReferenceData.parserreffile.exists()
+				&& testReferenceData.parserreffile.lastModified() > compilation.sourceFile.lastModified()) {
+			return FileUtils.readFileToString(testReferenceData.parserreffile);
 		}
 
 		// If no file exists, contact reference server
 		String res;
 		Reference ref = openClient();
 		try {
-			res = ref.parserReference(FileUtils.readFileToString(file));
+			res = ref.parserReference(FileUtils.readFileToString(compilation.sourceFile));
 		} catch (Throwable e) {
 			return fragmentBug(e);
 		}
-		FileUtils.writeStringToFile(parserreffile, res);
+		FileUtils.writeStringToFile(testReferenceData.parserreffile, res);
 		return res;
 	}
 
@@ -328,17 +329,17 @@ abstract public class AbstractTestSamplePrograms {
 
 		// Read in the result
 		String res;
-		if (semanticreffile.exists()
-				&& semanticreffile.lastModified() > file.lastModified())
-			res = FileUtils.readFileToString(semanticreffile);
+		if (testReferenceData.semanticreffile.exists()
+				&& testReferenceData.semanticreffile.lastModified() > compilation.sourceFile.lastModified())
+			res = FileUtils.readFileToString(testReferenceData.semanticreffile);
 		else {
 			Reference ref = openClient();
 			try {
-				res = ref.semanticReference(FileUtils.readFileToString(file));
+				res = ref.semanticReference(FileUtils.readFileToString(compilation.sourceFile));
 			} catch (Throwable e) {
 				return fragmentBug(e);
 			}
-			FileUtils.writeStringToFile(semanticreffile, res);
+			FileUtils.writeStringToFile(testReferenceData.semanticreffile, res);
 		}
 
 		// Extract the first line: there should always be multiple lines,
@@ -356,9 +357,9 @@ abstract public class AbstractTestSamplePrograms {
 
 	public String findExecRef(String inputText) throws IOException {
 		// Check for a .ref file
-		if (execreffile.exists()
-				&& execreffile.lastModified() > file.lastModified()) {
-			return FileUtils.readFileToString(execreffile);
+		if (testReferenceData.execreffile.exists()
+				&& testReferenceData.execreffile.lastModified() > compilation.sourceFile.lastModified()) {
+			return FileUtils.readFileToString(testReferenceData.execreffile);
 		}
 
 		// If no file exists, use the interpreter to generate one.
@@ -366,30 +367,30 @@ abstract public class AbstractTestSamplePrograms {
 		String res;
 		try {
 			res = ref
-					.execReference(FileUtils.readFileToString(file), inputText);
+					.execReference(FileUtils.readFileToString(compilation.sourceFile), inputText);
 		} catch (Throwable e) {
 			return fragmentBug(e);
 		}
-		FileUtils.writeStringToFile(execreffile, res);
+		FileUtils.writeStringToFile(testReferenceData.execreffile, res);
 		return res;
 	}
 
 	private String findOptimizerRef(String inputText) throws IOException {
 		// Check for a .ref file
-		if (optreffile.exists()
-				&& optreffile.lastModified() > file.lastModified()) {
-			return FileUtils.readFileToString(optreffile);
+		if (testReferenceData.optreffile.exists()
+				&& testReferenceData.optreffile.lastModified() > compilation.sourceFile.lastModified()) {
+			return FileUtils.readFileToString(testReferenceData.optreffile);
 		}
 
 		// If no file exists, use the interpreter to generate one.
 		Reference ref = openClient();
 		String res;
 		try {
-			res = ref.optReference(FileUtils.readFileToString(file), inputText);
+			res = ref.optReference(FileUtils.readFileToString(compilation.sourceFile), inputText);
 		} catch (Throwable e) {
 			return fragmentBug(e);
 		}
-		FileUtils.writeStringToFile(optreffile, res);
+		FileUtils.writeStringToFile(testReferenceData.optreffile, res);
 		return res;
 	}
 

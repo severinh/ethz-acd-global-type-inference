@@ -27,11 +27,9 @@ import cd.debug.CfgDump;
 import cd.exceptions.ParseFailure;
 import cd.ir.ast.ClassDecl;
 import cd.ir.ast.MethodDecl;
-import cd.ir.symbols.ClassSymbol;
 import cd.parser.JavaliLexer;
 import cd.parser.JavaliParser;
 import cd.parser.JavaliWalker;
-import cd.semantic.TypeSymbolTable;
 import cd.semantic.TypedSemanticAnalyzer;
 import cd.semantic.UntypedSemanticAnalyzer;
 
@@ -46,38 +44,26 @@ public class Main {
 
 	public static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-	// Set to non-null to write dump of control flow graph
-	public File cfgdumpbase;
-
-	/** Symbol for the Main type */
-	public ClassSymbol mainType;
-
-	/** List of all type symbols, used by code generator. */
-	public TypeSymbolTable typeSymbols;
-
-	public Main() {
-
-	}
-
 	/** Parse command line, invoke compile() routine */
 	public static void main(String args[]) throws IOException {
 		Main main = new Main();
 
 		for (String file : args) {
-			List<ClassDecl> astRoots;
-
+			CompilationContext compilation = new CompilationContext();
+			compilation.sourceFile = new File(file);
+			
 			// Parse
 			try (FileReader fin = new FileReader(file)) {
-				astRoots = main.parse(file, fin, false);
+				compilation.astRoots = main.parse(file, fin, false);
 			}
 
 			// Run the semantic check
-			main.semanticCheck(astRoots);
+			main.semanticCheck(compilation);
 
 			// Generate code
 			String sFile = file + Config.ASMEXT;
 			try (FileWriter fout = new FileWriter(sFile);) {
-				main.generateCode(astRoots, fout);
+				main.generateCode(compilation, fout);
 			}
 		}
 	}
@@ -129,50 +115,53 @@ public class Main {
 		}
 	}
 
-	public void semanticCheck(List<ClassDecl> astRoots) {
-		new UntypedSemanticAnalyzer(this).check(astRoots);
+	public void semanticCheck(CompilationContext context) {
+		List<ClassDecl> astRoots = context.astRoots;
+		new UntypedSemanticAnalyzer(context).check(astRoots);
 
 		// Uncomment to erase the existing variable types before type inference
 		// TODO Should be made configurable
 		// GlobalTypeEraser.getInstance().eraseTypesFrom(typeSymbols);
 		// LocalTypeEraser.getInstance().eraseTypesFrom(typeSymbols);
 
-		new TypedSemanticAnalyzer(this).check(astRoots);
+		new TypedSemanticAnalyzer(context).check(astRoots);
+		
+		File cfgDumpBase = context.cfgDumpBase;
 
 		// Build control flow graph
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())
 				new CFGBuilder(this).build(md);
-		CfgDump.toString(astRoots, ".cfg", cfgdumpbase, false);
+		CfgDump.toString(astRoots, ".cfg", cfgDumpBase, false);
 
 		// Compute dominators
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())
 				new Dominator(this).compute(md);
-		CfgDump.toString(astRoots, ".dom", cfgdumpbase, true);
+		CfgDump.toString(astRoots, ".dom", cfgDumpBase, true);
 
 		// Introduce SSA form.
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())
-				new SSA(this).compute(md);
-		CfgDump.toString(astRoots, ".ssa", cfgdumpbase, false);
+				new SSA(context).compute(md);
+		CfgDump.toString(astRoots, ".ssa", cfgDumpBase, false);
 
 		// Optimize using SSA form.
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())
-				new Optimizer(this).compute(md);
-		CfgDump.toString(astRoots, ".opt", cfgdumpbase, false);
+				new Optimizer(context).compute(md);
+		CfgDump.toString(astRoots, ".opt", cfgDumpBase, false);
 
 		// Remove SSA form.
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())
 				new DeSSA(this).compute(md);
-		CfgDump.toString(astRoots, ".dessa", cfgdumpbase, false);
+		CfgDump.toString(astRoots, ".dessa", cfgDumpBase, false);
 	}
 
-	public void generateCode(List<ClassDecl> astRoots, Writer out) {
-		CfgCodeGenerator cg = new CfgCodeGenerator(this, out);
-		cg.go(astRoots);
+	public void generateCode(CompilationContext context, Writer out) {
+		CfgCodeGenerator cg = new CfgCodeGenerator(context, out);
+		cg.go(context.astRoots);
 	}
 
 }

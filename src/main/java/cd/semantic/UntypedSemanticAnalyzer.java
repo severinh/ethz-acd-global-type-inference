@@ -3,7 +3,7 @@ package cd.semantic;
 import java.util.ArrayList;
 import java.util.List;
 
-import cd.Main;
+import cd.CompilationContext;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.ast.ClassDecl;
@@ -25,14 +25,14 @@ import cd.ir.symbols.TypeSymbol;
  */
 public class UntypedSemanticAnalyzer {
 
-	private final Main main;
+	private final CompilationContext context;
 
-	public UntypedSemanticAnalyzer(Main main) {
-		this.main = main;
+	public UntypedSemanticAnalyzer(CompilationContext context) {
+		this.context = context;
 	}
 
 	public void check(List<ClassDecl> classDecls) throws SemanticFailure {
-		main.typeSymbols = createSymbols(classDecls);
+		context.typeSymbols = createSymbols(classDecls);
 		checkUntypedInheritance(classDecls);
 	}
 
