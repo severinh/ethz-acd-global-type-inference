@@ -12,6 +12,10 @@ import cd.ir.ast.BuiltInRead;
 import cd.ir.ast.BuiltInReadFloat;
 import cd.ir.ast.Cast;
 import cd.ir.ast.Expr;
+import cd.ir.ast.FloatConst;
+import cd.ir.ast.IntConst;
+import cd.ir.ast.NewObject;
+import cd.ir.ast.NullConst;
 import cd.ir.ast.UnaryOp;
 import cd.ir.ast.UnaryOp.UOp;
 import cd.ir.ast.Var;
@@ -24,6 +28,8 @@ import cd.semantic.TypeSymbolTable;
 
 /**
  * Tests {@link ExprTypingVisitor}.
+ * 
+ * @todo Test all methods
  */
 public class ExprTypingVisitorTest {
 
@@ -225,11 +231,38 @@ public class ExprTypingVisitorTest {
 		assertType(xClass, new Cast(makeObjectVar(), xClass.name));
 		assertObjectType(new Cast(makeXVar(), types.getObjectType().name));
 		assertObjectType(new Cast(makeBottomVar(), types.getObjectType().name));
+		assertIntType(new Cast(makeIntVar(), types.getIntType().name));
 	}
 
 	@Test(expected = SemanticFailure.class)
-	public void testIncorrectCast() {
+	public void testIncorrectReferenceCast() {
 		type(new Cast(makeZVar(), xClass.name));
+	}
+
+	@Test(expected = SemanticFailure.class)
+	public void testIncorrectPrimitiveCast() {
+		type(new Cast(makeIntVar(), types.getFloatType().name));
+	}
+
+	@Test
+	public void testIntConst() {
+		assertIntType(new IntConst(42));
+	}
+
+	@Test
+	public void testFloatConst() {
+		assertFloatType(new FloatConst(42.0f));
+	}
+
+	@Test
+	public void testNewObject() {
+		assertObjectType(new NewObject(types.getObjectType().name));
+		assertType(xClass, new NewObject(xClass.name));
+	}
+
+	@Test
+	public void testNullConst() {
+		assertType(types.getNullType(), new NullConst());
 	}
 
 	@Test
