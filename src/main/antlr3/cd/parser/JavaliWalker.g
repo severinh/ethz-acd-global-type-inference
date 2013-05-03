@@ -115,12 +115,12 @@ methodDecl returns [MethodDecl mth]
    ;
 
 methodHeading returns [String returnType, String mthName, List<Pair<String>> formalParams]
-   :	r=type? n=Identifier { $returnType = ($r.typeName == null ? "?" : $r.typeName) ; $mthName = $n.text; $formalParams = emptyList(); }
-   |	r=type? n=Identifier { $returnType = ($r.typeName == null ? "?" : $r.typeName) ; $mthName = $n.text; $formalParams = new ArrayList<Pair<String>>(); } formalParamList[$formalParams]
+   :	r=type? n=Identifier { $returnType = ($r.typeName == null ? "<bottom>" : $r.typeName) ; $mthName = $n.text; $formalParams = emptyList(); }
+   |	r=type? n=Identifier { $returnType = ($r.typeName == null ? "<bottom>" : $r.typeName) ; $mthName = $n.text; $formalParams = new ArrayList<Pair<String>>(); } formalParamList[$formalParams]
    ;
 
 formalParamList[List<Pair<String>> formalParams]
-	:	( ^( VarDecl t=type? n=Identifier ) { $formalParams.add(new Pair<String>($t.typeName == null ? "?" : $t.typeName, $n.text)); } )+
+	:	( ^( VarDecl t=type? n=Identifier ) { $formalParams.add(new Pair<String>($t.typeName == null ? "<bottom>" : $t.typeName, $n.text)); } )+
 	;
 
 methodBody returns [Seq decls, Seq stmts]

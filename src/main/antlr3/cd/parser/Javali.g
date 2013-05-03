@@ -281,7 +281,7 @@ varDecl
 	;
 
 optionalTypeDecl
-	:   tok='var' -> Identifier[$tok, "?"]
+	:   tok='var' -> Identifier[$tok, "<bottom>"]
 	| type 
 	;
 
