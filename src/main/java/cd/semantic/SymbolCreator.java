@@ -22,13 +22,17 @@ import cd.ir.AstVisitor;
 public class SymbolCreator extends Object {
 
 	private final TypeSymbolTable typeSymbols;
+	private final ClassSymbolCreator classSymbolCreator;
+	private final MethodSymbolCreator methodSymbolCreator;
 
 	public SymbolCreator(TypeSymbolTable typesTable) {
 		this.typeSymbols = typesTable;
+		this.classSymbolCreator = new ClassSymbolCreator();
+		this.methodSymbolCreator = new MethodSymbolCreator();
 	}
 
 	public void createSymbols(ClassDecl cd) {
-		new ClassSymbolCreator(cd.sym).visitChildren(cd, null);
+		classSymbolCreator.visitChildren(cd, cd.sym);
 	}
 
 	/**
@@ -36,76 +40,66 @@ public class SymbolCreator extends Object {
 	 * {@link MethodSymbolCreator} to create symbols for all parameters and
 	 * local variables to each method as well. Checks for duplicate members.
 	 */
-	private class ClassSymbolCreator extends AstVisitor<Void, Void> {
-
-		private final ClassSymbol classSym;
-
-		public ClassSymbolCreator(ClassSymbol classSym) {
-			this.classSym = classSym;
-		}
+	private class ClassSymbolCreator extends AstVisitor<Void, ClassSymbol> {
 
 		@Override
-		public Void varDecl(VarDecl ast, Void arg) {
-			ast.sym = new VariableSymbol(ast.name,
-					typeSymbols.getType(ast.type), Kind.FIELD);
-			classSym.addField(ast.sym);
+		public Void varDecl(VarDecl varDecl, ClassSymbol classSymbol) {
+			varDecl.sym = new VariableSymbol(varDecl.name,
+					typeSymbols.getType(varDecl.type), Kind.FIELD);
+			classSymbol.addField(varDecl.sym);
 			return null;
 		}
 
 		@Override
-		public Void methodDecl(MethodDecl ast, Void arg) {
-			ast.sym = new MethodSymbol(ast.name, classSym);
-			classSym.addMethod(ast.sym);
+		public Void methodDecl(MethodDecl methodDecl, ClassSymbol classSymbol) {
+			methodDecl.sym = new MethodSymbol(methodDecl.name, classSymbol);
+			classSymbol.addMethod(methodDecl.sym);
 
 			// create return type symbol
-			if (ast.returnType.equals("void")) {
-				ast.sym.returnType = typeSymbols.getVoidType();
+			if (methodDecl.returnType.equals("void")) {
+				methodDecl.sym.returnType = typeSymbols.getVoidType();
 			} else {
-				ast.sym.returnType = typeSymbols.getType(ast.returnType);
+				methodDecl.sym.returnType = typeSymbols
+						.getType(methodDecl.returnType);
 			}
 
 			// create symbols for each parameter
 			Set<String> pnames = new HashSet<>();
-			for (int i = 0; i < ast.argumentNames.size(); i++) {
-				String argumentName = ast.argumentNames.get(i);
-				String argumentType = ast.argumentTypes.get(i);
+			for (int i = 0; i < methodDecl.argumentNames.size(); i++) {
+				String argumentName = methodDecl.argumentNames.get(i);
+				String argumentType = methodDecl.argumentTypes.get(i);
 				if (pnames.contains(argumentName))
 					throw new SemanticFailure(Cause.DOUBLE_DECLARATION,
 							"Method '%s' has two parameters named '%s'",
-							ast.sym, argumentName);
+							methodDecl.sym, argumentName);
 				pnames.add(argumentName);
 				VariableSymbol vs = new VariableSymbol(argumentName,
 						typeSymbols.getType(argumentType));
-				ast.sym.addParameter(vs);
+				methodDecl.sym.addParameter(vs);
 			}
 
 			// create symbols for the local variables
-			new MethodSymbolCreator(ast.sym).visitChildren(ast.decls(), null);
+			methodSymbolCreator.visitChildren(methodDecl.decls(),
+					methodDecl.sym);
 
 			return null;
 		}
 
 	}
 
-	private class MethodSymbolCreator extends AstVisitor<Void, Void> {
-
-		final MethodSymbol methodSym;
-
-		public MethodSymbolCreator(MethodSymbol methodSym) {
-			this.methodSym = methodSym;
-		}
+	private class MethodSymbolCreator extends AstVisitor<Void, MethodSymbol> {
 
 		@Override
-		public Void methodDecl(MethodDecl ast, Void arg) {
+		public Void methodDecl(MethodDecl methodDecl, MethodSymbol methodSymbol) {
 			throw new SemanticFailure(Cause.NESTED_METHODS_UNSUPPORTED,
 					"Nested methods are not supported.");
 		}
 
 		@Override
-		public Void varDecl(VarDecl ast, Void arg) {
-			ast.sym = new VariableSymbol(ast.name,
-					typeSymbols.getType(ast.type), Kind.LOCAL);
-			methodSym.addLocal(ast.sym);
+		public Void varDecl(VarDecl varDecl, MethodSymbol methodSymbol) {
+			varDecl.sym = new VariableSymbol(varDecl.name,
+					typeSymbols.getType(varDecl.type), Kind.LOCAL);
+			methodSymbol.addLocal(varDecl.sym);
 			return null;
 		}
 
