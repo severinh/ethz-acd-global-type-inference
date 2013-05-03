@@ -16,9 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import cd.CompilationContext;
 import cd.CompilerToolchain;
-import cd.Config;
 import cd.debug.AstDump;
-import cd.exceptions.AssemblyFailedException;
 import cd.exceptions.ParseFailure;
 import cd.exceptions.SemanticFailure;
 import cd.ir.ast.ClassDecl;
