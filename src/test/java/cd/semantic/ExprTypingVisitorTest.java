@@ -43,7 +43,6 @@ public class ExprTypingVisitorTest {
 	private ClassSymbol zClass;
 	private MethodSymbol xClassMethod;
 
-
 	private ExprTypingVisitor visitor;
 	private SymbolTable<VariableSymbol> scope;
 	private SymbolTable<VariableSymbol> methodScope;
@@ -65,10 +64,9 @@ public class ExprTypingVisitorTest {
 
 		xClass = new ClassSymbol("X", types.getObjectType());
 		zClass = new ClassSymbol("Z", types.getObjectType());
-		
+
 		xClassMethod = new MethodSymbol("m", xClass);
 		methodScope = xClassMethod.getScope();
-		
 
 		types.add(xClass);
 		types.add(zClass);
@@ -135,8 +133,9 @@ public class ExprTypingVisitorTest {
 		Assert.assertEquals(expectedType, actualType);
 		Assert.assertEquals(expectedType, expr.getType());
 	}
-	
-	private void assertTypeInScope(TypeSymbol expectedType, Expr expr, SymbolTable<VariableSymbol> currentScope) {
+
+	private void assertTypeInScope(TypeSymbol expectedType, Expr expr,
+			SymbolTable<VariableSymbol> currentScope) {
 		TypeSymbol actualType = typeWithScope(expr, currentScope);
 		Assert.assertEquals(expectedType, actualType);
 		Assert.assertEquals(expectedType, expr.getType());
@@ -292,11 +291,9 @@ public class ExprTypingVisitorTest {
 
 	@Test
 	public void testIndex() {
-		for (TypeSymbol elementType : types.allSymbols()) {
-			if (elementType instanceof ArrayTypeSymbol) {
-				continue;
-			}
-			arrayVariable.setType(types.getArrayTypeSymbol(elementType));
+		for (ArrayTypeSymbol arrayType : types.getArrayTypeSymbols()) {
+			TypeSymbol elementType = arrayType.elementType;
+			arrayVariable.setType(arrayType);
 
 			assertType(elementType, new Index(makeArrayVar(), makeIntVar()));
 			assertType(elementType, new Index(makeArrayVar(), makeBottomVar()));
@@ -312,29 +309,33 @@ public class ExprTypingVisitorTest {
 	public void testIncorrectIndexType() {
 		type(new Index(makeFloatVar(), makeFloatVar()));
 	}
-	
+
 	@Test
 	public void testThisRef() {
 		assertTypeInScope(xClass, new ThisRef(), methodScope);
 	}
-	
+
 	@Test(expected = SemanticFailure.class)
 	public void testInvalidMethodReceiver() {
-		type(new MethodCallExpr(makeZVar(), xClassMethod.name, Collections.<Expr>emptyList()));
+		type(new MethodCallExpr(makeZVar(), xClassMethod.name,
+				Collections.<Expr> emptyList()));
 	}
-	
+
 	@Test(expected = SemanticFailure.class)
 	public void testInvalidMethodArgumentsNumber() {
-		type(new MethodCallExpr(makeXVar(), xClassMethod.name, Arrays.asList(makeXVar(), makeZVar())));
+		type(new MethodCallExpr(makeXVar(), xClassMethod.name, Arrays.asList(
+				makeXVar(), makeZVar())));
 	}
-	
+
 	@Test(expected = SemanticFailure.class)
 	public void testInvalidMethodArgumentType() {
-		type(new MethodCallExpr(makeXVar(), xClassMethod.name, Arrays.asList(makeZVar())));
+		type(new MethodCallExpr(makeXVar(), xClassMethod.name,
+				Arrays.asList(makeZVar())));
 	}
-	
+
 	public void testMethodCall() {
-		assertIntType(new MethodCallExpr(makeXVar(), xClassMethod.name, Arrays.asList(makeXVar())));
+		assertIntType(new MethodCallExpr(makeXVar(), xClassMethod.name,
+				Arrays.asList(makeXVar())));
 	}
 
 	@Test
@@ -416,8 +417,9 @@ public class ExprTypingVisitorTest {
 	private TypeSymbol type(Expr expr) {
 		return visitor.type(expr, scope);
 	}
-	
-	private TypeSymbol typeWithScope(Expr expr, SymbolTable<VariableSymbol> currentScope) {
+
+	private TypeSymbol typeWithScope(Expr expr,
+			SymbolTable<VariableSymbol> currentScope) {
 		return visitor.type(expr, currentScope);
 	}
 

@@ -8,6 +8,7 @@ import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
+import cd.ir.symbols.NullTypeSymbol;
 import cd.ir.symbols.PrimitiveTypeSymbol;
 import cd.ir.symbols.TypeSymbol;
 
@@ -23,10 +24,14 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 
 	/**
 	 * Allow static access to the special type names from the parser.
+	 * 
+	 * The underscore prefix ensures that there will be no name clash with any
+	 * type in user programs. Also, underscores are safe to use in assembly
+	 * mnemonics, in contrast to "<" and ">".
 	 */
-	public static final String TOP_TYPE_NAME = "<top>";
-	public static final String NULL_TYPE_NAME = "<null>";
-	public static final String BOTTOM_TYPE_NAME = "<bottom>";
+	public static final String TOP_TYPE_NAME = "_top";
+	public static final String NULL_TYPE_NAME = "_null";
+	public static final String BOTTOM_TYPE_NAME = "_bottom";
 
 	/**
 	 * Symbols for the built-in primitive types.
@@ -40,7 +45,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	 * Symbols for the built-in Object and null types.
 	 */
 	private final ClassSymbol objectType;
-	private final ClassSymbol nullType;
+	private final NullTypeSymbol nullType;
 
 	/**
 	 * Symbol for the built-in top and bottom type.
@@ -56,7 +61,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		booleanType = new PrimitiveTypeSymbol("boolean");
 		voidType = new PrimitiveTypeSymbol("void");
 		objectType = new ClassSymbol("Object");
-		nullType = new ClassSymbol(NULL_TYPE_NAME);
+		nullType = new NullTypeSymbol(NULL_TYPE_NAME);
 		topType = new TypeSymbol(TOP_TYPE_NAME);
 		bottomType = new TypeSymbol(BOTTOM_TYPE_NAME);
 
@@ -65,12 +70,9 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		add(floatType);
 		add(voidType);
 		add(objectType);
-
-		// The following type symbols were not part of the symbol table so far
-		// TODO: Is it a problem to add them now?
-		// add(nullType);
-		// add(topType);
-		// add(bottomType);
+		add(nullType);
+		add(topType);
+		add(bottomType);
 	}
 
 	public PrimitiveTypeSymbol getIntType() {
@@ -93,7 +95,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		return objectType;
 	}
 
-	public ClassSymbol getNullType() {
+	public TypeSymbol getNullType() {
 		return nullType;
 	}
 
@@ -122,9 +124,11 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		super.add(typeSymbol);
 
 		// Automatically create a the corresponding array type for each type
-		// TODO: Overriding the method is a bit fragile, because it assumes that
-		// the 'add' method is the only way of adding a symbol to the symbol
-		// table.
+		// Overriding the method is a bit fragile, because it assumes that the
+		// 'add' method is the only way of adding a symbol to the symbol table.
+
+		// TODO: This also creates array type symbols for the bottom, top and
+		// null element types. This does not seem necessary.
 		super.add(new ArrayTypeSymbol(typeSymbol));
 	}
 
@@ -229,8 +233,8 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	 *       should be turned into a method of {@link TypeSymbol}.
 	 */
 	public boolean isSubType(TypeSymbol sup, TypeSymbol sub) {
-		if (sub == getNullType() && sup.isReferenceType()) {
-			return true;
+		if (sub == getNullType()) {
+			return (sup.isReferenceType() || sup == getTopType());
 		}
 		if (sub == getBottomType()) {
 			return true;
@@ -275,11 +279,6 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	 * Finds the symbol with the given name, or fails with a NO_SUCH_TYPE error.
 	 */
 	public TypeSymbol getType(String name) {
-		// TODO: Remove this once <bottom> is included in TypeSymbolTable
-		if (name.equals(getBottomType().name)) {
-			return getBottomType();
-		}
-
 		TypeSymbol res = get(name);
 		if (res == null) {
 			throw new SemanticFailure(Cause.NO_SUCH_TYPE,
