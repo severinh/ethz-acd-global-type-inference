@@ -13,6 +13,8 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cd.CompilerOptions.TypeErasureMode;
+import cd.CompilerOptions.TypeInferenceMode;
 import cd.cfg.CFGBuilder;
 import cd.cfg.DeSSA;
 import cd.cfg.Dominator;
@@ -30,6 +32,9 @@ import cd.parser.JavaliParser;
 import cd.parser.JavaliWalker;
 import cd.semantic.TypedSemanticAnalyzer;
 import cd.semantic.UntypedSemanticAnalyzer;
+import cd.semantic.ti.GlobalTypeEraser;
+import cd.semantic.ti.LocalTypeEraser;
+import cd.semantic.ti.LocalTypeInference;
 import cd.util.FileUtil;
 
 public class CompilerToolchain {
@@ -87,15 +92,18 @@ public class CompilerToolchain {
 		List<ClassDecl> astRoots = compilationContext.getAstRoots();
 		new UntypedSemanticAnalyzer(compilationContext).check(astRoots);
 
-		// Uncomment to erase the existing variable types before type inference
-		// TODO Should be made configurable
-		// GlobalTypeEraser.getInstance().eraseTypesFrom(context.typeSymbols);
-		
-//		LocalTypeEraser.getInstance().eraseTypesFrom(context.typeSymbols);
-//
-//		for (ClassDecl cd : astRoots)
-//			for (MethodDecl md : cd.methods())
-//				new LocalTypeInference(context.typeSymbols).inferTypes(md);
+		CompilerOptions options = compilationContext.getOptions();
+		if (options.getTypeErasure() == TypeErasureMode.LOCAL) {
+			LocalTypeEraser.getInstance().eraseTypesFrom(compilationContext.getTypeSymbols());
+		} else if (options.getTypeErasure() == TypeErasureMode.GLOBAL) {
+			GlobalTypeEraser.getInstance().eraseTypesFrom(compilationContext.getTypeSymbols());
+		}
+	
+		if (options.getTypeInference() == TypeInferenceMode.LOCAL) {
+			for (ClassDecl cd : astRoots)
+			for (MethodDecl md : cd.methods())
+				new LocalTypeInference(compilationContext.getTypeSymbols()).inferTypes(md);	
+		}
 
 		new TypedSemanticAnalyzer(compilationContext).check(astRoots);
 
