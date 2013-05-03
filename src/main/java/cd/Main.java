@@ -7,11 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The main entrypoint for the compiler. Consists of a series of routines which
- * must be invoked in order. The main() routine here invokes these routines, as
- * does the unit testing code. This is not the <b>best</b> programming practice,
- * as the series of calls to be invoked is duplicated in two places in the code,
- * but it will do for now.
+ * The main entrypoint of the compiler for standalone invocation (not in tests)
  */
 public class Main {
 
