@@ -21,6 +21,7 @@ import cd.cfg.SSA;
 import cd.codegen.CfgCodeGenerator;
 import cd.debug.AstDump;
 import cd.debug.CfgDump;
+import cd.exceptions.AssemblyFailedException;
 import cd.exceptions.ParseFailure;
 import cd.ir.ast.ClassDecl;
 import cd.ir.ast.MethodDecl;
@@ -29,6 +30,7 @@ import cd.parser.JavaliParser;
 import cd.parser.JavaliWalker;
 import cd.semantic.TypedSemanticAnalyzer;
 import cd.semantic.UntypedSemanticAnalyzer;
+import cd.util.FileUtil;
 
 public class CompilerToolchain {
 	public static final Logger LOG = LoggerFactory.getLogger(CompilerToolchain.class);
@@ -47,6 +49,7 @@ public class CompilerToolchain {
 		parse();
 		semanticCheck();
 		generateCode();
+		assembleExecutable();
 	}
 
 	public void parse()
@@ -134,5 +137,22 @@ public class CompilerToolchain {
 			CfgCodeGenerator cg = new CfgCodeGenerator(compilationContext, fout);
 			cg.go(compilationContext.astRoots);
 		}
+	}
+
+	public void assembleExecutable() throws IOException {
+		// At this point, we have generated a .s file and we have to compile
+		// it to a binary file. We need to call out to GCC or something
+		// to do this.
+		String asmOutput = FileUtil.runCommand(
+				Config.ASM_DIR,
+				Config.ASM,
+				new String[] { compilationContext.binaryFile.getAbsolutePath(),
+						compilationContext.assemblyFile.getAbsolutePath() }, null, false);
+
+		// To check if gcc succeeded, check if the binary file exists.
+		// We could use the return code instead, but this seems more
+		// portable to other compilers / make systems.
+		if (!compilationContext.binaryFile.exists())
+			throw new AssemblyFailedException(asmOutput);		
 	}
 }

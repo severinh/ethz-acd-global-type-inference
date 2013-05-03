@@ -249,21 +249,7 @@ abstract public class AbstractTestSamplePrograms {
 
 		// Run the code generator:
 		compiler.generateCode();
-
-		// At this point, we have generated a .s file and we have to compile
-		// it to a binary file. We need to call out to GCC or something
-		// to do this.
-		String asmOutput = FileUtil.runCommand(
-				Config.ASM_DIR,
-				Config.ASM,
-				new String[] { compilationContext.binaryFile.getAbsolutePath(),
-						compilationContext.assemblyFile.getAbsolutePath() }, null, false);
-
-		// To check if gcc succeeded, check if the binary file exists.
-		// We could use the return code instead, but this seems more
-		// portable to other compilers / make systems.
-		if (!compilationContext.binaryFile.exists())
-			throw new AssemblyFailedException(asmOutput);
+		compiler.assembleExecutable();
 
 		// Execute the binary file, providing input if relevant, and
 		// capturing the output. Check the error code so see if the
