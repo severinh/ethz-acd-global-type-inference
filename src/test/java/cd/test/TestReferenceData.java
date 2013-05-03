@@ -16,22 +16,18 @@ public class TestReferenceData {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(TestReferenceData.class);
 	
-	public File sourceFile;
-	public File semanticreffile;
-	public File execreffile;
-	public File cfgreffile;
-	public File optreffile;
-	protected File parserreffile;
+	private final File sourceFile;
+	private final File semanticreffile;
+	private final File execreffile;
+	private final File optreffile;
+	private final File parserreffile;
 
-	public TestReferenceData() {
-	}
 
 	public TestReferenceData(File file) {
 		this.sourceFile = file;
 		this.parserreffile = new File(file.getPath() + ".parser.ref");
 		this.semanticreffile = new File(file.getPath() + ".semantic.ref");
 		this.execreffile = new File(file.getPath() + ".exec.ref");
-		this.cfgreffile = new File(file.getPath() + ".cfg.dot.ref");
 		this.optreffile = new File(file.getPath() + ".opt.ref");	
 	}
 	
