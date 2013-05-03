@@ -22,6 +22,13 @@ import cd.ir.symbols.TypeSymbol;
 public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 
 	/**
+	 * Allow static access to the special type names from the parser.
+	 */
+	public static final String TOP_TYPE_NAME = "<top>";
+	public static final String NULL_TYPE_NAME = "<null>";
+	public static final String BOTTOM_TYPE_NAME = "<bottom>";
+
+	/**
 	 * Symbols for the built-in primitive types.
 	 */
 	private final PrimitiveTypeSymbol intType;
@@ -49,9 +56,9 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		booleanType = new PrimitiveTypeSymbol("boolean");
 		voidType = new PrimitiveTypeSymbol("void");
 		objectType = new ClassSymbol("Object");
-		nullType = new ClassSymbol("<null>");
-		topType = new TypeSymbol("<top>");
-		bottomType = new TypeSymbol("<bottom>");
+		nullType = new ClassSymbol(NULL_TYPE_NAME);
+		topType = new TypeSymbol(TOP_TYPE_NAME);
+		bottomType = new TypeSymbol(BOTTOM_TYPE_NAME);
 
 		add(intType);
 		add(booleanType);
