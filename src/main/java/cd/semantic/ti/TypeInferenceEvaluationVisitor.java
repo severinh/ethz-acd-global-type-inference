@@ -10,6 +10,7 @@ import cd.ir.ast.MethodDecl;
 import cd.ir.ast.VarDecl;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
+import cd.semantic.TypeSymbolTable;
 
 /**
  * Visits an AST and asserts that the declared type of fields, return values,
@@ -67,7 +68,10 @@ public class TypeInferenceEvaluationVisitor extends AstVisitor<Void, Void> {
 	}
 
 	private void assertInferredType(String expectedType, TypeSymbol inferredType) {
-		Assert.assertEquals(expectedType, inferredType.name);
+		// Ignore cases where the type is missing from the source program.
+		// There is nothing to compare the inferred type to.
+		if (!expectedType.equals(TypeSymbolTable.BOTTOM_TYPE_NAME)) {
+			Assert.assertEquals(expectedType, inferredType.name);
+		}
 	}
-
 }

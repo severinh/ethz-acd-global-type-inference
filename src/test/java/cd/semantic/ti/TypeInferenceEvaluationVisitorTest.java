@@ -50,7 +50,8 @@ public class TypeInferenceEvaluationVisitorTest {
 	@Test(expected = AssertionError.class)
 	public void testErasure() {
 		GlobalTypeEraser.getInstance().eraseTypesFrom(typeSymbols);
-		TypeInferenceEvaluationVisitor.getInstance().evaluate(classDecl);
+
+		evaluateTypeInference();
 	}
 
 	@Test
@@ -65,28 +66,28 @@ public class TypeInferenceEvaluationVisitorTest {
 		methodDecl.sym.getLocal(localVarDecl.name).setType(
 				typeSymbols.getFloatType());
 
-		TypeInferenceEvaluationVisitor.getInstance().evaluate(classDecl);
+		evaluateTypeInference();
 	}
 
 	@Test(expected = AssertionError.class)
 	public void testIncorrectReturnTypeInference() {
 		methodDecl.sym.returnType = typeSymbols.getIntType();
 
-		TypeInferenceEvaluationVisitor.getInstance().evaluate(classDecl);
+		evaluateTypeInference();
 	}
 
 	@Test(expected = AssertionError.class)
 	public void testIncorrectFieldTypeInference() {
 		fieldDecl.sym.setType(typeSymbols.getFloatType());
 
-		TypeInferenceEvaluationVisitor.getInstance().evaluate(classDecl);
+		evaluateTypeInference();
 	}
 
 	@Test(expected = AssertionError.class)
 	public void testIncorrectParameterTypeInference() {
 		methodDecl.sym.getParameter(0).setType(typeSymbols.getObjectType());
 
-		TypeInferenceEvaluationVisitor.getInstance().evaluate(classDecl);
+		evaluateTypeInference();
 	}
 
 	@Test(expected = AssertionError.class)
@@ -94,6 +95,20 @@ public class TypeInferenceEvaluationVisitorTest {
 		methodDecl.sym.getLocal(localVarDecl.name).setType(
 				typeSymbols.getBooleanType());
 
+		evaluateTypeInference();
+	}
+
+	@Test
+	public void testUnknownType() {
+		String unknownTypeName = TypeSymbolTable.BOTTOM_TYPE_NAME;
+		evaluateTypeInference(new VarDecl(unknownTypeName, "unknown"));
+	}
+
+	private void evaluateTypeInference() {
+		evaluateTypeInference(classDecl);
+	}
+
+	private void evaluateTypeInference(Ast ast) {
 		TypeInferenceEvaluationVisitor.getInstance().evaluate(classDecl);
 	}
 
