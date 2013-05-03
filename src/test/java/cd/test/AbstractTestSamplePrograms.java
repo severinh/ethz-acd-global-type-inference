@@ -2,8 +2,6 @@ package cd.test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
@@ -17,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cd.CompilationContext;
+import cd.CompilerToolchain;
 import cd.Config;
-import cd.Main;
 import cd.debug.AstDump;
 import cd.exceptions.AssemblyFailedException;
 import cd.exceptions.ParseFailure;
@@ -38,13 +36,14 @@ abstract public class AbstractTestSamplePrograms {
 	 */
 	private static final int VALGRIND_ERROR_CODE = 77;
 
-	protected CompilationContext compilation;
+	protected CompilerToolchain compiler;
+	protected CompilationContext compilationContext;
 
 	protected File infile;
 	protected File errfile;
 
 	protected TestReferenceData referenceData = new TestReferenceData();
-	protected Main main;
+	
 
 	public void assertEquals(String phase, String exp, String act) {
 		act = act.replace("\r\n", "\n"); // for windows machines
@@ -100,35 +99,33 @@ abstract public class AbstractTestSamplePrograms {
 			exc.printStackTrace();
 		}
 		Assert.assertEquals(
-				String.format("Phase %s for %s failed!", phase, compilation.sourceFile.getPath()),
+				String.format("Phase %s for %s failed!", phase, compilationContext.sourceFile.getPath()),
 				exp, act);
 	}
 
-	public static int counter = 0;
-
 	@Test
 	public void test() throws Throwable {
-		LOG.debug("Testing " + compilation.sourceFile);
+		LOG.debug("Testing " + compilationContext.sourceFile);
 
 		// ignore 64-bit-only tests when running 32-bit Java
-		if (new File(compilation.sourceFile.getAbsolutePath() + ".64bitonly").exists()
+		if (new File(compilationContext.sourceFile.getAbsolutePath() + ".64bitonly").exists()
 				&& Integer.valueOf(System.getProperty("sun.arch.data.model")) == 32) {
 			System.err.println("--> Ignoring test because it's 64-bit-only");
 		} else {
-			boolean hasWellDefinedOutput = !new File(compilation.sourceFile.getAbsolutePath()
+			boolean hasWellDefinedOutput = !new File(compilationContext.sourceFile.getAbsolutePath()
 					+ ".undefinedOutput").exists();
 
 			try {
 				// Load the input and reference results:
 				// Note: this may use the network if no .ref files exist.
 
-				compilation.deleteIntermediateFiles();
+				compilationContext.deleteIntermediateFiles();
 
 				// Parse the file and check that the generated AST is correct,
 				// or if the parser failed that the correct message was
 				// generated:
-				compilation.astRoots = testParser();
-				if (compilation.astRoots != null) {
+				compilationContext.astRoots = testParser();
+				if (compilationContext.astRoots != null) {
 					// Run the semantic check and check that errors
 					// are detected correctly, etc.
 					boolean passedSemanticAnalysis = testSemanticAnalyzer();
@@ -163,14 +160,10 @@ abstract public class AbstractTestSamplePrograms {
 		String parserRef = referenceData.findParserRef();
 		List<ClassDecl> astRoots = null;
 		String parserOut;
-		boolean parserDebug;
 
-		// parser's debug output is NOT relevant to this assignment.
-		// Change to TRUE if you'd like to see it for some reason.
-		parserDebug = false;
 		try {
-			astRoots = main.parse(compilation.sourceFile.getAbsolutePath(), new FileReader(
-					this.compilation.sourceFile), parserDebug);
+			compiler.parse();
+			astRoots = compilationContext.astRoots;
 			parserOut = AstDump.toString(astRoots);
 		} catch (ParseFailure pf) {
 			// Parse errors are ok too.
@@ -196,7 +189,7 @@ abstract public class AbstractTestSamplePrograms {
 		boolean passed;
 		String result;
 		try {
-			main.semanticCheck(compilation);
+			compiler.semanticCheck();
 			result = "OK";
 			passed = true;
 		} catch (SemanticFailure sf) {
@@ -217,7 +210,7 @@ abstract public class AbstractTestSamplePrograms {
 
 		// Invoke the interpreter. Don't bother to save the output: we already
 		// verified that in testCodeGenerator().
-		Interpreter interp = new Interpreter(compilation.astRoots,
+		Interpreter interp = new Interpreter(compilationContext.astRoots,
 				new StringReader(inFile), new StringWriter());
 
 		// Hacky: refactor this try/catch along with the one in ReferenceServer
@@ -248,9 +241,7 @@ abstract public class AbstractTestSamplePrograms {
 		String execRef = referenceData.findExecRef(inFile);
 
 		// Run the code generator:
-		try (FileWriter fw = new FileWriter(this.compilation.assemblyFile)) {
-			main.generateCode(compilation, fw);
-		}
+		compiler.generateCode();
 
 		// At this point, we have generated a .s file and we have to compile
 		// it to a binary file. We need to call out to GCC or something
@@ -258,20 +249,20 @@ abstract public class AbstractTestSamplePrograms {
 		String asmOutput = FileUtil.runCommand(
 				Config.ASM_DIR,
 				Config.ASM,
-				new String[] { compilation.binaryFile.getAbsolutePath(),
-						compilation.assemblyFile.getAbsolutePath() }, null, false);
+				new String[] { compilationContext.binaryFile.getAbsolutePath(),
+						compilationContext.assemblyFile.getAbsolutePath() }, null, false);
 
 		// To check if gcc succeeded, check if the binary file exists.
 		// We could use the return code instead, but this seems more
 		// portable to other compilers / make systems.
-		if (!compilation.binaryFile.exists())
+		if (!compilationContext.binaryFile.exists())
 			throw new AssemblyFailedException(asmOutput);
 
 		// Execute the binary file, providing input if relevant, and
 		// capturing the output. Check the error code so see if the
 		// code signaled dynamic errors.
 		String execOut = FileUtil.runCommand(new File("."),
-				new String[] { compilation.binaryFile.getAbsolutePath() }, new String[] {},
+				new String[] { compilationContext.binaryFile.getAbsolutePath() }, new String[] {},
 				inFile, true);
 
 		if (RUN_VALGRIND) {
@@ -279,7 +270,7 @@ abstract public class AbstractTestSamplePrograms {
 					new File("."),
 					new String[] { "valgrind",
 							"--error-exitcode=" + VALGRIND_ERROR_CODE,
-							compilation.binaryFile.getAbsolutePath() }, new String[] {},
+							compilationContext.binaryFile.getAbsolutePath() }, new String[] {},
 					inFile, true);
 			Assert.assertTrue(!valgrindOut.contains("Error: "
 					+ VALGRIND_ERROR_CODE));

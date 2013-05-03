@@ -1,6 +1,8 @@
 package cd.cfg;
 
-import cd.Main;
+import cd.ir.AstVisitor;
+import cd.ir.BasicBlock;
+import cd.ir.ControlFlowGraph;
 import cd.ir.ast.Ast;
 import cd.ir.ast.IfElse;
 import cd.ir.ast.MethodDecl;
@@ -8,14 +10,8 @@ import cd.ir.ast.ReturnStmt;
 import cd.ir.ast.Seq;
 import cd.ir.ast.Stmt;
 import cd.ir.ast.WhileLoop;
-import cd.ir.AstVisitor;
-import cd.ir.BasicBlock;
-import cd.ir.ControlFlowGraph;
 
 public class CFGBuilder {
-
-	public CFGBuilder(Main main) {
-	}
 
 	private ControlFlowGraph cfg;
 

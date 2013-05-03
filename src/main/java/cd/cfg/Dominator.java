@@ -8,7 +8,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cd.Main;
 import cd.ir.BasicBlock;
 import cd.ir.ControlFlowGraph;
 import cd.ir.ast.MethodDecl;
@@ -19,12 +18,6 @@ import cd.ir.ast.MethodDecl;
 public class Dominator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Dominator.class);
-
-	public final Main main;
-
-	public Dominator(Main main) {
-		this.main = main;
-	}
 
 	private List<BasicBlock> blocksInRevPostOrder;
 	private int[] postOrderIndex;

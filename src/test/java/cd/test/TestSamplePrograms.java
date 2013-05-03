@@ -15,7 +15,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import cd.CompilationContext;
-import cd.Main;
+import cd.CompilerToolchain;
 
 @RunWith(Parameterized.class)
 public class TestSamplePrograms extends AbstractTestSamplePrograms {
@@ -64,11 +64,12 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 	 *            The javali file to test.
 	 */
 	public TestSamplePrograms(String testName, File file) {
-		this.compilation = new CompilationContext(file);
+		this.compilationContext = new CompilationContext(file);
+		this.compiler = CompilerToolchain.forContext(this.compilationContext);
 		this.referenceData = new TestReferenceData(file);
 		this.infile = new File(file.getPath() + ".in");
 		this.errfile = new File(String.format("%s.err", file.getPath()));
-		this.main = new Main();
+
 	}
 
 }

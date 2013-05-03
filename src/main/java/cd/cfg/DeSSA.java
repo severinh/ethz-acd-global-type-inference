@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cd.Main;
+import cd.ir.BasicBlock;
+import cd.ir.ExprVisitor;
+import cd.ir.Phi;
 import cd.ir.ast.Assign;
 import cd.ir.ast.Ast;
 import cd.ir.ast.Expr;
@@ -13,17 +15,11 @@ import cd.ir.ast.MethodDecl;
 import cd.ir.ast.Var;
 import cd.ir.symbols.VariableSymbol;
 import cd.ir.symbols.VariableSymbol.Kind;
-import cd.ir.BasicBlock;
-import cd.ir.ExprVisitor;
-import cd.ir.Phi;
 import cd.util.DepthFirstSearchPreOrder;
 
 public class DeSSA {
 
 	private int maxTemp = 0;
-
-	public DeSSA(Main main) {
-	}
 
 	/**
 	 * Goes over the control flow graph and removes any phi nodes, converting
