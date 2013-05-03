@@ -14,9 +14,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import cd.CompilationContext;
-import cd.CompilerToolchain;
-
 @RunWith(Parameterized.class)
 public class TestSamplePrograms extends AbstractTestSamplePrograms {
 
@@ -60,16 +57,15 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 	}
 
 	/**
+	 * The constructor called by the parametric Junit test runner
+	 * @param testName
+	 * 			  Name of the test. Can be ignored, it is used to display 
+	 * 			  the name in Junit output/eclipse
 	 * @param file
 	 *            The javali file to test.
 	 */
 	public TestSamplePrograms(String testName, File file) {
-		this.compilationContext = new CompilationContext(file);
-		this.compiler = CompilerToolchain.forContext(this.compilationContext);
-		this.referenceData = new TestReferenceData(file);
-		this.infile = new File(file.getPath() + ".in");
-		this.errfile = new File(String.format("%s.err", file.getPath()));
-
+		super(file);
 	}
 
 }

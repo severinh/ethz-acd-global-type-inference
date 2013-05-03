@@ -36,14 +36,21 @@ abstract public class AbstractTestSamplePrograms {
 	 */
 	private static final int VALGRIND_ERROR_CODE = 77;
 
-	protected CompilerToolchain compiler;
-	protected CompilationContext compilationContext;
+	private final CompilerToolchain compiler;
+	private final CompilationContext compilationContext;
 
-	protected File infile;
-	protected File errfile;
-
-	protected TestReferenceData referenceData = new TestReferenceData();
+	private final File infile;
+	private final File errfile;
+	private final TestReferenceData referenceData;
 	
+
+	public AbstractTestSamplePrograms(File file) {
+		this.compilationContext = new CompilationContext(file);
+		this.compiler = CompilerToolchain.forContext(this.compilationContext);
+		this.referenceData = new TestReferenceData(file);
+		this.infile = new File(file.getPath() + ".in");
+		this.errfile = new File(String.format("%s.err", file.getPath()));
+	}
 
 	public void assertEquals(String phase, String exp, String act) {
 		act = act.replace("\r\n", "\n"); // for windows machines
@@ -283,7 +290,4 @@ abstract public class AbstractTestSamplePrograms {
 			assertEqualOutput("exec", execRef, execOut);
 		return false;
 	}
-
-
-
 }
