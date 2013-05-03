@@ -1,34 +1,25 @@
 package cd;
 
 public class CompilerOptions {
-	private final TypeErasureMode typeErasure;
-	private final TypeInferenceMode typeInference;
-	
+
+	private final TypeErasureMode typeErasureMode;
+	private final TypeInferenceMode typeInferenceMode;
+
 	public CompilerOptions() {
 		this(TypeErasureMode.NONE, TypeInferenceMode.NONE);
 	}
 
 	public CompilerOptions(TypeErasureMode erasure, TypeInferenceMode inference) {
-		this.typeErasure = erasure;
-		this.typeInference = inference;
-	}	
-	
-	public TypeErasureMode getTypeErasure() {
-		return typeErasure;
+		this.typeErasureMode = erasure;
+		this.typeInferenceMode = inference;
 	}
 
-	public TypeInferenceMode getTypeInference() {
-		return typeInference;
+	public TypeErasureMode getTypeErasureMode() {
+		return typeErasureMode;
 	}
-	
-	public static enum TypeErasureMode {
-		NONE,
-		LOCAL,
-		GLOBAL
+
+	public TypeInferenceMode getTypeInferenceMode() {
+		return typeInferenceMode;
 	}
-	
-	public static enum TypeInferenceMode {
-		NONE,
-		LOCAL
-	}
+
 }

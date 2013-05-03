@@ -6,10 +6,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-
+import cd.CompilationContext;
 import cd.ir.AstVisitor;
 import cd.ir.ast.Assign;
+import cd.ir.ast.ClassDecl;
 import cd.ir.ast.Expr;
 import cd.ir.ast.MethodDecl;
 import cd.ir.ast.Var;
@@ -20,21 +20,22 @@ import cd.semantic.ExprTypingVisitor;
 import cd.semantic.SymbolTable;
 import cd.semantic.TypeSymbolTable;
 
-public class LocalTypeInference {
+public class LocalTypeInference implements TypeInference {
 
-	private final TypeSymbolTable typeSymbols;
-	private final ExprTypingVisitor exprTypingVisitor;
-
-	public LocalTypeInference(TypeSymbolTable typeSymbols) {
-		super();
-
-		Assert.assertNotNull(typeSymbols);
-		this.typeSymbols = typeSymbols;
-		this.exprTypingVisitor = new ExprTypingVisitor(typeSymbols);
+	@Override
+	public void inferTypes(CompilationContext context) {
+		TypeSymbolTable typeSymbols = context.getTypeSymbols();
+		for (ClassDecl classDecl : context.getAstRoots()) {
+			for (MethodDecl methodDecl : classDecl.methods()) {
+				inferTypes(methodDecl, typeSymbols);
+			}
+		}
 	}
 
-	public void inferTypes(final MethodDecl mdecl) {
+	public void inferTypes(MethodDecl mdecl, TypeSymbolTable typeSymbols) {
 		final SymbolTable<VariableSymbol> scope = mdecl.sym.getScope();
+		final ExprTypingVisitor exprTypingVisitor = new ExprTypingVisitor(
+				typeSymbols);
 
 		// Run the expression typing visitor over the method once,
 		// such that type symbols are set to something non-null.
@@ -161,4 +162,5 @@ public class LocalTypeInference {
 		}
 
 	}
+
 }

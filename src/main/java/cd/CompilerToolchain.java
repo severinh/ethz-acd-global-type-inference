@@ -13,8 +13,6 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cd.CompilerOptions.TypeErasureMode;
-import cd.CompilerOptions.TypeInferenceMode;
 import cd.cfg.CFGBuilder;
 import cd.cfg.DeSSA;
 import cd.cfg.Dominator;
@@ -32,24 +30,24 @@ import cd.parser.JavaliParser;
 import cd.parser.JavaliWalker;
 import cd.semantic.TypedSemanticAnalyzer;
 import cd.semantic.UntypedSemanticAnalyzer;
-import cd.semantic.ti.GlobalTypeEraser;
-import cd.semantic.ti.LocalTypeEraser;
-import cd.semantic.ti.LocalTypeInference;
+import cd.semantic.ti.TypeEraser;
+import cd.semantic.ti.TypeInference;
 import cd.util.FileUtil;
 
 public class CompilerToolchain {
-	public static final Logger LOG = LoggerFactory.getLogger(CompilerToolchain.class);
-	
-	private final CompilationContext compilationContext;
-	
+	public static final Logger LOG = LoggerFactory
+			.getLogger(CompilerToolchain.class);
+
+	private final CompilationContext context;
+
 	protected CompilerToolchain(CompilationContext context) {
-		this.compilationContext = context;
+		this.context = context;
 	}
-	
+
 	public static CompilerToolchain forContext(CompilationContext context) {
 		return new CompilerToolchain(context);
 	}
-	
+
 	public void compile() throws IOException {
 		parse();
 		semanticCheck();
@@ -57,10 +55,9 @@ public class CompilerToolchain {
 		assembleExecutable();
 	}
 
-	public void parse()
-			throws IOException {
+	public void parse() throws IOException {
 		try {
-			try (FileReader fin = new FileReader(compilationContext.getSourceFile())) {
+			try (FileReader fin = new FileReader(context.getSourceFile())) {
 				ANTLRReaderStream input = new ANTLRReaderStream(fin);
 				JavaliLexer lexer = new JavaliLexer(input);
 				CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -79,7 +76,7 @@ public class CompilerToolchain {
 				List<ClassDecl> result = walker.unit();
 				LOG.debug(AstDump.toString(result));
 
-				compilationContext.setAstRoots(result);
+				context.setAstRoots(result);
 			}
 		} catch (RecognitionException e) {
 			ParseFailure pf = new ParseFailure(0, "?");
@@ -89,25 +86,22 @@ public class CompilerToolchain {
 	}
 
 	public void semanticCheck() {
-		List<ClassDecl> astRoots = compilationContext.getAstRoots();
-		new UntypedSemanticAnalyzer(compilationContext).check(astRoots);
+		List<ClassDecl> astRoots = context.getAstRoots();
+		new UntypedSemanticAnalyzer(context).check(astRoots);
 
-		CompilerOptions options = compilationContext.getOptions();
-		if (options.getTypeErasure() == TypeErasureMode.LOCAL) {
-			LocalTypeEraser.getInstance().eraseTypesFrom(compilationContext.getTypeSymbols());
-		} else if (options.getTypeErasure() == TypeErasureMode.GLOBAL) {
-			GlobalTypeEraser.getInstance().eraseTypesFrom(compilationContext.getTypeSymbols());
-		}
-	
-		if (options.getTypeInference() == TypeInferenceMode.LOCAL) {
-			for (ClassDecl cd : astRoots)
-			for (MethodDecl md : cd.methods())
-				new LocalTypeInference(compilationContext.getTypeSymbols()).inferTypes(md);	
-		}
+		CompilerOptions options = context.getOptions();
 
-		new TypedSemanticAnalyzer(compilationContext).check(astRoots);
+		TypeErasureMode typeEraserMode = options.getTypeErasureMode();
+		TypeEraser typeEraser = typeEraserMode.getTypeEraser();
+		typeEraser.eraseTypesFrom(context.getTypeSymbols());
 
-		File cfgDumpBase = compilationContext.getCfgDumpBase();
+		TypeInferenceMode typeInferenceMode = options.getTypeInferenceMode();
+		TypeInference typeInference = typeInferenceMode.getTypeInference();
+		typeInference.inferTypes(context);
+
+		new TypedSemanticAnalyzer(context).check(astRoots);
+
+		File cfgDumpBase = context.getCfgDumpBase();
 
 		// Build control flow graph
 		for (ClassDecl cd : astRoots)
@@ -124,13 +118,13 @@ public class CompilerToolchain {
 		// Introduce SSA form.
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())
-				new SSA(compilationContext).compute(md);
+				new SSA(context).compute(md);
 		CfgDump.toString(astRoots, ".ssa", cfgDumpBase, false);
 
 		// Optimize using SSA form.
 		for (ClassDecl cd : astRoots)
 			for (MethodDecl md : cd.methods())
-				new Optimizer(compilationContext).compute(md);
+				new Optimizer(context).compute(md);
 		CfgDump.toString(astRoots, ".opt", cfgDumpBase, false);
 
 		// Remove SSA form.
@@ -141,9 +135,9 @@ public class CompilerToolchain {
 	}
 
 	public void generateCode() throws IOException {
-		try (FileWriter fout = new FileWriter(compilationContext.getAssemblyFile());) {
-			CfgCodeGenerator cg = new CfgCodeGenerator(compilationContext, fout);
-			cg.go(compilationContext.getAstRoots());
+		try (FileWriter fout = new FileWriter(context.getAssemblyFile())) {
+			CfgCodeGenerator cg = new CfgCodeGenerator(context, fout);
+			cg.go(context.getAstRoots());
 		}
 	}
 
@@ -151,16 +145,15 @@ public class CompilerToolchain {
 		// At this point, we have generated a .s file and we have to compile
 		// it to a binary file. We need to call out to GCC or something
 		// to do this.
-		String asmOutput = FileUtil.runCommand(
-				Config.ASM_DIR,
-				Config.ASM,
-				new String[] { compilationContext.getBinaryFile().getAbsolutePath(),
-						compilationContext.getAssemblyFile().getAbsolutePath() }, null, false);
+		String binaryFilePath = context.getBinaryFile().getAbsolutePath();
+		String assemblyFilePath = context.getAssemblyFile().getAbsolutePath();
+		String asmOutput = FileUtil.runCommand(Config.ASM_DIR, Config.ASM,
+				new String[] { binaryFilePath, assemblyFilePath }, null, false);
 
 		// To check if gcc succeeded, check if the binary file exists.
 		// We could use the return code instead, but this seems more
 		// portable to other compilers / make systems.
-		if (!compilationContext.getBinaryFile().exists())
-			throw new AssemblyFailedException(asmOutput);		
+		if (!context.getBinaryFile().exists())
+			throw new AssemblyFailedException(asmOutput);
 	}
 }
