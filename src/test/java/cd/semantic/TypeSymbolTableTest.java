@@ -99,11 +99,6 @@ public class TypeSymbolTableTest {
 		assertLCA(objectType, A, E);
 		assertLCA(A, A, B);
 		assertLCA(B, C, D);
-
-		// TODO: Once the null type is actually part of the type symbol table,
-		// the following two assertions will be redundant
-		assertLCA(nullType, nullType, bottomType);
-		assertLCA(topType, nullType, topType);
 	}
 
 	private void assertLCA(TypeSymbol expectedLCA, TypeSymbol type,
