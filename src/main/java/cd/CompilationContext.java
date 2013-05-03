@@ -17,6 +17,8 @@ public class CompilationContext {
 	private final File binaryFile;
 	// Set to non-null to write dump of control flow graph
 	private final File cfgDumpBase;
+	
+	private final CompilerOptions options;
 
 	/** List of all type symbols, used by code generator. */
 	private TypeSymbolTable typeSymbols;
@@ -31,17 +33,23 @@ public class CompilationContext {
 	 * Constructor to be used for testing purposes
 	 */
 	public CompilationContext() {
-		sourceFile = null;
-		assemblyFile = null;
-		binaryFile = null;
-		cfgDumpBase = null;
+		this.sourceFile = null;
+		this.assemblyFile = null;
+		this.binaryFile = null;
+		this.cfgDumpBase = null;
+		this.options = new CompilerOptions();
+	}
+	
+	public CompilationContext(File file) {
+		this(file, new CompilerOptions());
 	}
 
-	public CompilationContext(File file) {
+	public CompilationContext(File file, CompilerOptions options) {
 		this.sourceFile = file;
 		this.assemblyFile = new File(file.getPath() + Config.ASMEXT);
 		this.binaryFile = new File(file.getPath() + Config.BINARYEXT);
-		this.cfgDumpBase = file;	
+		this.cfgDumpBase = file;
+		this.options = options;
 	}
 
 	public TypeSymbolTable getTypeSymbols() {
@@ -90,5 +98,9 @@ public class CompilationContext {
 
 	public void setAstRoots(List<ClassDecl> astRoots) {
 		this.astRoots = astRoots;
+	}
+
+	public CompilerOptions getOptions() {
+		return options;
 	}
 }

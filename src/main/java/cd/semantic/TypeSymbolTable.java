@@ -268,6 +268,12 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	 * Finds the symbol with the given name, or fails with a NO_SUCH_TYPE error.
 	 */
 	public TypeSymbol getType(String name) {
+		// TODO: Deal with missing types. The parser generates "?" for those.
+		// Remove this once <bottom> is included in TypeSymbolTable and replace "?" in the parser, too
+		if (name.equals("?")) {
+			return getBottomType();
+		}
+		
 		TypeSymbol res = get(name);
 		if (res == null) {
 			throw new SemanticFailure(Cause.NO_SUCH_TYPE,
