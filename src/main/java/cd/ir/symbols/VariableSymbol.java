@@ -58,9 +58,6 @@ public class VariableSymbol extends Symbol {
 	 * 
 	 * It must be modifiable in order to implement type inference. However, it
 	 * must not be modified anymore once type checking has taken place.
-	 * 
-	 * @todo Maybe prevent changes after type checking by "freezing" the
-	 *       variable symbol
 	 */
 	public void setType(TypeSymbol type) {
 		assert (type != null);
