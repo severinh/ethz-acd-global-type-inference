@@ -924,7 +924,6 @@ public class Interpreter {
 				final JlValue left = visit(ast.left(), arg);
 				final JlValue right = visit(ast.right(), arg);
 
-				// TODO Only increment this operator for integers
 				increment(ast.operator);
 				switch (ast.operator) {
 				case B_TIMES:
@@ -1053,10 +1052,8 @@ public class Interpreter {
 
 		@Override
 		public JlValue unaryOp(UnaryOp ast, StackFrame arg) {
-
 			JlValue val = visit(ast.arg(), arg);
 
-			// TODO Increment this only when is an int, we don't optimize floats
 			increment(ast.operator);
 
 			switch (ast.operator) {
