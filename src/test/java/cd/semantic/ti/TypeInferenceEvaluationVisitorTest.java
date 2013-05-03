@@ -39,7 +39,7 @@ public class TypeInferenceEvaluationVisitorTest {
 
 		CompilationContext context = new CompilationContext();
 		new UntypedSemanticAnalyzer(context).check(Arrays.asList(classDecl));
-		typeSymbols = context.typeSymbols;
+		typeSymbols = context.getTypeSymbols();
 	}
 
 	@Test

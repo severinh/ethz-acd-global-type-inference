@@ -12,30 +12,29 @@ import cd.semantic.TypeSymbolTable;
  * 
  */
 public class CompilationContext {
-	public File sourceFile;
-	public File assemblyFile;
-	public File binaryFile;
+	private final File sourceFile;
+	private final File assemblyFile;
+	private final File binaryFile;
 	// Set to non-null to write dump of control flow graph
-	public File cfgDumpBase;
+	private final File cfgDumpBase;
 
 	/** List of all type symbols, used by code generator. */
-	public TypeSymbolTable typeSymbols;
+	private TypeSymbolTable typeSymbols;
 	
 	/** Symbol for the Main type */
-	public ClassSymbol mainType;
+	private ClassSymbol mainType;
 	
-	public List<ClassDecl> astRoots;
+	private List<ClassDecl> astRoots;
 
 
-	public TypeSymbolTable getTypeSymbols() {
-		return typeSymbols;
-	}
-
-	public File getCfgDumpBase() {
-		return cfgDumpBase;
-	}
-
+	/**
+	 * Constructor to be used for testing purposes
+	 */
 	public CompilationContext() {
+		sourceFile = null;
+		assemblyFile = null;
+		binaryFile = null;
+		cfgDumpBase = null;
 	}
 
 	public CompilationContext(File file) {
@@ -45,11 +44,51 @@ public class CompilationContext {
 		this.cfgDumpBase = file;	
 	}
 
+	public TypeSymbolTable getTypeSymbols() {
+		return typeSymbols;
+	}
+
+	public File getCfgDumpBase() {
+		return cfgDumpBase;
+	}
+
+	public File getSourceFile() {
+		return sourceFile;
+	}
+
 	public void deleteIntermediateFiles() {
 		// Delete intermediate files from previous runs:
 		if (assemblyFile.exists())
 			assemblyFile.delete();
 		if (binaryFile.exists())
 			binaryFile.delete();		
+	}
+
+	public File getAssemblyFile() {
+		return assemblyFile;
+	}
+
+	public File getBinaryFile() {
+		return binaryFile;
+	}
+
+	public void setTypeSymbols(TypeSymbolTable typeSymbols) {
+		this.typeSymbols = typeSymbols;
+	}
+
+	public ClassSymbol getMainType() {
+		return mainType;
+	}
+
+	public void setMainType(ClassSymbol mainType) {
+		this.mainType = mainType;
+	}
+
+	public List<ClassDecl> getAstRoots() {
+		return astRoots;
+	}
+
+	public void setAstRoots(List<ClassDecl> astRoots) {
+		this.astRoots = astRoots;
 	}
 }

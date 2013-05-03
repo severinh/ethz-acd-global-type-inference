@@ -84,7 +84,7 @@ public class CfgCodeGenerator {
 			}
 
 			cg.emitLabel(exitLabel);
-			if (ast.sym.returnType.equals(context.typeSymbols.getVoidType())) {
+			if (ast.sym.returnType.equals(context.getTypeSymbols().getVoidType())) {
 				cg.emitMethodSuffix(true);
 			} else {
 				cg.emitMethodSuffix(true);

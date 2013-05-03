@@ -123,7 +123,7 @@ public class AstCodeGenerator {
 		}
 
 		// emit vtables
-		for (TypeSymbol ts : context.typeSymbols.allSymbols()) {
+		for (TypeSymbol ts : context.getTypeSymbols().allSymbols()) {
 			emitVtable(ts);
 		}
 
@@ -203,10 +203,10 @@ public class AstCodeGenerator {
 		// Generate AST for main() method:
 		// new Main().main()
 		NewObject newMain = new NewObject("Main");
-		newMain.setType(context.mainType);
+		newMain.setType(context.getMainType());
 		MethodCall callMain = new MethodCall(newMain, "main",
 				Collections.<Expr> emptyList());
-		callMain.sym = context.mainType.getMethod("main");
+		callMain.sym = context.getMainType().getMethod("main");
 
 		// Emit the main() method:
 		// new Main().main();
@@ -292,7 +292,7 @@ public class AstCodeGenerator {
 		} else if (ts instanceof ArrayTypeSymbol) {
 			ArrayTypeSymbol as = (ArrayTypeSymbol) ts;
 			emitLabel(vtable(as));
-			emitConstantData(vtable(context.typeSymbols.getObjectType()));
+			emitConstantData(vtable(context.getTypeSymbols().getObjectType()));
 		}
 	}
 
@@ -505,11 +505,11 @@ public class AstCodeGenerator {
 
 			public void binaryOp(BinaryOp ast, String leftReg, String rightReg) {
 
-				if (ast.getType() == context.typeSymbols.getObjectType()) {
+				if (ast.getType() == context.getTypeSymbols().getObjectType()) {
 					floatOp(leftReg, ast.operator, rightReg);
 				} else {
 
-					if (ast.left().getType() == context.typeSymbols
+					if (ast.left().getType() == context.getTypeSymbols()
 							.getFloatType()) {
 						floatCmp(leftReg, ast.operator, rightReg);
 					} else {
@@ -856,7 +856,7 @@ public class AstCodeGenerator {
 				break;
 
 			case U_MINUS: {
-				if (ast.getType() == context.typeSymbols.getFloatType()) {
+				if (ast.getType() == context.getTypeSymbols().getFloatType()) {
 					emitGprRegToFloatReg(FLOAT_REG_0, argReg);
 					push("%eax");
 					emit("movd", FLOAT_REG_0, "%eax");
@@ -949,7 +949,7 @@ public class AstCodeGenerator {
 
 			call("*" + reg, reg);
 
-			if (mthSymbol.returnType == context.typeSymbols.getVoidType()) {
+			if (mthSymbol.returnType == context.getTypeSymbols().getVoidType()) {
 				releaseRegister(reg);
 				return null;
 			}

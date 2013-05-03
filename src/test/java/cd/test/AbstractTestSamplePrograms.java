@@ -104,20 +104,20 @@ abstract public class AbstractTestSamplePrograms {
 			exc.printStackTrace();
 		}
 		Assert.assertEquals(
-				String.format("Phase %s for %s failed!", phase, compilationContext.sourceFile.getPath()),
+				String.format("Phase %s for %s failed!", phase, compilationContext.getSourceFile().getPath()),
 				exp, act);
 	}
 
 	@Test
 	public void test() throws Throwable {
-		LOG.debug("Testing " + compilationContext.sourceFile);
+		LOG.debug("Testing " + compilationContext.getSourceFile());
 
 		// ignore 64-bit-only tests when running 32-bit Java
-		if (new File(compilationContext.sourceFile.getAbsolutePath() + ".64bitonly").exists()
+		if (new File(compilationContext.getSourceFile().getAbsolutePath() + ".64bitonly").exists()
 				&& Integer.valueOf(System.getProperty("sun.arch.data.model")) == 32) {
 			System.err.println("--> Ignoring test because it's 64-bit-only");
 		} else {
-			boolean hasWellDefinedOutput = !new File(compilationContext.sourceFile.getAbsolutePath()
+			boolean hasWellDefinedOutput = !new File(compilationContext.getSourceFile().getAbsolutePath()
 					+ ".undefinedOutput").exists();
 
 			try {
@@ -129,8 +129,8 @@ abstract public class AbstractTestSamplePrograms {
 				// Parse the file and check that the generated AST is correct,
 				// or if the parser failed that the correct message was
 				// generated:
-				compilationContext.astRoots = testParser();
-				if (compilationContext.astRoots != null) {
+				compilationContext.setAstRoots(testParser());
+				if (compilationContext.getAstRoots() != null) {
 					// Run the semantic check and check that errors
 					// are detected correctly, etc.
 					boolean passedSemanticAnalysis = testSemanticAnalyzer();
@@ -168,7 +168,7 @@ abstract public class AbstractTestSamplePrograms {
 
 		try {
 			compiler.parse();
-			astRoots = compilationContext.astRoots;
+			astRoots = compilationContext.getAstRoots();
 			parserOut = AstDump.toString(astRoots);
 		} catch (ParseFailure pf) {
 			// Parse errors are ok too.
@@ -215,7 +215,7 @@ abstract public class AbstractTestSamplePrograms {
 
 		// Invoke the interpreter. Don't bother to save the output: we already
 		// verified that in testCodeGenerator().
-		Interpreter interp = new Interpreter(compilationContext.astRoots,
+		Interpreter interp = new Interpreter(compilationContext.getAstRoots(),
 				new StringReader(inFile), new StringWriter());
 
 		// Hacky: refactor this try/catch along with the one in ReferenceServer
@@ -253,7 +253,7 @@ abstract public class AbstractTestSamplePrograms {
 		// capturing the output. Check the error code so see if the
 		// code signaled dynamic errors.
 		String execOut = FileUtil.runCommand(new File("."),
-				new String[] { compilationContext.binaryFile.getAbsolutePath() }, new String[] {},
+				new String[] { compilationContext.getBinaryFile().getAbsolutePath() }, new String[] {},
 				inFile, true);
 
 		if (RUN_VALGRIND) {
@@ -261,7 +261,7 @@ abstract public class AbstractTestSamplePrograms {
 					new File("."),
 					new String[] { "valgrind",
 							"--error-exitcode=" + VALGRIND_ERROR_CODE,
-							compilationContext.binaryFile.getAbsolutePath() }, new String[] {},
+							compilationContext.getBinaryFile().getAbsolutePath() }, new String[] {},
 					inFile, true);
 			Assert.assertTrue(!valgrindOut.contains("Error: "
 					+ VALGRIND_ERROR_CODE));

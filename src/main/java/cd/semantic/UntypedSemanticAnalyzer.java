@@ -33,7 +33,7 @@ public class UntypedSemanticAnalyzer {
 	}
 
 	public void check(List<ClassDecl> classDecls) throws SemanticFailure {
-		context.typeSymbols = createSymbols(classDecls);
+		context.setTypeSymbols(createSymbols(classDecls));
 		checkUntypedInheritance(classDecls);
 	}
 

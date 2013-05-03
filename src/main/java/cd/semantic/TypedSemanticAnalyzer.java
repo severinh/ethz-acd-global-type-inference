@@ -32,8 +32,8 @@ public class TypedSemanticAnalyzer {
 
 	public void check(List<ClassDecl> classDecls) throws SemanticFailure {
 		checkInheritance(classDecls);
-		checkStartPoint(context.typeSymbols);
-		checkMethodBodies(context.typeSymbols, classDecls);
+		checkStartPoint(context.getTypeSymbols());
+		checkMethodBodies(context.getTypeSymbols(), classDecls);
 		rewriteMethodBodies(classDecls);
 	}
 
@@ -60,9 +60,9 @@ public class TypedSemanticAnalyzer {
 			MethodSymbol mainMethod = cs.getMethod("main");
 			if (mainMethod != null
 					&& mainMethod.getParameters().isEmpty()
-					&& mainMethod.returnType == context.typeSymbols
+					&& mainMethod.returnType == context.getTypeSymbols()
 							.getVoidType()) {
-				context.mainType = cs;
+				context.setMainType(cs);
 				return; // found the main() method!
 			}
 		}

@@ -55,7 +55,7 @@ public class CompilerToolchain {
 	public void parse()
 			throws IOException {
 		try {
-			try (FileReader fin = new FileReader(compilationContext.sourceFile)) {
+			try (FileReader fin = new FileReader(compilationContext.getSourceFile())) {
 				ANTLRReaderStream input = new ANTLRReaderStream(fin);
 				JavaliLexer lexer = new JavaliLexer(input);
 				CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -74,7 +74,7 @@ public class CompilerToolchain {
 				List<ClassDecl> result = walker.unit();
 				LOG.debug(AstDump.toString(result));
 
-				compilationContext.astRoots = result;
+				compilationContext.setAstRoots(result);
 			}
 		} catch (RecognitionException e) {
 			ParseFailure pf = new ParseFailure(0, "?");
@@ -84,7 +84,7 @@ public class CompilerToolchain {
 	}
 
 	public void semanticCheck() {
-		List<ClassDecl> astRoots = compilationContext.astRoots;
+		List<ClassDecl> astRoots = compilationContext.getAstRoots();
 		new UntypedSemanticAnalyzer(compilationContext).check(astRoots);
 
 		// Uncomment to erase the existing variable types before type inference
@@ -99,7 +99,7 @@ public class CompilerToolchain {
 
 		new TypedSemanticAnalyzer(compilationContext).check(astRoots);
 
-		File cfgDumpBase = compilationContext.cfgDumpBase;
+		File cfgDumpBase = compilationContext.getCfgDumpBase();
 
 		// Build control flow graph
 		for (ClassDecl cd : astRoots)
@@ -133,9 +133,9 @@ public class CompilerToolchain {
 	}
 
 	public void generateCode() throws IOException {
-		try (FileWriter fout = new FileWriter(compilationContext.assemblyFile);) {
+		try (FileWriter fout = new FileWriter(compilationContext.getAssemblyFile());) {
 			CfgCodeGenerator cg = new CfgCodeGenerator(compilationContext, fout);
-			cg.go(compilationContext.astRoots);
+			cg.go(compilationContext.getAstRoots());
 		}
 	}
 
@@ -146,13 +146,13 @@ public class CompilerToolchain {
 		String asmOutput = FileUtil.runCommand(
 				Config.ASM_DIR,
 				Config.ASM,
-				new String[] { compilationContext.binaryFile.getAbsolutePath(),
-						compilationContext.assemblyFile.getAbsolutePath() }, null, false);
+				new String[] { compilationContext.getBinaryFile().getAbsolutePath(),
+						compilationContext.getAssemblyFile().getAbsolutePath() }, null, false);
 
 		// To check if gcc succeeded, check if the binary file exists.
 		// We could use the return code instead, but this seems more
 		// portable to other compilers / make systems.
-		if (!compilationContext.binaryFile.exists())
+		if (!compilationContext.getBinaryFile().exists())
 			throw new AssemblyFailedException(asmOutput);		
 	}
 }

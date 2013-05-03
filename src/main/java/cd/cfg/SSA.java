@@ -32,7 +32,7 @@ public class SSA {
 
 	public SSA(CompilationContext context) {
 		this.uninitSym = new VariableSymbol("__UNINIT__",
-				context.typeSymbols.getNullType());
+				context.getTypeSymbols().getNullType());
 	}
 
 	private MethodSymbol msym;
