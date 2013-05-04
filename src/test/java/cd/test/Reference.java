@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 public interface Reference extends Remote {
 
 	public static final String PARSE_FAILURE = "ParseFailure";
-	public static final String SEMANTIC_PASSED = "OK\n";
+	public static final String SEMANTIC_PASSED = "OK";
 
 	public String parserReference(String fileText) throws RemoteException;
 

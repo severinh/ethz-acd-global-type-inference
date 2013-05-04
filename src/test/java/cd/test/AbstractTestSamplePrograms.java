@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -12,9 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import cd.CompilationContext;
 import cd.CompilerToolchain;
-import cd.debug.AstDump;
 import cd.exceptions.ParseFailure;
 import cd.exceptions.SemanticFailure;
+import cd.exceptions.SemanticFailure.Cause;
 import cd.util.FileUtil;
 
 abstract public class AbstractTestSamplePrograms {
@@ -23,22 +25,22 @@ abstract public class AbstractTestSamplePrograms {
 			.getLogger(AbstractTestSamplePrograms.class);
 
 	private static final boolean RUN_VALGRIND = false;
-	/**
-	 * We let valgrind return a special exit code if it detect a problem.
-	 * Otherwise valgrind returns the exit code of the simulated program.
-	 */
+
+	// We let valgrind return a special exit code if it detect a problem.
+	// Otherwise valgrind returns the exit code of the simulated program.
 	private static final int VALGRIND_ERROR_CODE = 77;
 
 	private final CompilerToolchain compiler;
-	private final CompilationContext compilationContext;
+	private final CompilationContext context;
 
 	private final File infile;
-	private final TestReferenceData referenceData;
+	private final ParsedReferenceData referenceData;
 
 	public AbstractTestSamplePrograms(File file) {
-		this.compilationContext = new CompilationContext(file);
-		this.compiler = CompilerToolchain.forContext(this.compilationContext);
-		this.referenceData = new TestReferenceData(file);
+		this.context = new CompilationContext(file);
+		this.compiler = CompilerToolchain.forContext(this.context);
+		this.referenceData = new ParsedReferenceData(new CachedReferenceData(
+				new RemoteReferenceData(file)));
 		this.infile = new File(file.getPath() + ".in");
 	}
 
@@ -83,91 +85,55 @@ abstract public class AbstractTestSamplePrograms {
 
 	private void warnAboutDiff(String phase, String exp, String act) {
 		Assert.assertEquals(String.format("Phase %s for %s failed!", phase,
-				compilationContext.getSourceFile().getPath()), exp, act);
+				context.getSourceFile().getPath()), exp, act);
 	}
 
 	@Test
 	public void test() throws Throwable {
-		LOG.debug("Testing " + compilationContext.getSourceFile());
+		LOG.debug("Testing " + context.getSourceFile());
 
-		boolean hasWellDefinedOutput = !new File(compilationContext
-				.getSourceFile().getAbsolutePath() + ".undefinedOutput")
-				.exists();
+		context.deleteIntermediateFiles();
 
-		compilationContext.deleteIntermediateFiles();
+		boolean isParserFailureRef = referenceData.isParserFailure();
+		boolean isParserFailure = false;
+		Cause semanticFailureCauseRef = null;
+		Cause semanticFailureCause = null;
 
-		// Load the input and reference results:
-		// Note: this may use the network if no .ref files exist.
-		testParser();
+		try {
+			compiler.compile();
+		} catch (ParseFailure parseFailure) {
+			LOG.debug(ExceptionUtils.getStackTrace(parseFailure));
+			isParserFailure = true;
+		} catch (SemanticFailure semanticFailure) {
+			LOG.debug(ExceptionUtils.getStackTrace(semanticFailure));
+			semanticFailureCause = semanticFailure.cause;
+		}
 
-		// Parse the file and check that the generated AST is correct,
-		// or if the parser failed that the correct message was
-		// generated:
-		if (compilationContext.getAstRoots() != null) {
-			// Run the semantic check and check that errors
-			// are detected correctly, etc.
-			boolean passedSemanticAnalysis = testSemanticAnalyzer();
-			if (passedSemanticAnalysis) {
-				boolean passedCodeGen = testCodeGenerator(hasWellDefinedOutput);
+		if (!isParserFailureRef && !isParserFailure) {
+			// Only run the remaining tests if parsing was successful
+			semanticFailureCauseRef = referenceData.getSemanticFailureCause();
+			Assert.assertEquals(semanticFailureCauseRef, semanticFailureCause);
 
-				if (passedCodeGen)
-					testOptimizer();
+			if (semanticFailureCause == null) {
+				// Only run the remaining tests if the semantic check was
+				// successful
+				testCodeGenerator();
+				testOptimizer();
 			}
+		} else {
+			Assert.assertEquals(isParserFailureRef, isParserFailure);
 		}
-	}
-
-	/** Run the parser and compare the output against the reference results */
-	public void testParser() throws Exception {
-		String parserRef = referenceData.findParserRef();
-		String parserOut;
-
-		try {
-			compiler.parse();
-			parserOut = AstDump.toString(compilationContext.getAstRoots());
-		} catch (ParseFailure pf) {
-			// Parse errors are ok too.
-			LOG.debug("");
-			LOG.debug("");
-			LOG.debug("{}", pf.toString());
-			parserOut = Reference.PARSE_FAILURE;
-		}
-
-		// Now that the 2nd assignment is over, we don't
-		// do a detailed comparison of the AST, just check
-		// whether the parse succeeded or failed.
-		if (parserOut.equals(Reference.PARSE_FAILURE)
-				|| parserRef.equals(Reference.PARSE_FAILURE))
-			assertEquals("parser", parserRef, parserOut);
-	}
-
-	public boolean testSemanticAnalyzer() throws IOException {
-		String semanticRef = referenceData.findSemanticRef();
-
-		boolean passed;
-		String result;
-		try {
-			compiler.semanticCheck();
-			result = "OK";
-			passed = true;
-		} catch (SemanticFailure sf) {
-			result = sf.cause.name();
-			LOG.debug("Error message: {}", sf.getLocalizedMessage());
-			passed = false;
-		}
-
-		assertEquals("semantic", semanticRef, result);
-		return passed;
 	}
 
 	private void testOptimizer() throws IOException {
 		// Determine the input and expected operation counts.
 		String inFile = (infile.exists() ? FileUtils.readFileToString(infile)
 				: "");
-		String optRef = referenceData.findOptimizerRef(inFile);
+		String optRef = referenceData.getOptimizationReference(inFile);
 
 		// Invoke the interpreter. Don't bother to save the output: we already
 		// verified that in testCodeGenerator().
-		Interpreter interp = new Interpreter(compilationContext.getAstRoots(),
+		Interpreter interp = new Interpreter(context.getAstRoots(),
 				new StringReader(inFile), new StringWriter());
 
 		// Hacky: refactor this try/catch along with the one in ReferenceServer
@@ -191,41 +157,33 @@ abstract public class AbstractTestSamplePrograms {
 	 * Run the code generator, assemble the resulting .s file, and (if the
 	 * output is well-defined) compare against the expected output.
 	 */
-	public boolean testCodeGenerator(boolean hasWellDefinedOutput)
-			throws IOException {
-		// Determine the input and expected output.
-		String inFile = (infile.exists() ? FileUtils.readFileToString(infile)
-				: "");
-		String execRef = referenceData.findExecRef(inFile);
+	public boolean testCodeGenerator() throws IOException {
+		// Determine the input and expected output
+		String inFile = "";
+		if (infile.exists()) {
+			FileUtils.readFileToString(infile);
+		}
 
-		// Run the code generator:
-		compiler.generateCode();
-		compiler.assembleExecutable();
+		String binaryFilePath = context.getBinaryFile().getAbsolutePath();
+		String execRef = referenceData.getExecutionReference(inFile);
 
 		// Execute the binary file, providing input if relevant, and
 		// capturing the output. Check the error code so see if the
 		// code signaled dynamic errors.
 		String execOut = FileUtil.runCommand(new File("."),
-				new String[] { compilationContext.getBinaryFile()
-						.getAbsolutePath() }, new String[] {}, inFile, true);
+				new String[] { binaryFilePath }, new String[] {}, inFile, true);
 
 		if (RUN_VALGRIND) {
+			String[] valgrindCommand = new String[] { "valgrind",
+					"--error-exitcode=" + VALGRIND_ERROR_CODE, binaryFilePath };
 			String valgrindOut = FileUtil.runCommand(new File("."),
-					new String[] {
-							"valgrind",
-							"--error-exitcode=" + VALGRIND_ERROR_CODE,
-							compilationContext.getBinaryFile()
-									.getAbsolutePath() }, new String[] {},
-					inFile, true);
-			Assert.assertTrue(!valgrindOut.contains("Error: "
+					valgrindCommand, new String[] {}, inFile, true);
+			Assert.assertFalse(valgrindOut.contains("Error: "
 					+ VALGRIND_ERROR_CODE));
 		}
 
 		// Compute the output to what we expected to see.
-		if (execRef.equals(execOut))
-			return true;
-		if (hasWellDefinedOutput)
-			assertEqualOutput("exec", execRef, execOut);
-		return false;
+		return execRef.equals(execOut);
 	}
+
 }
