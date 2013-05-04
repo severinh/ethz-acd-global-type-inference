@@ -255,7 +255,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	}
 
 	/**
-	 * Returns the least common ancestor type of two types.
+	 * Returns the lowest common ancestor type of two types.
 	 * 
 	 * @todo The implementation is currently not very efficient and may even be
 	 *       incorrect
