@@ -1,13 +1,9 @@
 package cd.test;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.List;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,7 +15,6 @@ import cd.CompilerToolchain;
 import cd.debug.AstDump;
 import cd.exceptions.ParseFailure;
 import cd.exceptions.SemanticFailure;
-import cd.ir.ast.ClassDecl;
 import cd.util.FileUtil;
 
 abstract public class AbstractTestSamplePrograms {
@@ -38,15 +33,13 @@ abstract public class AbstractTestSamplePrograms {
 	private final CompilationContext compilationContext;
 
 	private final File infile;
-	private final File errfile;
 	private final TestReferenceData referenceData;
-	
+
 	public AbstractTestSamplePrograms(File file) {
 		this.compilationContext = new CompilationContext(file);
 		this.compiler = CompilerToolchain.forContext(this.compilationContext);
 		this.referenceData = new TestReferenceData(file);
 		this.infile = new File(file.getPath() + ".in");
-		this.errfile = new File(String.format("%s.err", file.getPath()));
 	}
 
 	public void assertEquals(String phase, String exp, String act) {
@@ -89,74 +82,37 @@ abstract public class AbstractTestSamplePrograms {
 	}
 
 	private void warnAboutDiff(String phase, String exp, String act) {
-		try (PrintStream err = new PrintStream(errfile)) {
-			err.println(String.format(
-					"Phase %s failed because we expected to see:", phase));
-			err.println(exp);
-			err.println("But we actually saw:");
-			err.println(act);
-			err.println("The difference is:");
-			err.println(Diff.computeDiff(exp, act));
-		} catch (FileNotFoundException exc) {
-			System.err.println("Unable to write debug output to " + errfile
-					+ ":");
-			exc.printStackTrace();
-		}
-		Assert.assertEquals(
-				String.format("Phase %s for %s failed!", phase, compilationContext.getSourceFile().getPath()),
-				exp, act);
+		Assert.assertEquals(String.format("Phase %s for %s failed!", phase,
+				compilationContext.getSourceFile().getPath()), exp, act);
 	}
 
 	@Test
 	public void test() throws Throwable {
 		LOG.debug("Testing " + compilationContext.getSourceFile());
 
-		// ignore 64-bit-only tests when running 32-bit Java
-		if (new File(compilationContext.getSourceFile().getAbsolutePath() + ".64bitonly").exists()
-				&& Integer.valueOf(System.getProperty("sun.arch.data.model")) == 32) {
-			System.err.println("--> Ignoring test because it's 64-bit-only");
-		} else {
-			boolean hasWellDefinedOutput = !new File(compilationContext.getSourceFile().getAbsolutePath()
-					+ ".undefinedOutput").exists();
+		boolean hasWellDefinedOutput = !new File(compilationContext
+				.getSourceFile().getAbsolutePath() + ".undefinedOutput")
+				.exists();
 
-			try {
-				compilationContext.deleteIntermediateFiles();
+		compilationContext.deleteIntermediateFiles();
 
-				// Load the input and reference results:
-				// Note: this may use the network if no .ref files exist.
-				
-				testParser();
-				
-				// Parse the file and check that the generated AST is correct,
-				// or if the parser failed that the correct message was
-				// generated:
-				if (compilationContext.getAstRoots() != null) {
-					// Run the semantic check and check that errors
-					// are detected correctly, etc.
-					boolean passedSemanticAnalysis = testSemanticAnalyzer();
-					if (passedSemanticAnalysis) {
-						boolean passedCodeGen = testCodeGenerator(hasWellDefinedOutput);
+		// Load the input and reference results:
+		// Note: this may use the network if no .ref files exist.
+		testParser();
 
-						if (passedCodeGen)
-							testOptimizer();
-					}
-				}
-			} catch (org.junit.ComparisonFailure cf) {
-				throw cf;
-			} catch (Throwable e) {
-				try (PrintStream err = new PrintStream(errfile)) {
-					err.println("Test failed because an exception was thrown:");
-					err.println("    " + e.getLocalizedMessage());
-					err.println("Stack trace:");
-					e.printStackTrace(err);
-				}
-				throw e;
+		// Parse the file and check that the generated AST is correct,
+		// or if the parser failed that the correct message was
+		// generated:
+		if (compilationContext.getAstRoots() != null) {
+			// Run the semantic check and check that errors
+			// are detected correctly, etc.
+			boolean passedSemanticAnalysis = testSemanticAnalyzer();
+			if (passedSemanticAnalysis) {
+				boolean passedCodeGen = testCodeGenerator(hasWellDefinedOutput);
+
+				if (passedCodeGen)
+					testOptimizer();
 			}
-
-			// if we get here, then the test passed, so delete the errfile:
-			// (which has been accumulating debug output etc)
-			if (errfile.exists())
-				errfile.delete();
 		}
 	}
 
@@ -184,8 +140,7 @@ abstract public class AbstractTestSamplePrograms {
 			assertEquals("parser", parserRef, parserOut);
 	}
 
-	public boolean testSemanticAnalyzer()
-			throws IOException {
+	public boolean testSemanticAnalyzer() throws IOException {
 		String semanticRef = referenceData.findSemanticRef();
 
 		boolean passed;
@@ -236,7 +191,8 @@ abstract public class AbstractTestSamplePrograms {
 	 * Run the code generator, assemble the resulting .s file, and (if the
 	 * output is well-defined) compare against the expected output.
 	 */
-	public boolean testCodeGenerator(boolean hasWellDefinedOutput) throws IOException {
+	public boolean testCodeGenerator(boolean hasWellDefinedOutput)
+			throws IOException {
 		// Determine the input and expected output.
 		String inFile = (infile.exists() ? FileUtils.readFileToString(infile)
 				: "");
@@ -250,15 +206,16 @@ abstract public class AbstractTestSamplePrograms {
 		// capturing the output. Check the error code so see if the
 		// code signaled dynamic errors.
 		String execOut = FileUtil.runCommand(new File("."),
-				new String[] { compilationContext.getBinaryFile().getAbsolutePath() }, new String[] {},
-				inFile, true);
+				new String[] { compilationContext.getBinaryFile()
+						.getAbsolutePath() }, new String[] {}, inFile, true);
 
 		if (RUN_VALGRIND) {
-			String valgrindOut = FileUtil.runCommand(
-					new File("."),
-					new String[] { "valgrind",
+			String valgrindOut = FileUtil.runCommand(new File("."),
+					new String[] {
+							"valgrind",
 							"--error-exitcode=" + VALGRIND_ERROR_CODE,
-							compilationContext.getBinaryFile().getAbsolutePath() }, new String[] {},
+							compilationContext.getBinaryFile()
+									.getAbsolutePath() }, new String[] {},
 					inFile, true);
 			Assert.assertTrue(!valgrindOut.contains("Error: "
 					+ VALGRIND_ERROR_CODE));

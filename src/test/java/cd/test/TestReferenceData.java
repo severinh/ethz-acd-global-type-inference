@@ -22,7 +22,6 @@ public class TestReferenceData {
 	private final File optreffile;
 	private final File parserreffile;
 
-
 	public TestReferenceData(File file) {
 		this.sourceFile = file;
 		this.parserreffile = new File(file.getPath() + ".parser.ref");
