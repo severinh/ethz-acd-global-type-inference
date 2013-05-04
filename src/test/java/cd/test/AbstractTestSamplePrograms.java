@@ -41,7 +41,6 @@ abstract public class AbstractTestSamplePrograms {
 	private final File errfile;
 	private final TestReferenceData referenceData;
 	
-
 	public AbstractTestSamplePrograms(File file) {
 		this.compilationContext = new CompilationContext(file);
 		this.compiler = CompilerToolchain.forContext(this.compilationContext);
@@ -121,15 +120,16 @@ abstract public class AbstractTestSamplePrograms {
 					+ ".undefinedOutput").exists();
 
 			try {
-				// Load the input and reference results:
-				// Note: this may use the network if no .ref files exist.
-
 				compilationContext.deleteIntermediateFiles();
 
+				// Load the input and reference results:
+				// Note: this may use the network if no .ref files exist.
+				
+				testParser();
+				
 				// Parse the file and check that the generated AST is correct,
 				// or if the parser failed that the correct message was
 				// generated:
-				compilationContext.setAstRoots(testParser());
 				if (compilationContext.getAstRoots() != null) {
 					// Run the semantic check and check that errors
 					// are detected correctly, etc.
@@ -161,15 +161,13 @@ abstract public class AbstractTestSamplePrograms {
 	}
 
 	/** Run the parser and compare the output against the reference results */
-	public List<ClassDecl> testParser() throws Exception {
+	public void testParser() throws Exception {
 		String parserRef = referenceData.findParserRef();
-		List<ClassDecl> astRoots = null;
 		String parserOut;
 
 		try {
 			compiler.parse();
-			astRoots = compilationContext.getAstRoots();
-			parserOut = AstDump.toString(astRoots);
+			parserOut = AstDump.toString(compilationContext.getAstRoots());
 		} catch (ParseFailure pf) {
 			// Parse errors are ok too.
 			LOG.debug("");
@@ -184,7 +182,6 @@ abstract public class AbstractTestSamplePrograms {
 		if (parserOut.equals(Reference.PARSE_FAILURE)
 				|| parserRef.equals(Reference.PARSE_FAILURE))
 			assertEquals("parser", parserRef, parserOut);
-		return astRoots;
 	}
 
 	public boolean testSemanticAnalyzer()

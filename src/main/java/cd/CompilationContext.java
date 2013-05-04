@@ -12,22 +12,23 @@ import cd.semantic.TypeSymbolTable;
  * 
  */
 public class CompilationContext {
+
 	private final File sourceFile;
 	private final File assemblyFile;
 	private final File binaryFile;
+
 	// Set to non-null to write dump of control flow graph
 	private final File cfgDumpBase;
-	
+
 	private final CompilerOptions options;
 
 	/** List of all type symbols, used by code generator. */
 	private TypeSymbolTable typeSymbols;
-	
+
 	/** Symbol for the Main type */
 	private ClassSymbol mainType;
-	
-	private List<ClassDecl> astRoots;
 
+	private List<ClassDecl> astRoots;
 
 	/**
 	 * Constructor to be used for testing purposes
@@ -39,7 +40,7 @@ public class CompilationContext {
 		this.cfgDumpBase = null;
 		this.options = new CompilerOptions();
 	}
-	
+
 	public CompilationContext(File file) {
 		this(file, new CompilerOptions());
 	}
@@ -69,7 +70,7 @@ public class CompilationContext {
 		if (assemblyFile.exists())
 			assemblyFile.delete();
 		if (binaryFile.exists())
-			binaryFile.delete();		
+			binaryFile.delete();
 	}
 
 	public File getAssemblyFile() {
@@ -96,7 +97,13 @@ public class CompilationContext {
 		return astRoots;
 	}
 
-	public void setAstRoots(List<ClassDecl> astRoots) {
+	/**
+	 * Sets the AST roots (class declarations) that are present in this context.
+	 * 
+	 * The method is package-private because it is meant to be called by the
+	 * {@link CompilerToolchain}. It is only meant to be called once.
+	 */
+	void setAstRoots(List<ClassDecl> astRoots) {
 		this.astRoots = astRoots;
 	}
 

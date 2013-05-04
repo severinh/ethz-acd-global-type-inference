@@ -23,6 +23,7 @@ import cd.debug.AstDump;
 import cd.debug.CfgDump;
 import cd.exceptions.AssemblyFailedException;
 import cd.exceptions.ParseFailure;
+import cd.exceptions.SemanticFailure;
 import cd.ir.ast.ClassDecl;
 import cd.ir.ast.MethodDecl;
 import cd.parser.JavaliLexer;
@@ -55,7 +56,19 @@ public class CompilerToolchain {
 		assembleExecutable();
 	}
 
-	public void parse() throws IOException {
+	/**
+	 * Parses the source file and constructs the AST trees.
+	 * 
+	 * When the method has terminated successfully, the AST roots (class
+	 * declarations) are available from the compilation context.
+	 * 
+	 * @throws IOException
+	 *             if there is a problem reading the source file (e.g. if it
+	 *             does not exist)
+	 * @throws ParserFailure
+	 *             if the source does not have a valid syntax
+	 */
+	public void parse() throws IOException, ParseFailure {
 		try {
 			try (FileReader fin = new FileReader(context.getSourceFile())) {
 				ANTLRReaderStream input = new ANTLRReaderStream(fin);
@@ -85,7 +98,16 @@ public class CompilerToolchain {
 		}
 	}
 
-	public void semanticCheck() {
+	/**
+	 * Checks the semantics of the parsed program.
+	 * 
+	 * In particular, it performs type inference, checks that the program is
+	 * type-correct and performs various optimizations.
+	 * 
+	 * @throws SemanticFailure
+	 *             if there is a semantic error in the program
+	 */
+	public void semanticCheck() throws SemanticFailure {
 		List<ClassDecl> astRoots = context.getAstRoots();
 		new UntypedSemanticAnalyzer(context).check(astRoots);
 
