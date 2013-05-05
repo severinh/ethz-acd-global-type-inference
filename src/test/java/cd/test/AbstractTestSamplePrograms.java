@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.After;
@@ -29,20 +26,6 @@ abstract public class AbstractTestSamplePrograms {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(AbstractTestSamplePrograms.class);
 
-	private static final boolean IS_VALGRIND_ENABLED;
-
-	static {
-		boolean isValgrindEnabled;
-		try {
-			ResourceBundle bundle = ResourceBundle.getBundle("test");
-			isValgrindEnabled = Boolean.valueOf(bundle
-					.getString("valgrind.enabled"));
-		} catch (MissingResourceException e) {
-			isValgrindEnabled = false;
-		}
-		IS_VALGRIND_ENABLED = isValgrindEnabled;
-	}
-
 	// We let valgrind return a special exit code if it detect a problem.
 	// Otherwise valgrind returns the exit code of the simulated program.
 	private static final int VALGRIND_ERROR_CODE = 77;
@@ -50,14 +33,16 @@ abstract public class AbstractTestSamplePrograms {
 	private final CompilerToolchain compiler;
 	private final CompilationContext context;
 
-	private final File inputFile;
 	private final ReferenceData referenceData;
+	private final File inputFile;
+	private final TestConfig testConfig;
 
 	public AbstractTestSamplePrograms(File sourceFile) {
 		context = new CompilationContext(sourceFile);
 		compiler = CompilerToolchain.forContext(context);
 		referenceData = RemoteReferenceData.makeCached(sourceFile);
 		inputFile = new File(sourceFile.getPath() + ".in");
+		testConfig = new TestConfig(); // Could be passed as parameter
 	}
 
 	@After
@@ -141,7 +126,7 @@ abstract public class AbstractTestSamplePrograms {
 		String execOut = FileUtil.runCommand(new File("."),
 				new String[] { binaryFilePath }, new String[] {}, input, true);
 
-		if (IS_VALGRIND_ENABLED) {
+		if (testConfig.isValgrindEnabled()) {
 			String[] valgrindCommand = new String[] { "valgrind",
 					"--error-exitcode=" + VALGRIND_ERROR_CODE, binaryFilePath };
 			String valgrindOut = FileUtil.runCommand(new File("."),
