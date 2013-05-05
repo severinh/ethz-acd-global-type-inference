@@ -29,7 +29,8 @@ public class RemoteReferenceData extends ReferenceData {
 	}
 
 	public static ReferenceData makeCached(File sourceFile) {
-		return new CachedReferenceData(new RemoteReferenceData(sourceFile));
+		RemoteReferenceData backingData = new RemoteReferenceData(sourceFile);
+		return new CachedReferenceData(backingData, "remote");
 	}
 
 	@Override

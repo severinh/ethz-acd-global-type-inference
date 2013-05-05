@@ -17,8 +17,8 @@ public class CachedReferenceData extends FileBasedReferenceData {
 
 	private final ReferenceData backingData;
 
-	public CachedReferenceData(ReferenceData backingData) {
-		super(backingData.getSourceFile(), "remote");
+	public CachedReferenceData(ReferenceData backingData, String suffix) {
+		super(backingData.getSourceFile(), suffix);
 
 		this.backingData = backingData;
 	}
