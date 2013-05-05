@@ -40,4 +40,15 @@ public abstract class ReferenceData {
 	public abstract String getExecutionReference(String inputText)
 			throws IOException;
 
+	/**
+	 * Constructs a provider of reference data where local data always overrides
+	 * remote data, if present.
+	 */
+	public static ReferenceData localOverridingRemote(File sourceFile) {
+		ReferenceData remoteData = new RemoteReferenceData(sourceFile);
+		ReferenceData cachedRemoteData = new CachedReferenceData(remoteData, "");
+		ReferenceData localData = new LocalReferenceData(sourceFile, "override");
+		return new FallbackReferenceData(localData, cachedRemoteData);
+	}
+
 }

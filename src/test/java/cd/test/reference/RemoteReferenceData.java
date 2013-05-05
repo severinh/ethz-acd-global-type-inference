@@ -28,11 +28,6 @@ public class RemoteReferenceData extends ReferenceData {
 		this.sourceFile = sourceFile;
 	}
 
-	public static ReferenceData makeCached(File sourceFile) {
-		RemoteReferenceData backingData = new RemoteReferenceData(sourceFile);
-		return new CachedReferenceData(backingData, "remote");
-	}
-
 	@Override
 	public File getSourceFile() {
 		return sourceFile;

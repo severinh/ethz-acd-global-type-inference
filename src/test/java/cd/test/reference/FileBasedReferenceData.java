@@ -19,10 +19,13 @@ public abstract class FileBasedReferenceData extends ReferenceData {
 
 		this.sourceFile = sourceFile;
 
+		if (!suffix.isEmpty()) {
+			suffix = "." + suffix;
+		}
 		String path = sourceFile.getPath();
-		parserRefFile = new File(path + ".parser.ref." + suffix);
-		semanticRefFile = new File(path + ".semantic.ref." + suffix);
-		executionRefFile = new File(path + ".exec.ref." + suffix);
+		parserRefFile = new File(path + ".parser.ref" + suffix);
+		semanticRefFile = new File(path + ".semantic.ref" + suffix);
+		executionRefFile = new File(path + ".exec.ref" + suffix);
 	}
 
 	@Override

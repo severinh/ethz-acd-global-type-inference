@@ -12,8 +12,8 @@ import org.apache.commons.io.FileUtils;
  */
 public class LocalReferenceData extends FileBasedReferenceData {
 
-	public LocalReferenceData(File sourceFile) {
-		super(sourceFile, "local");
+	public LocalReferenceData(File sourceFile, String suffix) {
+		super(sourceFile, suffix);
 	}
 
 	@Override

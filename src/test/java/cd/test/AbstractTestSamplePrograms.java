@@ -16,7 +16,6 @@ import cd.CompilerOptions;
 import cd.exceptions.ParseFailure;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
-import cd.test.reference.FallbackReferenceData;
 import cd.test.reference.ReferenceData;
 import cd.util.FileUtil;
 
@@ -39,8 +38,7 @@ abstract public class AbstractTestSamplePrograms {
 	public AbstractTestSamplePrograms(File sourceFile, CompilerOptions options) {
 		this.context = new CompilationContext(sourceFile, options);
 		this.compiler = CompilerToolchain.forContext(context);
-		this.referenceData = FallbackReferenceData
-				.makeLocalDominatingRemote(context.getSourceFile());
+		this.referenceData = ReferenceData.localOverridingRemote(sourceFile);
 		this.inputFile = new File(context.getSourceFile().getPath() + ".in");
 		this.testConfig = new TestConfig(); // Could be passed as parameter
 	}
