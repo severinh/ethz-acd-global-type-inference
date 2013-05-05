@@ -2,6 +2,6 @@ class Main {
   void main() {
     var y, z;
     y = 1;
-    
+    z = 1.0;
   }
 }

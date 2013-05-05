@@ -25,7 +25,7 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 		// Run the tests on all files in a directory (search recursively)
 		String folderPath = TestSamplePrograms.class.getResource("/").getPath();
 		TEST_FILE_PROVIDER = RecursiveTestFileProvider.withExcludedDir(
-				new File(folderPath), "newsyntax");
+				new File(folderPath), "global");
 	}
 
 	@Parameters(name = "{index}: {0}")
