@@ -34,7 +34,7 @@ public class ParsedReferenceData implements ReferenceData {
 		return referenceData.getParserReference();
 	}
 
-	public boolean isParserFailure() throws IOException {
+	public boolean isParseFailure() throws IOException {
 		return getParserReference().equals(Reference.PARSE_FAILURE);
 	}
 

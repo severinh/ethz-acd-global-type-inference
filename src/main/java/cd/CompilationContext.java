@@ -65,8 +65,10 @@ public class CompilationContext {
 		return sourceFile;
 	}
 
+	/**
+	 * Delete intermediate files from previous runs.
+	 */
 	public void deleteIntermediateFiles() {
-		// Delete intermediate files from previous runs:
 		if (assemblyFile.exists())
 			assemblyFile.delete();
 		if (binaryFile.exists())
