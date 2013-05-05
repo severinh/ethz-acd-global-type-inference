@@ -1,15 +1,14 @@
-package cd.test;
+package cd.test.reference;
 
 import java.io.File;
 import java.io.IOException;
 
 import cd.exceptions.SemanticFailure.Cause;
+import cd.test.Reference;
 
 /**
  * Represents an oracle with regard to how various stages of compilation are
  * meant to react to a certain source file.
- * 
- * The data originates from a reference compiler.
  */
 public abstract class ReferenceData {
 

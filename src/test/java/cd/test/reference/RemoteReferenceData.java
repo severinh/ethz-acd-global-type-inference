@@ -1,4 +1,4 @@
-package cd.test;
+package cd.test.reference;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +10,8 @@ import java.rmi.registry.Registry;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import cd.test.Reference;
 
 /**
  * Fetches reference data directly from the remote reference compiler.

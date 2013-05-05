@@ -20,6 +20,8 @@ import cd.CompilerToolchain;
 import cd.exceptions.ParseFailure;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
+import cd.test.reference.ReferenceData;
+import cd.test.reference.RemoteReferenceData;
 import cd.util.FileUtil;
 
 abstract public class AbstractTestSamplePrograms {
