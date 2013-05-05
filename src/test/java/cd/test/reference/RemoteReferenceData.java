@@ -90,16 +90,6 @@ public class RemoteReferenceData extends ReferenceData {
 		}
 	}
 
-	@Override
-	public String getOptimizationReference(String inputText) throws IOException {
-		Reference ref = openClient();
-		try {
-			return ref.optReference(getSource(), inputText);
-		} catch (Throwable e) {
-			throw new RuntimeException("Bug in reference solution", e);
-		}
-	}
-
 	/**
 	 * Connects to {@code beholder.inf.ethz.ch} and returns a Reference
 	 * instance. This uses Java RMI to obtain the expected answer for various

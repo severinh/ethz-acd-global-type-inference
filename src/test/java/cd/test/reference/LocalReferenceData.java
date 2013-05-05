@@ -34,9 +34,4 @@ public class LocalReferenceData extends FileBasedReferenceData {
 		return FileUtils.readFileToString(getExecutionRefFile());
 	}
 
-	@Override
-	public String getOptimizationReference(String inputText) throws IOException {
-		return FileUtils.readFileToString(getOptimizationRefFile());
-	}
-
 }

@@ -40,7 +40,4 @@ public abstract class ReferenceData {
 	public abstract String getExecutionReference(String inputText)
 			throws IOException;
 
-	public abstract String getOptimizationReference(String inputText)
-			throws IOException;
-
 }

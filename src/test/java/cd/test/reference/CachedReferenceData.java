@@ -65,20 +65,6 @@ public class CachedReferenceData extends FileBasedReferenceData {
 		return result;
 	}
 
-	@Override
-	public String getOptimizationReference(String inputText) throws IOException {
-		// Check for a .ref file
-		if (isNewerThanSourceFile(getOptimizationRefFile())) {
-			return FileUtils.readFileToString(getOptimizationRefFile());
-		}
-
-		// If no file exists, use the interpreter to generate one.
-		String result = backingData.getOptimizationReference(inputText);
-		FileUtils.writeStringToFile(getOptimizationRefFile(), result);
-
-		return result;
-	}
-
 	private boolean isNewerThanSourceFile(File file) {
 		return file.exists()
 				&& file.lastModified() > getSourceFile().lastModified();

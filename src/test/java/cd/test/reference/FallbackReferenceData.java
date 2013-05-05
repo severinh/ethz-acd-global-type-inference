@@ -72,13 +72,4 @@ public class FallbackReferenceData extends ReferenceData {
 		}
 	}
 
-	@Override
-	public String getOptimizationReference(String inputText) throws IOException {
-		try {
-			return primaryData.getOptimizationReference(inputText);
-		} catch (IOException e) {
-			return secondaryData.getOptimizationReference(inputText);
-		}
-	}
-
 }

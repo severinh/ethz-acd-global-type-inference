@@ -2,8 +2,6 @@ package cd.test;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.After;
@@ -82,34 +80,8 @@ abstract public class AbstractTestSamplePrograms {
 				// Only run the remaining tests if the semantic check was
 				// successful
 				testCodeGenerator();
-				testOptimizer();
 			}
 		}
-	}
-
-	private void testOptimizer() throws IOException {
-		// Determine the input and expected operation counts.
-		String input = getInput();
-		String optRef = referenceData.getOptimizationReference(input);
-
-		// Invoke the interpreter. Don't bother to save the output: We already
-		// verified that in testCodeGenerator().
-		Interpreter interpreter = new Interpreter(context.getAstRoots(),
-				new StringReader(input), new StringWriter());
-
-		String operationSummary;
-		try {
-			interpreter.execute();
-			operationSummary = interpreter.operationSummary();
-		} catch (Interpreter.StaticError staticError) {
-			operationSummary = staticError.toString();
-		} catch (Interpreter.DynamicError dynamicError) {
-			operationSummary = dynamicError.format();
-		} catch (ParseFailure parseFailure) {
-			operationSummary = parseFailure.toString();
-		}
-
-		Assert.assertEquals(optRef, operationSummary);
 	}
 
 	/**

@@ -13,7 +13,6 @@ public abstract class FileBasedReferenceData extends ReferenceData {
 	private final File parserRefFile;
 	private final File semanticRefFile;
 	private final File executionRefFile;
-	private final File optimizationRefFile;
 
 	public FileBasedReferenceData(File sourceFile, String suffix) {
 		super();
@@ -24,7 +23,6 @@ public abstract class FileBasedReferenceData extends ReferenceData {
 		parserRefFile = new File(path + ".parser.ref." + suffix);
 		semanticRefFile = new File(path + ".semantic.ref." + suffix);
 		executionRefFile = new File(path + ".exec.ref." + suffix);
-		optimizationRefFile = new File(path + ".opt.ref." + suffix);
 	}
 
 	@Override
@@ -42,10 +40,6 @@ public abstract class FileBasedReferenceData extends ReferenceData {
 
 	protected File getExecutionRefFile() {
 		return executionRefFile;
-	}
-
-	protected File getOptimizationRefFile() {
-		return optimizationRefFile;
 	}
 
 }
