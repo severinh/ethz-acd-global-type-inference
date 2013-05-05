@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils;
 /**
  * Wraps a provider of reference data and caches the data for faster access.
  */
-public class CachedReferenceData implements ReferenceData {
+public class CachedReferenceData extends ReferenceData {
 
 	private final ReferenceData backingData;
 

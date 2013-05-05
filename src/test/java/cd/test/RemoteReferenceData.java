@@ -8,17 +8,26 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fetches reference data directly from the remote reference compiler.
  */
-public class RemoteReferenceData implements ReferenceData {
+public class RemoteReferenceData extends ReferenceData {
+
+	private static final Logger LOG = LoggerFactory
+			.getLogger(RemoteReferenceData.class);
 
 	private final File sourceFile;
 
 	public RemoteReferenceData(File sourceFile) {
 		super();
 		this.sourceFile = sourceFile;
+	}
+
+	public static ReferenceData makeCached(File sourceFile) {
+		return new CachedReferenceData(new RemoteReferenceData(sourceFile));
 	}
 
 	@Override
@@ -44,7 +53,25 @@ public class RemoteReferenceData implements ReferenceData {
 	public String getSemanticReference() throws IOException {
 		Reference ref = openClient();
 		try {
-			return ref.semanticReference(getSource());
+			// Semantic ref file is a little different. It consists
+			// of 2 lines, but only the first line is significant.
+			// The second one contains additional information that we log
+			// to the debug file.
+
+			String result = ref.semanticReference(getSource());
+
+			// Extract the first line: there should always be multiple lines,
+			// but someone may have tinkered with the file or something
+			if (result.contains("\n")) {
+				int newline = result.indexOf("\n");
+				String cause = result.substring(newline + 1);
+				if (!cause.equals("") && !cause.equals("\n")) {
+					LOG.debug("Error message from reference is: {}", cause);
+				}
+				return result.substring(0, newline); // First line
+			} else {
+				return result;
+			}
 		} catch (Throwable e) {
 			throw new RuntimeException("Bug in reference solution", e);
 		}

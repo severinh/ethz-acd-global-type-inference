@@ -49,13 +49,12 @@ abstract public class AbstractTestSamplePrograms {
 	private final CompilationContext context;
 
 	private final File inputFile;
-	private final ParsedReferenceData referenceData;
+	private final ReferenceData referenceData;
 
 	public AbstractTestSamplePrograms(File sourceFile) {
 		context = new CompilationContext(sourceFile);
 		compiler = CompilerToolchain.forContext(context);
-		referenceData = new ParsedReferenceData(new CachedReferenceData(
-				new RemoteReferenceData(sourceFile)));
+		referenceData = RemoteReferenceData.makeCached(sourceFile);
 		inputFile = new File(sourceFile.getPath() + ".in");
 	}
 
