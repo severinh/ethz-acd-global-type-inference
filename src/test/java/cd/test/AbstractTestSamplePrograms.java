@@ -14,11 +14,12 @@ import org.slf4j.LoggerFactory;
 
 import cd.CompilationContext;
 import cd.CompilerToolchain;
+import cd.CompilerOptions;
 import cd.exceptions.ParseFailure;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
+import cd.test.reference.FallbackReferenceData;
 import cd.test.reference.ReferenceData;
-import cd.test.reference.RemoteReferenceData;
 import cd.util.FileUtil;
 
 abstract public class AbstractTestSamplePrograms {
@@ -37,12 +38,13 @@ abstract public class AbstractTestSamplePrograms {
 	private final File inputFile;
 	private final TestConfig testConfig;
 
-	public AbstractTestSamplePrograms(File sourceFile) {
-		context = new CompilationContext(sourceFile);
-		compiler = CompilerToolchain.forContext(context);
-		referenceData = RemoteReferenceData.makeCached(sourceFile);
-		inputFile = new File(sourceFile.getPath() + ".in");
-		testConfig = new TestConfig(); // Could be passed as parameter
+	public AbstractTestSamplePrograms(File sourceFile, CompilerOptions options) {
+		this.context = new CompilationContext(sourceFile, options);
+		this.compiler = CompilerToolchain.forContext(context);
+		this.referenceData = FallbackReferenceData
+				.makeLocalDominatingRemote(context.getSourceFile());
+		this.inputFile = new File(context.getSourceFile().getPath() + ".in");
+		this.testConfig = new TestConfig(); // Could be passed as parameter
 	}
 
 	@After

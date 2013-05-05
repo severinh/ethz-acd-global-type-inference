@@ -23,17 +23,20 @@ public class LocalReferenceData extends FileBasedReferenceData {
 
 	@Override
 	public String getSemanticReference() throws IOException {
-		return FileUtils.readFileToString(getParserRefFile());
+		// Only return the first line
+		String result = FileUtils.readFileToString(getSemanticRefFile());
+		String[] lines = result.split("\n");
+		return lines[0].trim();
 	}
 
 	@Override
 	public String getExecutionReference(String inputText) throws IOException {
-		return FileUtils.readFileToString(getParserRefFile());
+		return FileUtils.readFileToString(getExecutionRefFile());
 	}
 
 	@Override
 	public String getOptimizationReference(String inputText) throws IOException {
-		return FileUtils.readFileToString(getParserRefFile());
+		return FileUtils.readFileToString(getOptimizationRefFile());
 	}
 
 }

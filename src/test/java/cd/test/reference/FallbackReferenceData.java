@@ -29,6 +29,17 @@ public class FallbackReferenceData extends ReferenceData {
 				secondaryData.getSourceFile());
 	}
 
+	/**
+	 * Constructs a provider of reference data where local data always overrides
+	 * remote data, if present.
+	 */
+	public static FallbackReferenceData makeLocalDominatingRemote(
+			File sourceFile) {
+		ReferenceData remoteData = RemoteReferenceData.makeCached(sourceFile);
+		ReferenceData localData = new LocalReferenceData(sourceFile);
+		return new FallbackReferenceData(localData, remoteData);
+	}
+
 	@Override
 	public File getSourceFile() {
 		return primaryData.getSourceFile();
