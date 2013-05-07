@@ -1,7 +1,5 @@
 package cd.exceptions;
 
-import java.util.NoSuchElementException;
-
 /**
  * Thrown by the semantic checker when a semantic error is detected in the
  * user's program.
@@ -119,17 +117,8 @@ public class SemanticFailure extends RuntimeException {
 		 * Indicates the use of a local variable that may not have been
 		 * initialized (CD2 only).
 		 */
-		POSSIBLY_UNINITIALIZED;
+		POSSIBLY_UNINITIALIZED
 
-		public static Cause fromString(String causeString) {
-			for (Cause cause : Cause.values()) {
-				if (cause.toString().equals(causeString)) {
-					return cause;
-				}
-			}
-			throw new NoSuchElementException("no such cause '" + causeString
-					+ "'");
-		}
 	}
 
 	public final Cause cause;

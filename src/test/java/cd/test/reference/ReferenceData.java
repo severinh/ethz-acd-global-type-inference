@@ -3,6 +3,7 @@ package cd.test.reference;
 import java.io.File;
 import java.io.IOException;
 
+import com.google.common.base.Enums;
 import com.google.common.base.Optional;
 
 import cd.exceptions.SemanticFailure.Cause;
@@ -30,13 +31,7 @@ public abstract class ReferenceData {
 	public abstract String getSemanticReference() throws IOException;
 
 	public Optional<Cause> getSemanticFailureCause() throws IOException {
-		String result = getSemanticReference();
-
-		if (result.equals(Reference.SEMANTIC_PASSED)) {
-			return Optional.absent();
-		} else {
-			return Optional.of(Cause.fromString(result));
-		}
+		return Enums.getIfPresent(Cause.class, getSemanticReference());
 	}
 
 	public abstract String getExecutionReference(String inputText)
