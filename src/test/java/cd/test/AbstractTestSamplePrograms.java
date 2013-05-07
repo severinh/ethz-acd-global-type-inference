@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
+
 import cd.CompilationContext;
 import cd.CompilerToolchain;
 import cd.CompilerOptions;
@@ -54,8 +56,8 @@ abstract public class AbstractTestSamplePrograms {
 
 		boolean isParseFailureRef = referenceData.isParseFailure();
 		boolean isParseFailure = false;
-		Cause semanticFailureCauseRef = null;
-		Cause semanticFailureCause = null;
+		Optional<Cause> semanticFailureCauseRef = Optional.absent();
+		Optional<Cause> semanticFailureCause = Optional.absent();
 
 		try {
 			compiler.compile();
@@ -64,7 +66,7 @@ abstract public class AbstractTestSamplePrograms {
 			isParseFailure = true;
 		} catch (SemanticFailure semanticFailure) {
 			LOG.debug(ExceptionUtils.getStackTrace(semanticFailure));
-			semanticFailureCause = semanticFailure.cause;
+			semanticFailureCause = Optional.of(semanticFailure.cause);
 		}
 
 		if (isParseFailureRef || isParseFailure) {
@@ -74,7 +76,7 @@ abstract public class AbstractTestSamplePrograms {
 			semanticFailureCauseRef = referenceData.getSemanticFailureCause();
 			Assert.assertEquals(semanticFailureCauseRef, semanticFailureCause);
 
-			if (semanticFailureCause == null) {
+			if (!semanticFailureCause.isPresent()) {
 				// Only run the remaining tests if the semantic check was
 				// successful
 				testCodeGenerator();

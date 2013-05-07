@@ -3,6 +3,8 @@ package cd.test.reference;
 import java.io.File;
 import java.io.IOException;
 
+import com.google.common.base.Optional;
+
 import cd.exceptions.SemanticFailure.Cause;
 import cd.test.Reference;
 
@@ -27,13 +29,13 @@ public abstract class ReferenceData {
 
 	public abstract String getSemanticReference() throws IOException;
 
-	public Cause getSemanticFailureCause() throws IOException {
+	public Optional<Cause> getSemanticFailureCause() throws IOException {
 		String result = getSemanticReference();
 
 		if (result.equals(Reference.SEMANTIC_PASSED)) {
-			return null;
+			return Optional.absent();
 		} else {
-			return Cause.fromString(result);
+			return Optional.of(Cause.fromString(result));
 		}
 	}
 
