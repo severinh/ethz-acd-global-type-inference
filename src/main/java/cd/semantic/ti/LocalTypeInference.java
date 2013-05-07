@@ -1,10 +1,12 @@
 package cd.semantic.ti;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 
 import cd.CompilationContext;
 import cd.ir.AstVisitor;
@@ -121,11 +123,11 @@ public class LocalTypeInference implements TypeInference {
 	private static class AssignDeps {
 
 		private final Set<Assign> assigns;
-		private final Map<VariableSymbol, Set<Assign>> variableUseMap;
+		private final Multimap<VariableSymbol, Assign> variableUseMap;
 
 		public AssignDeps() {
 			assigns = new LinkedHashSet<>();
-			variableUseMap = new LinkedHashMap<>();
+			variableUseMap = LinkedHashMultimap.create();
 		}
 
 		public void registerAssign(Assign assign) {
@@ -138,21 +140,11 @@ public class LocalTypeInference implements TypeInference {
 
 		public void registerVariableUse(VariableSymbol variable,
 				Assign usingAssign) {
-			Set<Assign> dependencies = variableUseMap.get(variable);
-			if (dependencies == null) {
-				dependencies = new LinkedHashSet<>();
-				variableUseMap.put(variable, dependencies);
-			}
-			dependencies.add(usingAssign);
+			variableUseMap.put(variable, usingAssign);
 		}
 
-		public Set<Assign> getVariableUses(VariableSymbol variable) {
-			Set<Assign> result = variableUseMap.get(variable);
-			if (result == null) {
-				return Collections.emptySet();
-			} else {
-				return Collections.unmodifiableSet(result);
-			}
+		public Collection<Assign> getVariableUses(VariableSymbol variable) {
+			return variableUseMap.get(variable);
 		}
 
 		@Override
