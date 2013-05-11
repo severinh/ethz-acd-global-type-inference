@@ -24,7 +24,10 @@ public abstract class TypeConstraint {
 		for (ConstraintCondition cond : conditions) {
 			TypeVariable var = cond.getTypeVariable();
 			Set<TypeSymbol> availableTypes = var.getTypes();
-			active &= availableTypes.contains(cond.getTypeAtom());
+			if (!availableTypes.contains(cond.getTypeAtom())) {
+				active = false;
+				break;
+			}
 		}
 		return active;
 	}
