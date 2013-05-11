@@ -18,8 +18,6 @@ import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.ir.symbols.VariableSymbol.Kind;
-import cd.semantic.ExprTypingVisitor;
-import cd.semantic.SymbolTable;
 import cd.semantic.TypeSymbolTable;
 import cd.semantic.ti.constraintSolving.ConstantTypeSet;
 import cd.semantic.ti.constraintSolving.ConstraintSolver;
@@ -30,21 +28,6 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
 	@Override
 	public void inferTypes(MethodDecl mdecl, TypeSymbolTable typeSymbols) {
-		// Run the expression typing visitor over the method once,
-		// such that type symbols are set to something non-null.
-		final SymbolTable<VariableSymbol> scope = mdecl.sym.getScope();
-		final ExprTypingVisitor exprTypingVisitor = new ExprTypingVisitor(
-				typeSymbols);
-		mdecl.accept(new AstVisitor<Void, Void>() {
-
-			@Override
-			protected Void dfltExpr(Expr expr, Void arg) {
-				exprTypingVisitor.type(expr, scope);
-				return null;
-			}
-
-		}, null);
-
 		ConstraintGenerator constraintGen = new ConstraintGenerator(mdecl,
 				typeSymbols);
 		constraintGen.generate();

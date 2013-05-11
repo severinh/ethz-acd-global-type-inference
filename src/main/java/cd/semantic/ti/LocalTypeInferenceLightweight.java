@@ -24,21 +24,8 @@ public class LocalTypeInferenceLightweight extends LocalTypeInference {
 
 	@Override
 	public void inferTypes(MethodDecl mdecl, TypeSymbolTable typeSymbols) {
-		final SymbolTable<VariableSymbol> scope = mdecl.sym.getScope();
-		final ExprTypingVisitor exprTypingVisitor = new ExprTypingVisitor(
-				typeSymbols);
-
-		// Run the expression typing visitor over the method once,
-		// such that type symbols are set to something non-null.
-		mdecl.accept(new AstVisitor<Void, Void>() {
-
-			@Override
-			protected Void dfltExpr(Expr expr, Void arg) {
-				exprTypingVisitor.type(expr, scope);
-				return null;
-			}
-
-		}, null);
+		SymbolTable<VariableSymbol> scope = mdecl.sym.getScope();
+		ExprTypingVisitor exprTypingVisitor = new ExprTypingVisitor(typeSymbols);
 
 		// Collect all assignments to local variables and record what other
 		// assignments such an assignment affects.
