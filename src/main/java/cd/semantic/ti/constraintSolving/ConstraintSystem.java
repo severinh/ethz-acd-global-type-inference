@@ -28,14 +28,6 @@ public class ConstraintSystem {
 		return ImmutableSet.copyOf(typeVariables);
 	}
 
-	public LowerConstBoundConstraint addLowerBound(TypeVariable var,
-			ConstantTypeSet lowerBound, ConstraintCondition... conditions) {
-		LowerConstBoundConstraint result = new LowerConstBoundConstraint(
-				var, lowerBound, Arrays.asList(conditions));
-		lowerBoundConstraints.add(result);
-		return result;
-	}
-
 	public Set<VariableInequalityConstraint> getVariableInequalityConstraints() {
 		return variableInequalityConstraints;
 	}
@@ -47,6 +39,14 @@ public class ConstraintSystem {
 	public Set<UpperConstBoundConstraint> getUpperBoundConstraints() {
 		return upperBoundConstraints;
 	}
+	
+	public LowerConstBoundConstraint addLowerBound(TypeVariable var,
+			ConstantTypeSet lowerBound, ConstraintCondition... conditions) {
+		LowerConstBoundConstraint result = new LowerConstBoundConstraint(
+				var, lowerBound, Arrays.asList(conditions));
+		lowerBoundConstraints.add(result);
+		return result;
+	}
 
 	public UpperConstBoundConstraint addUpperBound(TypeVariable var,
 			ConstantTypeSet upperBound, ConstraintCondition... conditions) {
@@ -55,26 +55,25 @@ public class ConstraintSystem {
 		upperBoundConstraints.add(result);
 		return result;
 	}
+	
+	public void addVarInequality(TypeVariable var1, TypeVariable var2,
+			ConstraintCondition... conditions) {
+		List<ConstraintCondition> conds = Arrays.asList(conditions);
+		VariableInequalityConstraint constraint = new VariableInequalityConstraint(
+				var1, var2, conds);
+		variableInequalityConstraints.add(constraint);	
+	}
 
 	public void addConstEquality(TypeVariable var,
 			ConstantTypeSet constSet, ConstraintCondition... conditions) {
-		LowerConstBoundConstraint low = new LowerConstBoundConstraint(var,
-				constSet, Arrays.asList(conditions));
-		lowerBoundConstraints.add(low);
-		UpperConstBoundConstraint up = new UpperConstBoundConstraint(var,
-				constSet, Arrays.asList(conditions));
-		upperBoundConstraints.add(up);
+		addLowerBound(var, constSet, conditions);
+		addUpperBound(var, constSet, conditions);
 	}
-
+	
 	public void addVarEquality(TypeVariable var1, TypeVariable var2,
 			ConstraintCondition... conditions) {
-		List<ConstraintCondition> constConditions = Arrays.asList(conditions);
-		VariableInequalityConstraint low = new VariableInequalityConstraint(
-				var1, var2, constConditions);
-		variableInequalityConstraints.add(low);
-		VariableInequalityConstraint up = new VariableInequalityConstraint(
-				var2, var1, constConditions);
-		variableInequalityConstraints.add(up);
+		addVarInequality(var1, var2, conditions);
+		addVarInequality(var2, var1, conditions);
 	}
 
 	public TypeVariable addTypeVariable() {

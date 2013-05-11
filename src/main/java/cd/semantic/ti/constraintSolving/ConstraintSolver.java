@@ -18,8 +18,10 @@ public class ConstraintSolver {
 
 	public void solve() {
 		hasSolution = true;
-		boolean changed = false;
+		boolean changed;
 		do {
+			changed = false;
+			
 			for (LowerConstBoundConstraint constraint : constraintSystem.getLowerBoundConstraints()) {
 				if (constraint.isActive()) {
 					TypeVariable typeVar = constraint.getTypeVariable();
@@ -46,7 +48,7 @@ public class ConstraintSolver {
 				if (constraint.isActive()) {
 					ConstantTypeSet upperBound = constraint.getUpperBound();
 					TypeVariable typeVar = constraint.getTypeVariable();
-					if (typeVar.isSubsetOf(upperBound)) {
+					if (!typeVar.isSubsetOf(upperBound)) {
 						hasSolution = false;
 						changed = false;
 						break;
