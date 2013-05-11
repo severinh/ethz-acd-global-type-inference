@@ -8,10 +8,8 @@ import java.util.Set;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
-import cd.CompilationContext;
 import cd.ir.AstVisitor;
 import cd.ir.ast.Assign;
-import cd.ir.ast.ClassDecl;
 import cd.ir.ast.Expr;
 import cd.ir.ast.MethodDecl;
 import cd.ir.ast.Var;
@@ -22,18 +20,9 @@ import cd.semantic.ExprTypingVisitor;
 import cd.semantic.SymbolTable;
 import cd.semantic.TypeSymbolTable;
 
-public class LocalTypeInference implements TypeInference {
+public class LocalTypeInferenceLightweight extends LocalTypeInference {
 
 	@Override
-	public void inferTypes(CompilationContext context) {
-		TypeSymbolTable typeSymbols = context.getTypeSymbols();
-		for (ClassDecl classDecl : context.getAstRoots()) {
-			for (MethodDecl methodDecl : classDecl.methods()) {
-				inferTypes(methodDecl, typeSymbols);
-			}
-		}
-	}
-
 	public void inferTypes(MethodDecl mdecl, TypeSymbolTable typeSymbols) {
 		final SymbolTable<VariableSymbol> scope = mdecl.sym.getScope();
 		final ExprTypingVisitor exprTypingVisitor = new ExprTypingVisitor(

@@ -4,13 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import cd.CompilationContext;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.AstVisitor;
 import cd.ir.ExprVisitor;
 import cd.ir.ast.Assign;
-import cd.ir.ast.ClassDecl;
 import cd.ir.ast.Expr;
 import cd.ir.ast.IntConst;
 import cd.ir.ast.MethodDecl;
@@ -28,18 +26,9 @@ import cd.semantic.ti.constraintSolving.ConstraintSolver;
 import cd.semantic.ti.constraintSolving.ConstraintSystem;
 import cd.semantic.ti.constraintSolving.TypeVariable;
 
-public class LocalTypeInferenceWithConstraints implements TypeInference {
+public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
 	@Override
-	public void inferTypes(CompilationContext context) {
-		TypeSymbolTable typeSymbols = context.getTypeSymbols();
-		for (ClassDecl classDecl : context.getAstRoots()) {
-			for (MethodDecl methodDecl : classDecl.methods()) {
-				inferTypes(methodDecl, typeSymbols);
-			}
-		}
-	}
-
 	public void inferTypes(MethodDecl mdecl, TypeSymbolTable typeSymbols) {
 		// Run the expression typing visitor over the method once,
 		// such that type symbols are set to something non-null.
@@ -55,7 +44,7 @@ public class LocalTypeInferenceWithConstraints implements TypeInference {
 			}
 
 		}, null);
-		
+
 		ConstraintGenerator constraintGen = new ConstraintGenerator(mdecl,
 				typeSymbols);
 		constraintGen.generate();
