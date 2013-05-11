@@ -100,7 +100,7 @@ public class LocalTypeInferenceWithConstraints implements TypeInference {
 		// variables while
 		// these TypeVariables are constraint solver variables describing the
 		// type of such program variables
-		private final Map<VariableSymbol, TypeVariable> localSymbolVariables = new HashMap<VariableSymbol, TypeVariable>();
+		private final Map<VariableSymbol, TypeVariable> localSymbolVariables = new HashMap<>();
 
 		public ConstraintGenerator(MethodDecl mdecl, TypeSymbolTable typeSymbols) {
 			this.mdecl = mdecl;
