@@ -31,28 +31,31 @@ abstract public class AbstractTestSamplePrograms {
 	private static final int VALGRIND_ERROR_CODE = 77;
 
 	private final CompilerToolchain compiler;
-	private final CompilationContext context;
 
 	private final ReferenceData referenceData;
 	private final File inputFile;
 	private final TestConfig testConfig;
 
 	public AbstractTestSamplePrograms(File sourceFile, CompilerOptions options) {
-		this.context = new CompilationContext(sourceFile, options);
+		CompilationContext context = new CompilationContext(sourceFile, options);
 		this.compiler = CompilerToolchain.forContext(context);
 		this.referenceData = ReferenceData.localOverridingRemote(sourceFile);
 		this.inputFile = new File(context.getSourceFile().getPath() + ".in");
 		this.testConfig = new TestConfig(); // Could be passed as parameter
 	}
 
+	protected CompilerToolchain getCompiler() {
+		return compiler;
+	}
+
 	@After
 	public void tearDown() {
-		context.deleteIntermediateFiles();
+		getCompiler().getContext().deleteIntermediateFiles();
 	}
 
 	@Test
 	public void test() throws Throwable {
-		LOG.debug("Testing " + context.getSourceFile());
+		LOG.debug("Testing " + getCompiler().getContext().getSourceFile());
 
 		boolean isParseFailureRef = referenceData.isParseFailure();
 		boolean isParseFailure = false;
@@ -91,7 +94,8 @@ abstract public class AbstractTestSamplePrograms {
 	private void testCodeGenerator() throws IOException {
 		// Determine the input and expected output
 		String input = getInput();
-		String binaryFilePath = context.getBinaryFile().getAbsolutePath();
+		String binaryFilePath = getCompiler().getContext().getBinaryFile()
+				.getAbsolutePath();
 		String execRef = referenceData.getExecutionReference(input);
 
 		// Execute the binary file, providing input if relevant, and

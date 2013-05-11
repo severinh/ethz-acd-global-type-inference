@@ -11,6 +11,7 @@ import cd.ir.ast.VarDecl;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.semantic.TypeSymbolTable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Visits an AST and asserts that the declared type of fields, return values,
@@ -24,14 +25,10 @@ import cd.semantic.TypeSymbolTable;
  */
 public class TypeInferenceEvaluationVisitor extends AstVisitor<Void, Void> {
 
-	private static final TypeInferenceEvaluationVisitor INSTANCE = new TypeInferenceEvaluationVisitor();
+	private final TypeSymbolTable typeSymbols;
 
-	public static final TypeInferenceEvaluationVisitor getInstance() {
-		return INSTANCE;
-	}
-
-	private TypeInferenceEvaluationVisitor() {
-		// nop
+	public TypeInferenceEvaluationVisitor(TypeSymbolTable typeSymbols) {
+		this.typeSymbols = checkNotNull(typeSymbols);
 	}
 
 	/**
@@ -67,11 +64,17 @@ public class TypeInferenceEvaluationVisitor extends AstVisitor<Void, Void> {
 		return dfltDecl(methodDecl, arg);
 	}
 
-	private void assertInferredType(String expectedType, TypeSymbol inferredType) {
+	private void assertInferredType(String expectedTypeName,
+			TypeSymbol inferredType) {
+		TypeSymbol expectedType = typeSymbols.get(expectedTypeName);
 		// Ignore cases where the type is missing from the source program.
 		// There is nothing to compare the inferred type to.
-		if (!expectedType.equals(TypeSymbolTable.BOTTOM_TYPE_NAME)) {
-			Assert.assertEquals(expectedType, inferredType.name);
+		if (!expectedType.equals(typeSymbols.getBottomType())) {
+			// Allow the inferred type to more specific than the expected type,
+			// but not the bottom type symbol
+			Assert.assertNotEquals(inferredType, typeSymbols.getBottomType());
+			Assert.assertTrue(typeSymbols.isSubType(expectedType, inferredType));
 		}
 	}
+
 }

@@ -25,6 +25,8 @@ public class TypeInferenceEvaluationVisitorTest {
 	private VarDecl fieldDecl;
 	private ClassDecl classDecl;
 
+	private TypeInferenceEvaluationVisitor evaluationVisitor;
+
 	@Before
 	public void setUp() {
 		// Construct a very simple AST with a single class, field, method,
@@ -40,11 +42,13 @@ public class TypeInferenceEvaluationVisitorTest {
 		CompilationContext context = new CompilationContext();
 		new UntypedSemanticAnalyzer(context).check(Arrays.asList(classDecl));
 		typeSymbols = context.getTypeSymbols();
+
+		evaluationVisitor = new TypeInferenceEvaluationVisitor(typeSymbols);
 	}
 
 	@Test
 	public void testNoErasure() {
-		TypeInferenceEvaluationVisitor.getInstance().evaluate(classDecl);
+		evaluationVisitor.evaluate(classDecl);
 	}
 
 	@Test(expected = AssertionError.class)
@@ -109,7 +113,7 @@ public class TypeInferenceEvaluationVisitorTest {
 	}
 
 	private void evaluateTypeInference(Ast ast) {
-		TypeInferenceEvaluationVisitor.getInstance().evaluate(classDecl);
+		evaluationVisitor.evaluate(classDecl);
 	}
 
 }
