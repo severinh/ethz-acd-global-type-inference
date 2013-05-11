@@ -28,4 +28,9 @@ public class ConstantTypeSet implements TypeSet {
 		typeSyms.retainAll(typeSet.getTypes());
 		return new ConstantTypeSet(typeSyms);
 	}
+
+	@Override
+	public boolean isSubsetOf(TypeSet other) {
+		return other.getTypes().containsAll(types);
+	}
 }

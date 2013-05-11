@@ -2,8 +2,11 @@ package cd.semantic.ti;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import cd.CompilationContext;
+import cd.exceptions.SemanticFailure;
+import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.AstVisitor;
 import cd.ir.ExprVisitor;
 import cd.ir.ast.ClassDecl;
@@ -11,6 +14,7 @@ import cd.ir.ast.MethodDecl;
 import cd.ir.ast.ReturnStmt;
 import cd.ir.ast.Var;
 import cd.ir.symbols.MethodSymbol;
+import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.semantic.TypeSymbolTable;
 import cd.semantic.ti.constraintSolving.ConstantTypeSet;
@@ -38,8 +42,24 @@ public class LocalTypeInferenceWithConstraints implements TypeInference {
 		ConstraintSolver solver = new ConstraintSolver(
 				constraintGen.getConstraintSystem());
 		solver.solve();
+		if (!solver.hasSolution()) {
+			throw new SemanticFailure(Cause.TYPE_ERROR,
+					"Type inference was unable to resolve type constraints");
+		} else {
+			for (VariableSymbol varSym : mdecl.sym.getLocals()) {
+				Set<TypeSymbol> possibleTypes = constraintGen.getPossibleTypes(varSym);
+				if (possibleTypes.isEmpty()) {
+					throw new SemanticFailure(Cause.TYPE_ERROR,
+							"No type could be found for " + varSym.name);					
+				} else if (possibleTypes.size() > 1) {
+					throw new SemanticFailure(Cause.TYPE_ERROR,
+							"Type inference resulted in ambiguous type for " + varSym.name);	
+				} else {
+					varSym.setType(possibleTypes.iterator().next());
+				}
+			}
+		}
 
-		// TODO: annotate the VariableSymbols with the types obtained from the solution
 	}
 
 	/**
@@ -67,6 +87,10 @@ public class LocalTypeInferenceWithConstraints implements TypeInference {
 
 		public ConstraintSystem getConstraintSystem() {
 			return constraintSystem;
+		}
+		
+		public Set<TypeSymbol> getPossibleTypes(VariableSymbol varSym) {
+			return localSymbolVariables.get(varSym).getTypes();
 		}
 
 		public void generate() {

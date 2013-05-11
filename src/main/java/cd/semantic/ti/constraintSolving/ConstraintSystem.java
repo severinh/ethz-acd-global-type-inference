@@ -36,6 +36,18 @@ public class ConstraintSystem {
 		return result;
 	}
 
+	public Set<VariableInequalityConstraint> getVariableInequalityConstraints() {
+		return variableInequalityConstraints;
+	}
+
+	public Set<LowerConstBoundConstraint> getLowerBoundConstraints() {
+		return lowerBoundConstraints;
+	}
+
+	public Set<UpperConstBoundConstraint> getUpperBoundConstraints() {
+		return upperBoundConstraints;
+	}
+
 	public UpperConstBoundConstraint addUpperBound(TypeVariable var,
 			ConstantTypeSet upperBound, ConstraintCondition... conditions) {
 		UpperConstBoundConstraint result = new UpperConstBoundConstraint(

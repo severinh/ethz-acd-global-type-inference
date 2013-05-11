@@ -23,4 +23,17 @@ public class TypeVariable implements TypeSet {
 	public Set<TypeSymbol> getTypes() {
 		return ImmutableSet.copyOf(types);
 	}
+
+	@Override
+	public boolean isSubsetOf(TypeSet other) {
+		return other.getTypes().containsAll(types);
+	}
+	
+	/**
+	 * Make this type variable include all the types in the other typeset
+	 * @param other
+	 */
+	public void extend(TypeSet other) {
+		types.addAll(other.getTypes());
+	}
 }

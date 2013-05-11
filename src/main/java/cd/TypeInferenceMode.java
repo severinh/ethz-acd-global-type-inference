@@ -2,6 +2,7 @@ package cd;
 
 import cd.semantic.ti.GlobalTypeInference;
 import cd.semantic.ti.LocalTypeInference;
+import cd.semantic.ti.LocalTypeInferenceWithConstraints;
 import cd.semantic.ti.TypeInference;
 
 /**
@@ -27,6 +28,12 @@ public enum TypeInferenceMode {
 		@Override
 		public TypeInference getTypeInference() {
 			return new LocalTypeInference();
+		}
+	},
+	LOCAL_CONSTRAINTS {
+		@Override
+		public TypeInference getTypeInference() {
+			return new LocalTypeInferenceWithConstraints();
 		}
 	},
 	GLOBAL {
