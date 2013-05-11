@@ -24,7 +24,7 @@ public enum TypeInferenceMode {
 			};
 		}
 	},
-	LOCAL {
+	LOCAL_LIGHTWEIGHT {
 		@Override
 		public TypeInference getTypeInference() {
 			return new LocalTypeInferenceLightweight();

@@ -33,7 +33,7 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 	public static Collection<Object[]> testFiles() {
 		List<Object[]> result = new ArrayList<>();
 		CompilerOptions options = new CompilerOptions(TypeErasureMode.LOCAL,
-				TypeInferenceMode.LOCAL);
+				TypeInferenceMode.LOCAL_LIGHTWEIGHT);
 		for (File file : TEST_FILE_PROVIDER.getTestFiles()) {
 			result.add(new Object[] { file.getName(), file, options });
 		}

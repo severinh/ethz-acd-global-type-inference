@@ -6,10 +6,10 @@ import cd.semantic.ti.constraintSolving.ConstantTypeSet;
 import cd.semantic.ti.constraintSolving.TypeVariable;
 
 /**
- * A lower bound constraint for a type variable v, i.e. L \subseteq v, where
- * L is the lower bound (a constant set)
+ * A lower bound constraint for a type variable v, i.e. L \subseteq v, where L
+ * is the lower bound (a constant set)
  */
-public class LowerConstBoundConstraint extends  TypeConstraint {
+public class LowerConstBoundConstraint extends TypeConstraint {
 	private final TypeVariable typeVariable;
 	private final ConstantTypeSet lowerBound;
 
