@@ -8,15 +8,15 @@ import cd.ir.symbols.TypeSymbol;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Represents a type variable that holds sets of typesymbols that may be
+ * Represents a type variable that holds sets of type symbols that may be
  * manipulated when solving
  * 
  */
 public class TypeVariable implements TypeSet {
-	private Set<TypeSymbol> types = new HashSet<>();
+	private Set<TypeSymbol> types;
 
 	public TypeVariable() {
-
+		this.types = new HashSet<>();
 	}
 
 	@Override
@@ -28,10 +28,9 @@ public class TypeVariable implements TypeSet {
 	public boolean isSubsetOf(TypeSet other) {
 		return other.getTypes().containsAll(types);
 	}
-	
+
 	/**
-	 * Make this type variable include all the types in the other typeset
-	 * @param other
+	 * Make this type variable include all the types in the other type set
 	 */
 	public void extend(TypeSet other) {
 		types.addAll(other.getTypes());

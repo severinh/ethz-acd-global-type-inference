@@ -4,14 +4,16 @@ import cd.semantic.ti.constraintSolving.constraints.LowerConstBoundConstraint;
 import cd.semantic.ti.constraintSolving.constraints.UpperConstBoundConstraint;
 import cd.semantic.ti.constraintSolving.constraints.VariableInequalityConstraint;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class ConstraintSolver {
 	private final ConstraintSystem constraintSystem;
 	private boolean hasSolution;
 
 	public ConstraintSolver(ConstraintSystem constraints) {
-		this.constraintSystem = constraints;
+		this.constraintSystem = checkNotNull(constraints);
 	}
-	
+
 	public boolean hasSolution() {
 		return hasSolution;
 	}
@@ -21,8 +23,9 @@ public class ConstraintSolver {
 		boolean changed;
 		do {
 			changed = false;
-			
-			for (LowerConstBoundConstraint constraint : constraintSystem.getLowerBoundConstraints()) {
+
+			for (LowerConstBoundConstraint constraint : constraintSystem
+					.getLowerBoundConstraints()) {
 				if (constraint.isActive()) {
 					TypeVariable typeVar = constraint.getTypeVariable();
 					ConstantTypeSet lowerBound = constraint.getLowerBound();
@@ -32,9 +35,10 @@ public class ConstraintSolver {
 					}
 				}
 			}
-			
-			for (VariableInequalityConstraint constraint : constraintSystem.getVariableInequalityConstraints()) {
-				if (constraint.isActive()) {			
+
+			for (VariableInequalityConstraint constraint : constraintSystem
+					.getVariableInequalityConstraints()) {
+				if (constraint.isActive()) {
 					TypeVariable rightVar = constraint.getRight();
 					TypeVariable leftVar = constraint.getLeft();
 					if (!leftVar.isSubsetOf(rightVar)) {
@@ -43,8 +47,9 @@ public class ConstraintSolver {
 					}
 				}
 			}
-			
-			for (UpperConstBoundConstraint constraint : constraintSystem.getUpperBoundConstraints()) {
+
+			for (UpperConstBoundConstraint constraint : constraintSystem
+					.getUpperBoundConstraints()) {
 				if (constraint.isActive()) {
 					ConstantTypeSet upperBound = constraint.getUpperBound();
 					TypeVariable typeVar = constraint.getTypeVariable();

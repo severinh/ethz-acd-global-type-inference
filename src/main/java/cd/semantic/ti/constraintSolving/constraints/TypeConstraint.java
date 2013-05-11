@@ -1,22 +1,24 @@
 package cd.semantic.ti.constraintSolving.constraints;
 
-import java.util.List;
 import java.util.Set;
 
 import cd.ir.symbols.TypeSymbol;
 import cd.semantic.ti.constraintSolving.TypeVariable;
 
-public abstract class TypeConstraint {
-	private final List<ConstraintCondition> conditions;
+import com.google.common.collect.ImmutableList;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-	public List<ConstraintCondition> getConditions() {
+public abstract class TypeConstraint {
+	private final ImmutableList<ConstraintCondition> conditions;
+
+	public TypeConstraint(ImmutableList<ConstraintCondition> conditions) {
+		this.conditions = checkNotNull(conditions);
+	}
+
+	public ImmutableList<ConstraintCondition> getConditions() {
 		return conditions;
 	}
 
-	public TypeConstraint(List<ConstraintCondition> conditions) {
-		this.conditions = conditions;
-	}
-	
 	public boolean isActive() {
 		boolean active = true;
 		for (ConstraintCondition cond : conditions) {
