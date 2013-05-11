@@ -11,6 +11,8 @@ import cd.ir.ExprVisitor;
 import cd.ir.ast.Assign;
 import cd.ir.ast.Expr;
 import cd.ir.ast.IntConst;
+import cd.ir.ast.FloatConst;
+import cd.ir.ast.BooleanConst;
 import cd.ir.ast.MethodDecl;
 import cd.ir.ast.ReturnStmt;
 import cd.ir.ast.Var;
@@ -164,6 +166,24 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				ConstantTypeSet intTypeSet = new ConstantTypeSet(
 						typeSymbols.getIntType());
 				constraintSystem.addConstEquality(typeVar, intTypeSet);
+				return typeVar;
+			}
+
+			@Override
+			public TypeVariable floatConst(FloatConst ast, Void arg) {
+				TypeVariable typeVar = constraintSystem.addTypeVariable();
+				ConstantTypeSet floatTypeSet = new ConstantTypeSet(
+						typeSymbols.getFloatType());
+				constraintSystem.addConstEquality(typeVar, floatTypeSet);
+				return typeVar;
+			}
+
+			@Override
+			public TypeVariable booleanConst(BooleanConst ast, Void arg) {
+				TypeVariable typeVar = constraintSystem.addTypeVariable();
+				ConstantTypeSet booleanTypeSet = new ConstantTypeSet(
+						typeSymbols.getBooleanType());
+				constraintSystem.addConstEquality(typeVar, booleanTypeSet);
 				return typeVar;
 			}
 
