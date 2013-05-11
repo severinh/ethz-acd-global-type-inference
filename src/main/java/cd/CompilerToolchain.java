@@ -49,6 +49,10 @@ public class CompilerToolchain {
 		return new CompilerToolchain(context);
 	}
 
+	public CompilationContext getContext() {
+		return context;
+	}
+
 	public void compile() throws IOException {
 		parse();
 		semanticCheck();
