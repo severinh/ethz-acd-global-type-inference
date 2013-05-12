@@ -9,6 +9,8 @@ import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.semantic.SymbolTable;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class ClassSymbol extends TypeSymbol {
 
 	private final ClassSymbol superClass;
@@ -101,6 +103,8 @@ public class ClassSymbol extends TypeSymbol {
 	 *             if there is already a method with the same name in this class
 	 */
 	public void addMethod(MethodSymbol method) {
+		checkArgument(method.owner.equals(this));
+
 		if (methods.containsKey(method.name)) {
 			throw new SemanticFailure(Cause.DOUBLE_DECLARATION,
 					"Method '%s' was declared twice in the same class '%s'",
