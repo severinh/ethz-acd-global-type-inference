@@ -21,6 +21,7 @@ import cd.ir.ast.BuiltInWrite;
 import cd.ir.ast.BuiltInWriteFloat;
 import cd.ir.ast.Cast;
 import cd.ir.ast.Expr;
+import cd.ir.ast.Field;
 import cd.ir.ast.FloatConst;
 import cd.ir.ast.Index;
 import cd.ir.ast.IntConst;
@@ -73,9 +74,18 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				} else if (possibleTypes.size() == 1) {
 					type = possibleTypes.iterator().next();
 				} else if (possibleTypes.size() > 1) {
-					throw new SemanticFailure(Cause.TYPE_ERROR,
-							"Type inference resulted in ambiguous type for "
-									+ varSym.name);
+					// NOTE: we may still try to take the join (lca). This is
+					// sometimes necessary.
+					TypeSymbol[] typesArray = possibleTypes
+							.toArray(new TypeSymbol[possibleTypes.size()]);
+					TypeSymbol lca = typeSymbols.getLCA(typesArray);
+					if (lca != typeSymbols.getTopType()) {
+						type = lca;
+					} else {
+						throw new SemanticFailure(Cause.TYPE_ERROR,
+								"Type inference resulted in ambiguous type for "
+										+ varSym.name);
+					}
 				}
 				varSym.setType(type);
 			}
@@ -92,6 +102,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 		private final MethodDecl mdecl;
 		private final ConstraintSystem constraintSystem;
 		private final MethodSymbolCache methodSymbolCache;
+		private ClassSymbolFieldCache classFieldSymbolCache;
 		
 		private TypeVariable returnTypeVariable;
 		
@@ -108,6 +119,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			this.mdecl = mdecl;
 			this.constraintSystem = new ConstraintSystem();
 			this.methodSymbolCache = MethodSymbolCache.of(typeSymbols);
+			this.classFieldSymbolCache = ClassSymbolFieldCache.of(typeSymbols);
 		}
 
 		public ConstraintSystem getConstraintSystem() {

@@ -274,6 +274,14 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 			return getTopType();
 		}
 	}
+	
+	public TypeSymbol getLCA(TypeSymbol... symbols) {
+		TypeSymbol result = getBottomType();
+		for (TypeSymbol sym : symbols) {
+			result = getLCA(result, sym);
+		}
+		return result;
+	}
 
 	/**
 	 * Finds the symbol with the given name, or fails with a NO_SUCH_TYPE error.
