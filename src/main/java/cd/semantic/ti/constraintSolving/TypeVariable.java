@@ -9,11 +9,10 @@ import com.google.common.collect.ImmutableSet;
 
 /**
  * Represents a type variable that holds sets of type symbols that may be
- * manipulated when solving
- * 
+ * manipulated when solving.
  */
 public class TypeVariable implements TypeSet {
-	private Set<TypeSymbol> types;
+	private final Set<TypeSymbol> types;
 
 	public TypeVariable() {
 		this.types = new HashSet<>();
@@ -30,7 +29,7 @@ public class TypeVariable implements TypeSet {
 	}
 
 	/**
-	 * Make this type variable include all the types in the other type set
+	 * Make this type variable include all the types in the other type set.
 	 */
 	public void extend(TypeSet other) {
 		types.addAll(other.getTypes());

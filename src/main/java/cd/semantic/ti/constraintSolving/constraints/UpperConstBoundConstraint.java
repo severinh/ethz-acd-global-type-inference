@@ -9,7 +9,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An upper bound constraint for a type variable v, i.e. v \subseteq U, where U
- * is the upper bound (a constant set)
+ * is the upper bound (a constant set).
  */
 public class UpperConstBoundConstraint extends TypeConstraint {
 	private final TypeVariable typeVariable;
@@ -29,5 +29,15 @@ public class UpperConstBoundConstraint extends TypeConstraint {
 
 	public ConstantTypeSet getUpperBound() {
 		return upperBound;
+	}
+
+	@Override
+	public boolean isSatisfied() {
+		return !isActive() || typeVariable.isSubsetOf(upperBound);
+	}
+
+	@Override
+	public <R, A> R accept(TypeConstraintVisitor<R, A> visitor, A arg) {
+		return visitor.visitUpperConstBoundConstraint(this, arg);
 	}
 }

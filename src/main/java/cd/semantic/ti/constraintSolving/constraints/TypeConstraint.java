@@ -24,4 +24,9 @@ public abstract class TypeConstraint {
 		}
 		return active;
 	}
+
+	public abstract boolean isSatisfied();
+
+	public abstract <R, A> R accept(TypeConstraintVisitor<R, A> visitor, A arg);
+
 }
