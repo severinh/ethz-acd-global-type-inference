@@ -2,6 +2,7 @@ package cd.semantic.ti;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +23,8 @@ import cd.ir.ast.Expr;
 import cd.ir.ast.FloatConst;
 import cd.ir.ast.Index;
 import cd.ir.ast.IntConst;
+import cd.ir.ast.MethodCall;
+import cd.ir.ast.MethodCallExpr;
 import cd.ir.ast.MethodDecl;
 import cd.ir.ast.NewObject;
 import cd.ir.ast.ReturnStmt;
@@ -177,6 +180,24 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				return null;
 			}
 			
+			@Override
+			public Void methodCall(MethodCall call, Void arg) {
+				MethodSymbol msym = call.sym;
+
+				List<Expr> arguments = call.argumentsWithoutReceiver();
+				for (int argNum = 0; argNum < arguments.size(); argNum++) {
+					TypeVariable argTypeVar = exprVisitor.visit(arguments.get(argNum), null);
+					// TODO: expand formal argument type to set of all subtypes of that type. 
+					// This is not correct yet, since no subtypes of formal type could be passed as arguments.
+					VariableSymbol paramSym = msym.getParameter(argNum);
+					ConstantTypeSet expectedArgType = new ConstantTypeSet(paramSym.getType());
+					constraintSystem.addUpperBound(argTypeVar, expectedArgType);
+				}
+				return null;
+			}
+			
+			
+			
 			// TODO: other statements which are necessary
 		}
 
@@ -324,6 +345,32 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				}
 				
 				assert(resultVar != null);
+				return resultVar;
+			}
+			
+			
+			@Override
+			public TypeVariable methodCall(MethodCallExpr call, Void arg) {
+				MethodSymbol msym = call.sym;
+
+				List<Expr> arguments = call.argumentsWithoutReceiver();
+				for (int argNum = 0; argNum < arguments.size(); argNum++) {
+					TypeVariable argTypeVar = visit(arguments.get(argNum), null);
+					// TODO: expand formal argument type to set of all subtypes of that type. 
+					// This is not correct yet, since no subtypes of formal type could be passed as arguments.
+					VariableSymbol paramSym = msym.getParameter(argNum);
+					ConstantTypeSet expectedArgType = new ConstantTypeSet(paramSym.getType());
+					constraintSystem.addUpperBound(argTypeVar, expectedArgType);
+				}
+				
+				TypeSymbol resultSym = msym.returnType;
+				TypeVariable resultVar = constraintSystem.addTypeVariable();
+				// TODO: Is it possible to have a call to a method with void return type here?
+				// If not, remove if.
+				if (resultSym != typeSymbols.getVoidType()) {
+					ConstantTypeSet expectedResultTypes = new ConstantTypeSet(resultSym);
+					constraintSystem.addUpperBound(resultVar, expectedResultTypes);
+				}
 				return resultVar;
 			}
 			
