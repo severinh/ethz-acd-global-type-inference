@@ -314,7 +314,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				case B_MOD:
 				case B_PLUS:
 				case B_MINUS:
-					constraintSystem.addConstEquality(leftTypeVar, numTypes);
+					constraintSystem.addUpperBound(leftTypeVar, numTypes);
 					constraintSystem.addVarEquality(leftTypeVar, rightTypeVar);
 					resultVar = leftTypeVar;
 					break;
@@ -335,7 +335,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				case B_LESS_OR_EQUAL:
 				case B_GREATER_THAN:
 				case B_GREATER_OR_EQUAL:
-					constraintSystem.addConstEquality(leftTypeVar, numTypes);
+					constraintSystem.addUpperBound(leftTypeVar, numTypes);
 					constraintSystem.addVarEquality(leftTypeVar, rightTypeVar);
 					resultVar = constraintSystem.addTypeVariable();
 					constraintSystem.addConstEquality(resultVar, booleanType);
