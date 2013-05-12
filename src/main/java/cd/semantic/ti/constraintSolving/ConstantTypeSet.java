@@ -3,6 +3,8 @@ package cd.semantic.ti.constraintSolving;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import cd.ir.symbols.TypeSymbol;
 
 import com.google.common.collect.ImmutableSet;
@@ -32,5 +34,14 @@ public class ConstantTypeSet implements TypeSet {
 	@Override
 	public boolean isSubsetOf(TypeSet other) {
 		return other.getTypes().containsAll(types);
+	}
+
+	@Override
+	public String toString() {
+		if (types.isEmpty()) {
+			return "\u2205";
+		} else {
+			return "{" + StringUtils.join(types, ",") + "}";
+		}
 	}
 }

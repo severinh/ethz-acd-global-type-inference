@@ -6,6 +6,7 @@ import java.util.Set;
 
 import cd.semantic.ti.constraintSolving.constraints.ConstraintCondition;
 import cd.semantic.ti.constraintSolving.constraints.LowerConstBoundConstraint;
+import cd.semantic.ti.constraintSolving.constraints.TypeConstraint;
 import cd.semantic.ti.constraintSolving.constraints.UpperConstBoundConstraint;
 import cd.semantic.ti.constraintSolving.constraints.VariableInequalityConstraint;
 
@@ -20,24 +21,14 @@ public class ConstraintSystem {
 	private final Set<TypeVariable> typeVariables = new LinkedHashSet<>();
 
 	// the constraints we impose on type variables
-	private final Set<VariableInequalityConstraint> variableInequalityConstraints = new HashSet<>();
-	private final Set<LowerConstBoundConstraint> lowerBoundConstraints = new HashSet<>();
-	private final Set<UpperConstBoundConstraint> upperBoundConstraints = new HashSet<>();
+	private final Set<TypeConstraint> typeConstraints = new HashSet<>();
 
 	public ImmutableSet<TypeVariable> getTypeVariables() {
 		return ImmutableSet.copyOf(typeVariables);
 	}
 
-	public Set<VariableInequalityConstraint> getVariableInequalityConstraints() {
-		return variableInequalityConstraints;
-	}
-
-	public Set<LowerConstBoundConstraint> getLowerBoundConstraints() {
-		return lowerBoundConstraints;
-	}
-
-	public Set<UpperConstBoundConstraint> getUpperBoundConstraints() {
-		return upperBoundConstraints;
+	public Set<TypeConstraint> getTypeConstraints() {
+		return typeConstraints;
 	}
 
 	public LowerConstBoundConstraint addLowerBound(TypeVariable var,
@@ -47,7 +38,7 @@ public class ConstraintSystem {
 
 		LowerConstBoundConstraint result = new LowerConstBoundConstraint(var,
 				lowerBound, ImmutableList.copyOf(conditions));
-		lowerBoundConstraints.add(result);
+		typeConstraints.add(result);
 		return result;
 	}
 
@@ -58,7 +49,7 @@ public class ConstraintSystem {
 
 		UpperConstBoundConstraint result = new UpperConstBoundConstraint(var,
 				upperBound, ImmutableList.copyOf(conditions));
-		upperBoundConstraints.add(result);
+		typeConstraints.add(result);
 		return result;
 	}
 
@@ -71,7 +62,7 @@ public class ConstraintSystem {
 				.copyOf(conditions);
 		VariableInequalityConstraint constraint = new VariableInequalityConstraint(
 				var1, var2, conds);
-		variableInequalityConstraints.add(constraint);
+		typeConstraints.add(constraint);
 	}
 
 	public void addConstEquality(TypeVariable var, ConstantTypeSet constSet,

@@ -9,7 +9,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A lower bound constraint for a type variable v, i.e. L \subseteq v, where L
- * is the lower bound (a constant set)
+ * is the lower bound (a constant set).
  */
 public class LowerConstBoundConstraint extends TypeConstraint {
 	private final TypeVariable typeVariable;
@@ -29,5 +29,20 @@ public class LowerConstBoundConstraint extends TypeConstraint {
 
 	public ConstantTypeSet getLowerBound() {
 		return lowerBound;
+	}
+
+	@Override
+	public boolean isSatisfied() {
+		return !isActive() || lowerBound.isSubsetOf(typeVariable);
+	}
+
+	@Override
+	public <R, A> R accept(TypeConstraintVisitor<R, A> visitor, A arg) {
+		return visitor.visitLowerConstBoundConstraint(this, arg);
+	}
+
+	@Override
+	public String toString() {
+		return buildString(lowerBound + "\u2286" + typeVariable);
 	}
 }

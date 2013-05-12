@@ -1,6 +1,10 @@
 package cd.semantic.ti.constraintSolving;
 
+import java.util.Set;
+
 import cd.semantic.ti.constraintSolving.constraints.LowerConstBoundConstraint;
+import cd.semantic.ti.constraintSolving.constraints.TypeConstraint;
+import cd.semantic.ti.constraintSolving.constraints.TypeConstraintVisitor;
 import cd.semantic.ti.constraintSolving.constraints.UpperConstBoundConstraint;
 import cd.semantic.ti.constraintSolving.constraints.VariableInequalityConstraint;
 
@@ -21,45 +25,42 @@ public class ConstraintSolver {
 	public void solve() {
 		hasSolution = true;
 		boolean changed;
+		UnsatisfiedConstraintUpdater variableUpdater = new UnsatisfiedConstraintUpdater();
+		Set<TypeConstraint> constraints = constraintSystem.getTypeConstraints();
 		do {
 			changed = false;
-
-			for (LowerConstBoundConstraint constraint : constraintSystem
-					.getLowerBoundConstraints()) {
-				if (constraint.isActive()) {
-					TypeVariable typeVar = constraint.getTypeVariable();
-					ConstantTypeSet lowerBound = constraint.getLowerBound();
-					if (!lowerBound.isSubsetOf(typeVar)) {
-						typeVar.extend(lowerBound);
-						changed = true;
-					}
+			for (TypeConstraint constraint : constraints) {
+				if (!constraint.isSatisfied()) {
+					constraint.accept(variableUpdater, null);
+					changed = true;
 				}
 			}
-
-			for (VariableInequalityConstraint constraint : constraintSystem
-					.getVariableInequalityConstraints()) {
-				if (constraint.isActive()) {
-					TypeVariable rightVar = constraint.getRight();
-					TypeVariable leftVar = constraint.getLeft();
-					if (!leftVar.isSubsetOf(rightVar)) {
-						rightVar.extend(leftVar);
-						changed = true;
-					}
-				}
-			}
-
-			for (UpperConstBoundConstraint constraint : constraintSystem
-					.getUpperBoundConstraints()) {
-				if (constraint.isActive()) {
-					ConstantTypeSet upperBound = constraint.getUpperBound();
-					TypeVariable typeVar = constraint.getTypeVariable();
-					if (!typeVar.isSubsetOf(upperBound)) {
-						hasSolution = false;
-						changed = false;
-						break;
-					}
-				}
-			}
-		} while (changed);
+		} while (changed && hasSolution);
 	}
+
+	private class UnsatisfiedConstraintUpdater implements
+			TypeConstraintVisitor<Void, Void> {
+
+		@Override
+		public Void visitLowerConstBoundConstraint(
+				LowerConstBoundConstraint constraint, Void arg) {
+			constraint.getTypeVariable().extend(constraint.getLowerBound());
+			return null;
+		}
+
+		@Override
+		public Void visitUpperConstBoundConstraint(
+				UpperConstBoundConstraint constraint, Void arg) {
+			hasSolution = false;
+			return null;
+		}
+
+		@Override
+		public Void visitVariableInequalityConstraint(
+				VariableInequalityConstraint constraint, Void arg) {
+			constraint.getRight().extend(constraint.getLeft());
+			return null;
+		}
+	}
+
 }
