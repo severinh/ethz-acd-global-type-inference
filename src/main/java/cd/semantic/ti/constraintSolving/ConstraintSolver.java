@@ -58,7 +58,7 @@ public class ConstraintSolver {
 		@Override
 		public Void visitVariableInequalityConstraint(
 				VariableInequalityConstraint constraint, Void arg) {
-			constraint.getLeft().extend(constraint.getRight());
+			constraint.getRight().extend(constraint.getLeft());
 			return null;
 		}
 	}
