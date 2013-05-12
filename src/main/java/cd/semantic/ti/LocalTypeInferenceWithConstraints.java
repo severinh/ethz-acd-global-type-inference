@@ -57,16 +57,21 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			for (VariableSymbol varSym : mdecl.sym.getLocals()) {
 				Set<TypeSymbol> possibleTypes = constraintGen
 						.getPossibleTypes(varSym);
+				TypeSymbol type = null;
 				if (possibleTypes.isEmpty()) {
-					throw new SemanticFailure(Cause.TYPE_ERROR,
-							"No type could be found for " + varSym.name);
+					// Use the bottom type if there are no types in the type
+					// set. Since the constraint system has been solved
+					// successfully, this usually (always?) means that the
+					// variable symbol is not used at all.
+					type = typeSymbols.getBottomType();
+				} else if (possibleTypes.size() == 1) {
+					type = possibleTypes.iterator().next();
 				} else if (possibleTypes.size() > 1) {
 					throw new SemanticFailure(Cause.TYPE_ERROR,
 							"Type inference resulted in ambiguous type for "
 									+ varSym.name);
-				} else {
-					varSym.setType(possibleTypes.iterator().next());
 				}
+				varSym.setType(type);
 			}
 		}
 
