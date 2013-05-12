@@ -380,27 +380,40 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			
 			@Override
 			public TypeVariable methodCall(MethodCallExpr call, Void arg) {
-				MethodSymbol msym = call.sym;
-
 				List<Expr> arguments = call.argumentsWithoutReceiver();
-				for (int argNum = 0; argNum < arguments.size(); argNum++) {
-					TypeVariable argTypeVar = visit(arguments.get(argNum), null);
-					// TODO: expand formal argument type to set of all subtypes of that type. 
-					// This is not correct yet, since no subtypes of formal type could be passed as arguments.
-					VariableSymbol paramSym = msym.getParameter(argNum);
-					ConstantTypeSet expectedArgType = new ConstantTypeSet(paramSym.getType());
-					constraintSystem.addUpperBound(argTypeVar, expectedArgType);
+				Collection<MethodSymbol> methodSymbols = methodSymbolCache.get(
+						call.methodName, arguments.size());
+				Expr receiver = call.receiver();
+				TypeVariable receiverTypeVar = visit(receiver, null);
+				TypeVariable returnTypeVar = constraintSystem.addTypeVariable();
+
+
+				for (MethodSymbol msym : methodSymbols) {
+					ConstraintCondition condition = new ConstraintCondition(msym.owner, receiverTypeVar);
+					for (int argNum = 0; argNum < arguments.size(); argNum++) {
+						TypeVariable argTypeVar = visit(arguments.get(argNum),
+								null);
+						// TODO: expand formal argument type to set of all
+						// subtypes of that type.
+						// This is not correct yet, since no subtypes of formal
+						// type could be passed as arguments.
+						VariableSymbol paramSym = msym.getParameter(argNum);
+						ConstantTypeSet expectedArgType = new ConstantTypeSet(paramSym.getType());
+						constraintSystem.addUpperBound(argTypeVar,
+								expectedArgType, condition);
+					}
+					TypeSymbol resultSym = msym.returnType;
+					// TODO: Is it possible to have a call to a method with void
+					// return type here?
+					// If not, remove if.
+					if (resultSym != typeSymbols.getVoidType()) {
+						ConstantTypeSet expectedResultTypes = new ConstantTypeSet(
+								resultSym);
+						constraintSystem.addUpperBound(returnTypeVar,
+								expectedResultTypes, condition);
+					}
 				}
-				
-				TypeSymbol resultSym = msym.returnType;
-				TypeVariable resultVar = constraintSystem.addTypeVariable();
-				// TODO: Is it possible to have a call to a method with void return type here?
-				// If not, remove if.
-				if (resultSym != typeSymbols.getVoidType()) {
-					ConstantTypeSet expectedResultTypes = new ConstantTypeSet(resultSym);
-					constraintSystem.addUpperBound(resultVar, expectedResultTypes);
-				}
-				return resultVar;
+				return returnTypeVar;
 			}
 			
 
