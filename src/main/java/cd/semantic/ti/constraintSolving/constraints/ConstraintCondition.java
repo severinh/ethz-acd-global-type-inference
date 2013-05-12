@@ -1,9 +1,8 @@
 package cd.semantic.ti.constraintSolving.constraints;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import cd.ir.symbols.TypeSymbol;
 import cd.semantic.ti.constraintSolving.TypeVariable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Condition that constraints may depend on. It is of the form a \in v, where a
@@ -24,5 +23,10 @@ public class ConstraintCondition {
 
 	public TypeVariable getTypeVariable() {
 		return typeVariable;
+	}
+
+	public boolean isSatisfied() {
+		boolean result = getTypeVariable().getTypes().contains(getTypeAtom());
+		return result;
 	}
 }
