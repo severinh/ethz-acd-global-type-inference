@@ -28,6 +28,7 @@ import cd.ir.ast.MethodCall;
 import cd.ir.ast.MethodCallExpr;
 import cd.ir.ast.MethodDecl;
 import cd.ir.ast.NewObject;
+import cd.ir.ast.NullConst;
 import cd.ir.ast.ReturnStmt;
 import cd.ir.ast.ThisRef;
 import cd.ir.ast.Var;
@@ -251,6 +252,16 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 						typeSymbols.getBooleanType());
 				constraintSystem.addConstEquality(typeVar, booleanTypeSet);
 				return typeVar;
+			}
+			
+			@Override
+			public TypeVariable nullConst(NullConst ast, Void arg) {
+				Set<TypeSymbol> referenceTypeSymbols = new HashSet<>(typeSymbols.getReferenceTypeSymbols());
+				referenceTypeSymbols.remove(typeSymbols.getNullType());
+				ConstantTypeSet allReferenceTypeSet = new ConstantTypeSet(referenceTypeSymbols);
+				TypeVariable nullTypeVar = constraintSystem.addTypeVariable();
+				constraintSystem.addConstEquality(nullTypeVar, allReferenceTypeSet);
+				return nullTypeVar;
 			}
 			
 			@Override
