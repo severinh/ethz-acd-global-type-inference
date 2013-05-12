@@ -18,7 +18,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Cache that makes it possible to efficiently look up all method symbols with a
  * certain name and a certain number of parameters.
  */
-public class MethodSymbolCache {
+public final class MethodSymbolCache {
 
 	private final ImmutableMultimap<Key, MethodSymbol> map;
 
@@ -42,6 +42,16 @@ public class MethodSymbolCache {
 		return new MethodSymbolCache(ImmutableMultimap.copyOf(map));
 	}
 
+	/**
+	 * Returns a collection of all method symbols in the cache that have a
+	 * certain name and a certain number of parameters.
+	 * 
+	 * @param name
+	 *            the name that the method symbols must share
+	 * @param parameterCount
+	 *            the number of parameters that the method symbols must have
+	 * @return the newly-constructed cache
+	 */
 	public ImmutableCollection<MethodSymbol> get(String name, int parameterCount) {
 		Key key = new Key(name, parameterCount);
 		return map.get(key);
