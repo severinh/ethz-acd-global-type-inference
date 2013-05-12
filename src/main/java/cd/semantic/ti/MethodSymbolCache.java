@@ -26,6 +26,9 @@ public class MethodSymbolCache {
 		this.map = map;
 	}
 
+	/**
+	 * Build the cache from all methods in the given type symbol table.
+	 */
 	public static MethodSymbolCache of(TypeSymbolTable typeSymbols) {
 		Multimap<Key, MethodSymbol> map = LinkedHashMultimap.create();
 		for (ClassSymbol classSymbol : typeSymbols.getClassSymbols()) {
