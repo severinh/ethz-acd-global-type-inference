@@ -27,6 +27,7 @@ import cd.ir.ast.IntConst;
 import cd.ir.ast.MethodCall;
 import cd.ir.ast.MethodCallExpr;
 import cd.ir.ast.MethodDecl;
+import cd.ir.ast.NewArray;
 import cd.ir.ast.NewObject;
 import cd.ir.ast.NullConst;
 import cd.ir.ast.ReturnStmt;
@@ -270,6 +271,15 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				TypeSymbol classSym = typeSymbols.getType(ast.typeName);
 				ConstantTypeSet classTypeSet = new ConstantTypeSet(classSym);
 				constraintSystem.addConstEquality(typeVar, classTypeSet);
+				return typeVar;
+			}
+			
+			@Override
+			public TypeVariable newArray(NewArray ast, Void arg) {
+				TypeVariable typeVar = constraintSystem.addTypeVariable();
+				TypeSymbol arraySym = typeSymbols.getArrayTypeSymbol(typeSymbols.get(ast.typeName));
+				ConstantTypeSet arrayTypeSet = new ConstantTypeSet(arraySym);
+				constraintSystem.addConstEquality(typeVar, arrayTypeSet);
 				return typeVar;
 			}
 			
