@@ -41,4 +41,8 @@ public class LowerConstBoundConstraint extends TypeConstraint {
 		return visitor.visitLowerConstBoundConstraint(this, arg);
 	}
 
+	@Override
+	public String toString() {
+		return buildString(lowerBound + "\u2286" + typeVariable);
+	}
 }

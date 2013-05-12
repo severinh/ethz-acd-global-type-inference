@@ -37,4 +37,9 @@ public class VariableInequalityConstraint extends TypeConstraint {
 	public <R, A> R accept(TypeConstraintVisitor<R, A> visitor, A arg) {
 		return visitor.visitVariableInequalityConstraint(this, arg);
 	}
+
+	@Override
+	public String toString() {
+		return buildString(left + "\u2286" + right);
+	}
 }

@@ -1,5 +1,10 @@
 package cd.semantic.ti.constraintSolving.constraints;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.collect.ImmutableList;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -29,4 +34,17 @@ public abstract class TypeConstraint {
 
 	public abstract <R, A> R accept(TypeConstraintVisitor<R, A> visitor, A arg);
 
+	protected String buildString(String inequalityString) {
+		if (conditions.isEmpty()) {
+			return inequalityString;
+		} else {
+			List<String> conditionStrings = new ArrayList<>(conditions.size());
+			for (ConstraintCondition condition : conditions) {
+				conditionStrings.add("(" + condition + ")");
+			}
+			return StringUtils.join(conditionStrings, "\u2227") + "\u21D2("
+					+ inequalityString + ")";
+		}
+
+	}
 }

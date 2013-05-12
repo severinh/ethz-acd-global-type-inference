@@ -40,4 +40,9 @@ public class UpperConstBoundConstraint extends TypeConstraint {
 	public <R, A> R accept(TypeConstraintVisitor<R, A> visitor, A arg) {
 		return visitor.visitUpperConstBoundConstraint(this, arg);
 	}
+
+	@Override
+	public String toString() {
+		return buildString(typeVariable + "\u2286" + upperBound);
+	}
 }

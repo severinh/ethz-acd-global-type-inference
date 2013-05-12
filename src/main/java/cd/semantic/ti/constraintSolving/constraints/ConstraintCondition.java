@@ -29,4 +29,9 @@ public class ConstraintCondition {
 		boolean result = getTypeVariable().getTypes().contains(getTypeAtom());
 		return result;
 	}
+
+	@Override
+	public String toString() {
+		return typeAtom + "\u2208" + typeVariable;
+	}
 }
