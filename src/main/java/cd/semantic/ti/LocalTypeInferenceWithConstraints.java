@@ -1,6 +1,7 @@
 package cd.semantic.ti;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,13 +10,17 @@ import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.AstVisitor;
 import cd.ir.ExprVisitor;
 import cd.ir.ast.Assign;
-import cd.ir.ast.Expr;
-import cd.ir.ast.IntConst;
-import cd.ir.ast.FloatConst;
+import cd.ir.ast.BinaryOp;
+import cd.ir.ast.BinaryOp.BOp;
 import cd.ir.ast.BooleanConst;
+import cd.ir.ast.Expr;
+import cd.ir.ast.FloatConst;
+import cd.ir.ast.Index;
+import cd.ir.ast.IntConst;
 import cd.ir.ast.MethodDecl;
 import cd.ir.ast.ReturnStmt;
 import cd.ir.ast.Var;
+import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
@@ -146,9 +151,8 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 					}
 				}
 				return null;
-
 			}
-
+			
 			// TODO: other statements which are necessary
 		}
 
@@ -186,6 +190,81 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				constraintSystem.addConstEquality(typeVar, booleanTypeSet);
 				return typeVar;
 			}
+			
+			@Override
+			public TypeVariable index(Index idx, Void arg) {
+				Expr lhs = idx.left();
+				if (lhs instanceof Var) {
+					VariableSymbol varSym = ((Var) lhs).getSymbol();
+					if (varSym.getKind().equals(Kind.LOCAL)) {
+						TypeVariable localTypeVar = localSymbolVariables
+								.get(varSym);
+						TypeVariable indexTypeVar = visit(idx.right(), null);
+						constraintSystem.addConstEquality(indexTypeVar, new ConstantTypeSet(typeSymbols.getIntType()));
+						// TODO: maybe exclude types like _bottom[]?
+						Set<ArrayTypeSymbol> allArraySyms = new HashSet<>(typeSymbols.getArrayTypeSymbols());
+						ConstantTypeSet arrayTypesSet = new ConstantTypeSet(allArraySyms);
+						constraintSystem.addConstEquality(localTypeVar, arrayTypesSet);
+						TypeVariable resultVar = constraintSystem.addTypeVariable();
+						// TODO: Constrain resultVar to have the same types as arrayTypesSet, but with the "[]" removed.
+						//	 	 We probably need a new constraint type for that.
+						return resultVar;
+					}
+				}
+				return null;
+			}
+			
+			@Override
+			public TypeVariable binaryOp(BinaryOp binaryOp, Void arg) {
+				BOp op = binaryOp.operator;
+				TypeVariable leftTypeVar = visit(binaryOp.left(), null);
+				TypeVariable rightTypeVar = visit(binaryOp.right(), null);
+				TypeVariable resultVar;
+				
+				ConstantTypeSet numTypes = new ConstantTypeSet(
+						new HashSet<>(typeSymbols.getNumericalTypeSymbols()));
+				ConstantTypeSet booleanType = new ConstantTypeSet(typeSymbols.getBooleanType());
+
+				switch (op) {
+				case B_TIMES:
+				case B_DIV:
+				case B_MOD:
+				case B_PLUS:
+				case B_MINUS:
+					constraintSystem.addConstEquality(leftTypeVar, numTypes);
+					constraintSystem.addVarEquality(leftTypeVar, rightTypeVar);
+					resultVar = leftTypeVar;
+					break;
+				case B_AND:
+				case B_OR:
+					constraintSystem.addVarEquality(leftTypeVar, rightTypeVar);
+					constraintSystem.addConstEquality(leftTypeVar, booleanType);
+					resultVar = constraintSystem.addTypeVariable();
+					constraintSystem.addConstEquality(resultVar, booleanType);
+					break;
+				case B_EQUAL:
+				case B_NOT_EQUAL:
+					constraintSystem.addVarEquality(leftTypeVar, rightTypeVar);
+					resultVar = constraintSystem.addTypeVariable();
+					constraintSystem.addConstEquality(resultVar, booleanType);
+					break;
+				case B_LESS_THAN:
+				case B_LESS_OR_EQUAL:
+				case B_GREATER_THAN:
+				case B_GREATER_OR_EQUAL:
+					constraintSystem.addConstEquality(leftTypeVar, numTypes);
+					constraintSystem.addVarEquality(leftTypeVar, rightTypeVar);
+					resultVar = constraintSystem.addTypeVariable();
+					constraintSystem.addConstEquality(resultVar, booleanType);
+					break;
+				default:
+					resultVar = null;
+				}
+				
+				assert(resultVar != null);
+				return resultVar;
+			}
+			
 
 			// TODO: all expression cases
 		}
