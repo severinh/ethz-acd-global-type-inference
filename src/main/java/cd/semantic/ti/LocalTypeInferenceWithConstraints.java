@@ -187,11 +187,16 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			
 			@Override
 			public Void methodCall(MethodCall call, Void arg) {
+				// TODO: The method symbol is null at this point, since we do
+				// not know yet what the receiver is. For simple method calls on
+				// 'this', we could resolve the method symbol unambiguously, but
+				// not for arbitrary receivers.
 				MethodSymbol msym = call.sym;
 
 				List<Expr> arguments = call.argumentsWithoutReceiver();
 				for (int argNum = 0; argNum < arguments.size(); argNum++) {
-					TypeVariable argTypeVar = exprVisitor.visit(arguments.get(argNum), null);
+					Expr argument = arguments.get(argNum);
+					TypeVariable argTypeVar = exprVisitor.visit(argument, null);
 					// TODO: expand formal argument type to set of all subtypes of that type. 
 					// This is not correct yet, since no subtypes of formal type could be passed as arguments.
 					VariableSymbol paramSym = msym.getParameter(argNum);
