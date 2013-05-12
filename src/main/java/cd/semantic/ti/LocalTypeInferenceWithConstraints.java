@@ -237,7 +237,15 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			@Override
 			public TypeVariable var(Var ast, Void arg) {
 				VariableSymbol varSym = ast.getSymbol();
-				return localSymbolVariables.get(varSym);
+				if (varSym.getKind() == Kind.FIELD) {
+					// TODO: maybe also save these variables in a map to reuse, like locals?
+					TypeVariable resultVar = constraintSystem.addTypeVariable();
+					ConstantTypeSet fieldTypeSet = new ConstantTypeSet(varSym.getType());
+					constraintSystem.addConstEquality(resultVar, fieldTypeSet);
+					return resultVar;
+				} else {
+					return localSymbolVariables.get(varSym);
+				}
 			}
 
 			@Override
@@ -318,13 +326,33 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				return typeVar;
 			}
 			
+			@Override
+			public TypeVariable field(Field ast, Void arg) {
+				String fieldName = ast.fieldName;
+				Expr receiver = ast.arg();
+				TypeVariable receiverTypeVar = visit(receiver, null);
+
+				Collection<ClassSymbol> classSymbols = classFieldSymbolCache.get(fieldName);
+				TypeVariable resultType = constraintSystem.addTypeVariable();
+
+				for (ClassSymbol classSym : classSymbols) {
+					VariableSymbol fieldSymbol = classSym.getField(fieldName);
+					TypeSymbol fieldType = fieldSymbol.getType();
+					ConstraintCondition condition = new ConstraintCondition(fieldType, receiverTypeVar);
+					ConstantTypeSet fieldTypeSet = new ConstantTypeSet(fieldType);
+					constraintSystem.addConstEquality(resultType, fieldTypeSet, condition);
+				}
+				return resultType;
+			}
 			
 			
 			@Override
 			public TypeVariable index(Index idx, Void arg) {
 				Expr lhs = idx.left();
+				// TODO: handle other lhs cases, generalize this
 				if (lhs instanceof Var) {
 					VariableSymbol varSym = ((Var) lhs).getSymbol();
+					TypeVariable resultVar = constraintSystem.addTypeVariable();
 					if (varSym.getKind().equals(Kind.LOCAL)) {
 						TypeVariable localTypeVar = localSymbolVariables
 								.get(varSym);
@@ -334,9 +362,19 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 						Set<ArrayTypeSymbol> allArraySyms = new HashSet<>(typeSymbols.getArrayTypeSymbols());
 						ConstantTypeSet arrayTypesSet = new ConstantTypeSet(allArraySyms);
 						constraintSystem.addConstEquality(localTypeVar, arrayTypesSet);
-						TypeVariable resultVar = constraintSystem.addTypeVariable();
 						// TODO: Constrain resultVar to have the same types as arrayTypesSet, but with the "[]" removed.
 						//	 	 We probably need a new constraint type for that.
+						return resultVar;
+					} else if (varSym.getKind() == Kind.FIELD) {
+						TypeSymbol arrayType = varSym.getType();
+						// We check field type here even if type checker does that too, since we don't want to fail with Cast exceptions 
+						if (!(arrayType instanceof ArrayTypeSymbol)) {
+							throw new SemanticFailure(Cause.TYPE_ERROR,
+									"An array type was required, but %s was found", arrayType);						
+						}
+						TypeSymbol elemType = ((ArrayTypeSymbol) arrayType).elementType;
+						ConstantTypeSet elemTypeSet = new ConstantTypeSet(elemType);
+						constraintSystem.addConstEquality(resultVar, elemTypeSet);
 						return resultVar;
 					}
 				}
