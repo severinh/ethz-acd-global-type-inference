@@ -190,7 +190,8 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				// TODO: The method symbol is null at this point, since we do
 				// not know yet what the receiver is. For simple method calls on
 				// 'this', we could resolve the method symbol unambiguously, but
-				// not for arbitrary receivers.
+				// not for arbitrary receivers. We need conditional type
+				// constraints.
 				MethodSymbol msym = call.sym;
 
 				List<Expr> arguments = call.argumentsWithoutReceiver();
