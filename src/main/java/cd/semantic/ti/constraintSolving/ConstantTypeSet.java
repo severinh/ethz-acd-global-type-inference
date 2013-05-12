@@ -14,7 +14,7 @@ public class ConstantTypeSet implements TypeSet {
 		this.types = ImmutableSet.copyOf(syms);
 	}
 
-	public ConstantTypeSet(Set<TypeSymbol> types) {
+	public ConstantTypeSet(Set<? extends TypeSymbol> types) {
 		this.types = ImmutableSet.copyOf(types);
 	}
 
