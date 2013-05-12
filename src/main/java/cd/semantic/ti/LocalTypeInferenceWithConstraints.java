@@ -1,5 +1,6 @@
 package cd.semantic.ti;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,8 +29,10 @@ import cd.ir.ast.MethodCallExpr;
 import cd.ir.ast.MethodDecl;
 import cd.ir.ast.NewObject;
 import cd.ir.ast.ReturnStmt;
+import cd.ir.ast.ThisRef;
 import cd.ir.ast.Var;
 import cd.ir.symbols.ArrayTypeSymbol;
+import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
@@ -39,6 +42,7 @@ import cd.semantic.ti.constraintSolving.ConstantTypeSet;
 import cd.semantic.ti.constraintSolving.ConstraintSolver;
 import cd.semantic.ti.constraintSolving.ConstraintSystem;
 import cd.semantic.ti.constraintSolving.TypeVariable;
+import cd.semantic.ti.constraintSolving.constraints.ConstraintCondition;
 
 public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
@@ -82,11 +86,13 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 	 * and constraints as necessary for a method.
 	 */
 	public class ConstraintGenerator extends AstVisitor<TypeVariable, Void> {
-		private MethodDecl mdecl;
-		private ConstraintSystem constraintSystem = new ConstraintSystem();
-		private TypeVariable returnTypeVariable;
 		private final TypeSymbolTable typeSymbols;
-
+		private final MethodDecl mdecl;
+		private final ConstraintSystem constraintSystem;
+		private final MethodSymbolCache methodSymbolCache;
+		
+		private TypeVariable returnTypeVariable;
+		
 		// Map to remember the type variables for our parameters and locals,
 		// i.e. what we are eventually interested in.
 		// Note to avoid confusion: VariableSymbols are symbols for program
@@ -96,8 +102,10 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 		private final Map<VariableSymbol, TypeVariable> localSymbolVariables = new HashMap<>();
 
 		public ConstraintGenerator(MethodDecl mdecl, TypeSymbolTable typeSymbols) {
-			this.mdecl = mdecl;
 			this.typeSymbols = typeSymbols;
+			this.mdecl = mdecl;
+			this.constraintSystem = new ConstraintSystem();
+			this.methodSymbolCache = MethodSymbolCache.of(typeSymbols);
 		}
 
 		public ConstraintSystem getConstraintSystem() {
@@ -187,27 +195,25 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			
 			@Override
 			public Void methodCall(MethodCall call, Void arg) {
-				// TODO: The method symbol is null at this point, since we do
-				// not know yet what the receiver is. For simple method calls on
-				// 'this', we could resolve the method symbol unambiguously, but
-				// not for arbitrary receivers. We need conditional type
-				// constraints.
-				MethodSymbol msym = call.sym;
-
 				List<Expr> arguments = call.argumentsWithoutReceiver();
-				for (int argNum = 0; argNum < arguments.size(); argNum++) {
-					Expr argument = arguments.get(argNum);
-					TypeVariable argTypeVar = exprVisitor.visit(argument, null);
-					// TODO: expand formal argument type to set of all subtypes of that type. 
-					// This is not correct yet, since no subtypes of formal type could be passed as arguments.
-					VariableSymbol paramSym = msym.getParameter(argNum);
-					ConstantTypeSet expectedArgType = new ConstantTypeSet(paramSym.getType());
-					constraintSystem.addUpperBound(argTypeVar, expectedArgType);
+				Collection<MethodSymbol> methodSymbols = methodSymbolCache.get(call.methodName, arguments.size());
+				Expr receiver = call.receiver();
+				TypeVariable receiverTypeVar = exprVisitor.visit(receiver, null);
+				
+				for (MethodSymbol msym : methodSymbols) {
+					for (int argNum = 0; argNum < arguments.size(); argNum++) {
+						Expr argument = arguments.get(argNum);
+						TypeVariable argTypeVar = exprVisitor.visit(argument, null);
+						// TODO: expand formal argument type to set of all subtypes of that type. 
+						// This is not correct yet, since no subtypes of formal type could be passed as arguments.
+						VariableSymbol paramSym = msym.getParameter(argNum);
+						ConstantTypeSet expectedArgType = new ConstantTypeSet(paramSym.getType());
+						ConstraintCondition condition = new ConstraintCondition(msym.owner, receiverTypeVar);
+						constraintSystem.addUpperBound(argTypeVar, expectedArgType, condition);
+					}
 				}
 				return null;
 			}
-			
-			
 			
 			// TODO: other statements which are necessary
 		}
@@ -252,6 +258,18 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				TypeVariable typeVar = constraintSystem.addTypeVariable();
 				TypeSymbol classSym = typeSymbols.getType(ast.typeName);
 				ConstantTypeSet classTypeSet = new ConstantTypeSet(classSym);
+				constraintSystem.addConstEquality(typeVar, classTypeSet);
+				return typeVar;
+			}
+			
+			@Override
+			public TypeVariable thisRef(ThisRef ast, Void arg) {
+				TypeVariable typeVar = constraintSystem.addTypeVariable();
+				ClassSymbol classSymbol = mdecl.sym.owner;
+				// TODO: This is obviously not correct yet
+				// The actual type of this may of course be a subtype of the
+				// class in which the current method is defined in.
+				ConstantTypeSet classTypeSet = new ConstantTypeSet(classSymbol);
 				constraintSystem.addConstEquality(typeVar, classTypeSet);
 				return typeVar;
 			}
