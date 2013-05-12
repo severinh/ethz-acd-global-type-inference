@@ -289,7 +289,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			@Override
 			public TypeVariable newArray(NewArray ast, Void arg) {
 				TypeVariable typeVar = constraintSystem.addTypeVariable();
-				TypeSymbol arraySym = typeSymbols.getArrayTypeSymbol(typeSymbols.get(ast.typeName));
+				TypeSymbol arraySym = typeSymbols.get(ast.typeName);
 				ConstantTypeSet arrayTypeSet = new ConstantTypeSet(arraySym);
 				constraintSystem.addConstEquality(typeVar, arrayTypeSet);
 				return typeVar;
@@ -317,6 +317,8 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				constraintSystem.addConstEquality(typeVar, resultTypeSet);
 				return typeVar;
 			}
+			
+			
 			
 			@Override
 			public TypeVariable index(Index idx, Void arg) {
