@@ -1,0 +1,18 @@
+class A {
+  void foo(A a) {
+    write(1);
+  }
+}
+
+class B extends A { }
+
+class Main {
+  void main() {
+    B b;
+    b = new B();
+  }
+  
+  void test(B b) {
+    b.foo(b);
+  }
+}
