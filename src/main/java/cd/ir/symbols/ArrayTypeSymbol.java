@@ -1,4 +1,7 @@
 package cd.ir.symbols;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 
 public class ArrayTypeSymbol extends TypeSymbol {
 
@@ -6,6 +9,8 @@ public class ArrayTypeSymbol extends TypeSymbol {
 
 	public ArrayTypeSymbol(TypeSymbol elementType) {
 		super(makeNameFromElementType(elementType));
+		checkNotNull(elementType);
+		checkArgument(elementType.isDeclarableType());
 		this.elementType = elementType;
 	}
 

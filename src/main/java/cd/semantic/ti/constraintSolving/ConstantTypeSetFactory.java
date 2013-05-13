@@ -57,8 +57,8 @@ public class ConstantTypeSetFactory {
 	
 	public ConstantTypeSet makeDeclarableSubtypes(TypeSymbol typeSymbol) {
 		checkNotNull(typeSymbol);
-		if (!typeSymbols.isDeclarableType(typeSymbol)) 
-			return new ConstantTypeSet();		
+		if (!typeSymbol.isDeclarableType()) 
+			return new ConstantTypeSet();	
 		
 		if (typeSymbol instanceof ClassSymbol) {
 			ClassSymbol classSym = (ClassSymbol) typeSymbol;
@@ -103,18 +103,20 @@ public class ConstantTypeSetFactory {
 	}
 
 	/**
-	 * Returns a constant type set containing all reference types.
+	 * Returns a constant type set containing all declarable reference types.
 	 */
 	public ConstantTypeSet makeReferenceTypeSet() {
 		if (referenceTypeSet == null) {
-			referenceTypeSet = new ConstantTypeSet(
-					typeSymbols.getReferenceTypeSymbols());
+			Set<TypeSymbol> referenceTypes = new HashSet<>();
+			referenceTypes.addAll(typeSymbols.getClassSymbols());
+			referenceTypes.addAll(typeSymbols.getArrayTypeSymbols());
+			referenceTypeSet = new ConstantTypeSet(referenceTypes);
 		}
 		return referenceTypeSet;
 	}
 
 	/**
-	 * Returns a constant type set containing all array types.
+	 * Returns a constant type set containing all declarable array types.
 	 */
 	public ConstantTypeSet makeArrayTypeSet() {
 		if (arrayTypeSet == null) {

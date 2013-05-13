@@ -9,6 +9,10 @@ public class TypeSymbol extends Symbol {
 	public boolean isReferenceType() {
 		return false;
 	}
+	
+	public boolean isDeclarableType() {
+		return true;
+	}
 
 	@Override
 	public String toString() {

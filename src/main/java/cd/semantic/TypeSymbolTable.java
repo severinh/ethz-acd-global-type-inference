@@ -1,14 +1,18 @@
 package cd.semantic;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.symbols.ArrayTypeSymbol;
+import cd.ir.symbols.BottomTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.NullTypeSymbol;
 import cd.ir.symbols.PrimitiveTypeSymbol;
+import cd.ir.symbols.TopTypeSymbol;
 import cd.ir.symbols.TypeSymbol;
 
 import com.google.common.collect.ImmutableSet;
@@ -63,8 +67,8 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		voidType = new PrimitiveTypeSymbol("void");
 		objectType = new ClassSymbol("Object");
 		nullType = new NullTypeSymbol(NULL_TYPE_NAME);
-		topType = new TypeSymbol(TOP_TYPE_NAME);
-		bottomType = new TypeSymbol(BOTTOM_TYPE_NAME);
+		topType = new TopTypeSymbol(TOP_TYPE_NAME);
+		bottomType = new BottomTypeSymbol(BOTTOM_TYPE_NAME);
 
 		add(intType);
 		add(booleanType);
@@ -128,16 +132,15 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		// Overriding the method is a bit fragile, because it assumes that the
 		// 'add' method is the only way of adding a symbol to the symbol table.
 
-		// TODO: This also creates array type symbols for the bottom, top and
-		// null element types. This does not seem necessary.
-		super.add(new ArrayTypeSymbol(typeSymbol));
+		if (typeSymbol.isDeclarableType() && typeSymbol != voidType) {
+			super.add(new ArrayTypeSymbol(typeSymbol));
+		}
 	}
 
 	/**
 	 * Returns the list of all class symbols in this symbol table.
 	 * 
-	 * It also includes built-in class symbols like <code>Object</code> and
-	 * <code>null</code>.
+	 * It also includes built-in class symbol <code>Object</code>
 	 * 
 	 * @return the class symbols
 	 */
@@ -186,6 +189,12 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		}
 		return builder.build();
 	}
+	
+	public ImmutableSet<TypeSymbol> getDeclarableReferenceTypeSymbols() {
+		Set<TypeSymbol> refTypes = new HashSet<>(getReferenceTypeSymbols());
+		refTypes.remove(nullType);
+		return ImmutableSet.copyOf(refTypes);
+	}
 
 	/**
 	 * Returns a set of all array type symbols in this symbol table.
@@ -208,7 +217,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		ImmutableSet.Builder<ClassSymbol> builder = ImmutableSet.builder();
 		
 		for (ClassSymbol classSym : getClassSymbols()) {
-			if (isDeclarableType(classSym) && isSubType(typeSym, classSym)) {
+			if (isSubType(typeSym, classSym)) {
 				builder.add(classSym);
 			}
 		}
@@ -234,14 +243,6 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 			return getObjectType();
 		}
 		return ((ClassSymbol) sym).getSuperClass();
-	}
-
-	/**
-	 * Returns whether the type may be declared in the source code, in general
-	 * (There are still restrictions, of course, e.g. for void)
-	 */
-	public boolean isDeclarableType(TypeSymbol sym) {
-		return !(sym == nullType || sym == topType || sym == bottomType);
 	}
 
 	/**

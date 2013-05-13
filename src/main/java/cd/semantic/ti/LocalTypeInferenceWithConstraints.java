@@ -283,11 +283,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			
 			@Override
 			public TypeVariable nullConst(NullConst ast, Void arg) {
-				// TODO: Does not use constantTypeSetFactory.getReferenceTypeSet yet,
-				// because it drops the null type from the type set.
-				Set<TypeSymbol> referenceTypeSymbols = new HashSet<>(typeSymbols.getReferenceTypeSymbols());
-				referenceTypeSymbols.remove(typeSymbols.getNullType());
-				ConstantTypeSet allReferenceTypeSet = new ConstantTypeSet(referenceTypeSymbols);
+				ConstantTypeSet allReferenceTypeSet = constantTypeSetFactory.makeReferenceTypeSet();
 				TypeVariable nullTypeVar = constraintSystem.addTypeVariable();
 				constraintSystem.addUpperBound(nullTypeVar, allReferenceTypeSet);
 				return nullTypeVar;
@@ -367,7 +363,6 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 					if (varSym.getKind().equals(Kind.LOCAL)) {
 						TypeVariable localTypeVar = localSymbolVariables
 								.get(varSym);
-						// TODO: maybe exclude types like _bottom[]?
 						ConstantTypeSet arrayTypesSet = constantTypeSetFactory.makeArrayTypeSet();
 						constraintSystem.addUpperBound(localTypeVar, arrayTypesSet);
 						// TODO: Constrain resultVar to have the same types as arrayTypesSet, but with the "[]" removed.

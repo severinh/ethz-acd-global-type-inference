@@ -13,5 +13,10 @@ public class NullTypeSymbol extends TypeSymbol {
 	public boolean isReferenceType() {
 		return true;
 	}
+	
+	@Override
+	public boolean isDeclarableType() {
+		return false;
+	}
 
 }
