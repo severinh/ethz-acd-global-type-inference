@@ -57,35 +57,68 @@ abstract public class AbstractTestSamplePrograms {
 	public void test() throws Throwable {
 		LOG.debug("Testing " + getCompiler().getContext().getSourceFile());
 
-		boolean isParseFailureRef = referenceData.isParseFailure();
-		boolean isParseFailure = false;
-		Optional<Cause> semanticFailureCause = Optional.absent();
+		Optional<ParseFailure> parseFailure = Optional.absent();
+		Optional<SemanticFailure> semanticFailure = Optional.absent();
 
 		try {
 			compiler.compile();
-		} catch (ParseFailure parseFailure) {
-			LOG.debug(ExceptionUtils.getStackTrace(parseFailure));
-			isParseFailure = true;
-		} catch (SemanticFailure semanticFailure) {
-			LOG.debug(ExceptionUtils.getStackTrace(semanticFailure));
-			semanticFailureCause = Optional.of(semanticFailure.cause);
+		} catch (ParseFailure failure) {
+			parseFailure = Optional.of(failure);
+		} catch (SemanticFailure failure) {
+			semanticFailure = Optional.of(failure);
 		}
 
+		boolean isParseFailureRef = referenceData.isParseFailure();
+		boolean isParseFailure = parseFailure.isPresent();
+
 		if (isParseFailureRef || isParseFailure) {
-			Assert.assertEquals(isParseFailureRef, isParseFailure);
+			assertEqualsWithException(parseFailure, isParseFailureRef,
+					isParseFailure);
 		} else {
 			// Only fetch the semantic failure reference data and run the
 			// remaining tests if parsing was successful
 			Optional<Cause> semanticFailureCauseRef = referenceData
 					.getSemanticFailureCause();
-			Assert.assertEquals(semanticFailureCauseRef, semanticFailureCause);
+			Optional<Cause> semanticFailureCause;
 
-			if (!semanticFailureCause.isPresent()) {
+			if (semanticFailure.isPresent()) {
+				semanticFailureCause = Optional.of(semanticFailure.get().cause);
+			} else {
+				semanticFailureCause = Optional.absent();
+			}
+			assertEqualsWithException(semanticFailure, semanticFailureCauseRef,
+					semanticFailureCause);
+
+			if (!semanticFailure.isPresent()) {
 				// Only run the remaining tests if the semantic check was
 				// successful
 				testCodeGenerator();
 			}
 		}
+	}
+
+	/**
+	 * Assert that two values are equal and optionally use an exception as the
+	 * message if the assertion fails.
+	 * 
+	 * @param exception
+	 *            the optional exception. Note that it may be absent even though
+	 *            the two values are unequal and it may be present even though
+	 *            the values are equal. In other words, its presence is
+	 *            independent of the values being equal or unequal
+	 * @param expected
+	 *            expected value
+	 * @param actual
+	 *            actual value
+	 */
+	private static void assertEqualsWithException(
+			Optional<? extends Exception> exception, Object expected,
+			Object actual) {
+		String message = "";
+		if (exception.isPresent()) {
+			message = ExceptionUtils.getStackTrace(exception.get());
+		}
+		Assert.assertEquals(message, expected, actual);
 	}
 
 	/**
