@@ -280,7 +280,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				referenceTypeSymbols.remove(typeSymbols.getNullType());
 				ConstantTypeSet allReferenceTypeSet = new ConstantTypeSet(referenceTypeSymbols);
 				TypeVariable nullTypeVar = constraintSystem.addTypeVariable();
-				constraintSystem.addConstEquality(nullTypeVar, allReferenceTypeSet);
+				constraintSystem.addUpperBound(nullTypeVar, allReferenceTypeSet);
 				return nullTypeVar;
 			}
 			
