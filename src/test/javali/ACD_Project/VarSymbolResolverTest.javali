@@ -21,7 +21,7 @@ class A {
 		x = p;
 	}
 	
-	void dontGetX() {
+	int dontGetX() {
 		int x;
 		// x must be resolved to the local variable symbol
 		// (as the local variable shadows the field)
