@@ -10,6 +10,7 @@ class Main {
   void main() {
     B b;
     b = new B();
+    test(b);
   }
   
   void test(B b) {

@@ -1,12 +1,15 @@
 package cd.semantic.ti.constraintSolving;
 
-import java.util.HashMap;
-import java.util.Map;
+import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.semantic.TypeSymbolTable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Constructs and caches constant type sets.
@@ -50,6 +53,22 @@ public class ConstantTypeSetFactory {
 			singletonTypeSets.put(typeSymbol, result);
 		}
 		return result;
+	}
+	
+	public ConstantTypeSet makeDeclarableSubtypes(TypeSymbol typeSymbol) {
+		checkNotNull(typeSymbol);
+		if (!typeSymbols.isDeclarableType(typeSymbol)) 
+			return new ConstantTypeSet();		
+		
+		// add the type itself
+		Set<TypeSymbol> subTypes = new HashSet<>();
+		subTypes.add(typeSymbol);
+		
+		if (typeSymbol instanceof ClassSymbol) {
+			ClassSymbol classSym = (ClassSymbol) typeSymbol;
+			subTypes.addAll(typeSymbols.getClassSymbolSubtypes(classSym));
+		}
+		return new ConstantTypeSet(subTypes);
 	}
 
 	/**

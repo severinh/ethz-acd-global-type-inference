@@ -2,8 +2,7 @@ package cd.semantic;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
 
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
@@ -12,6 +11,8 @@ import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.NullTypeSymbol;
 import cd.ir.symbols.PrimitiveTypeSymbol;
 import cd.ir.symbols.TypeSymbol;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Table that holds all type symbols of the program.
@@ -75,7 +76,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		add(topType);
 		add(bottomType);
 	}
-
+	
 	public PrimitiveTypeSymbol getIntType() {
 		return intType;
 	}
@@ -199,6 +200,21 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		}
 		return builder.build();
 	}
+	
+	/**
+	 * Returns all ClassSymbols a given ClassSymbol has as subtypes.
+	 * (This does include the symbol itself, but _not_ the NullTypeSymbol)
+	 */
+	public ImmutableSet<ClassSymbol> getClassSymbolSubtypes(ClassSymbol typeSym) {
+		ImmutableSet.Builder<ClassSymbol> builder = ImmutableSet.builder();
+		
+		for (ClassSymbol classSym : getClassSymbols()) {
+			if (isDeclarableType(classSym) && isSubType(typeSym, classSym)) {
+				builder.add(classSym);
+			}
+		}
+		return builder.build();
+	}
 
 	/**
 	 * Returns the super type of a type, if any.
@@ -219,6 +235,14 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 			return getObjectType();
 		}
 		return ((ClassSymbol) sym).getSuperClass();
+	}
+
+	/**
+	 * Returns whether the type may be declared in the source code, in general
+	 * (There are still restrictions, of course, e.g. for void)
+	 */
+	public boolean isDeclarableType(TypeSymbol sym) {
+		return !(sym == nullType || sym == topType || sym == bottomType);
 	}
 
 	/**

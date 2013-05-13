@@ -220,20 +220,19 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				Set<ClassSymbol> possibleReceiverTypes = new HashSet<>();
 				
 				for (MethodSymbol msym : methodSymbols) {
-					possibleReceiverTypes.add(msym.owner);
+					possibleReceiverTypes.addAll(typeSymbols.getClassSymbolSubtypes(msym.owner));
 					for (int argNum = 0; argNum < arguments.size(); argNum++) {
 						Expr argument = arguments.get(argNum);
 						TypeVariable argTypeVar = exprVisitor.visit(argument, null);
-						// TODO: expand formal argument type to set of all subtypes of that type. 
-						// This is not correct yet, since no subtypes of formal type could be passed as arguments.
 						VariableSymbol paramSym = msym.getParameter(argNum);
-						ConstantTypeSet expectedArgType = constantTypeSetFactory.make(paramSym.getType());
+						TypeSymbol paramType = paramSym.getType();
+						ConstantTypeSet expectedArgType = constantTypeSetFactory.makeDeclarableSubtypes(paramType);
 						ConstraintCondition condition = new ConstraintCondition(msym.owner, receiverTypeVar);
 						constraintSystem.addUpperBound(argTypeVar, expectedArgType, condition);
 					}
 				}
 				
-				// the receiver _must_ be one of the classes that have a method 
+				// the receiver _must_ be a subtype of any class that has a method 
 				// with the right name and number of arguments
 				ConstantTypeSet possibleReceiverTypeSet = new ConstantTypeSet(possibleReceiverTypes);
 				constraintSystem.addUpperBound(receiverTypeVar, possibleReceiverTypeSet);
@@ -468,37 +467,33 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				Set<ClassSymbol> possibleReceiverTypes = new HashSet<>();
 
 				for (MethodSymbol msym : methodSymbols) {
-					possibleReceiverTypes.add(msym.owner);
-					ConstraintCondition condition = new ConstraintCondition(msym.owner, receiverTypeVar);
+					possibleReceiverTypes.addAll(typeSymbols.getClassSymbolSubtypes(msym.owner));
+					ConstraintCondition condition = new ConstraintCondition(
+							msym.owner, receiverTypeVar);
 					for (int argNum = 0; argNum < arguments.size(); argNum++) {
 						TypeVariable argTypeVar = visit(arguments.get(argNum),
 								null);
-						// TODO: expand formal argument type to set of all
-						// subtypes of that type.
-						// This is not correct yet, since no subtypes of formal
-						// type could be passed as arguments.
 						VariableSymbol paramSym = msym.getParameter(argNum);
-						ConstantTypeSet expectedArgType = constantTypeSetFactory.make(paramSym.getType());
+						TypeSymbol paramType = paramSym.getType();
+						ConstantTypeSet expectedArgType = constantTypeSetFactory
+								.makeDeclarableSubtypes(paramType);
 						constraintSystem.addUpperBound(argTypeVar,
 								expectedArgType, condition);
 					}
 					TypeSymbol resultSym = msym.returnType;
-					// TODO: Is it possible to have a call to a method with void
-					// return type here?
-					// If not, remove if.
-					if (resultSym != typeSymbols.getVoidType()) {
-						ConstantTypeSet expectedResultTypes = constantTypeSetFactory.make(
-								resultSym);
-						constraintSystem.addUpperBound(returnTypeVar,
-								expectedResultTypes, condition);
-					}
+					ConstantTypeSet expectedResultTypes = constantTypeSetFactory
+							.make(resultSym);
+					constraintSystem.addUpperBound(returnTypeVar,
+							expectedResultTypes, condition);
 				}
-				
-				// the receiver _must_ be one of the classes that have a method 
+
+				// the receiver _must_ be a subtype of any class that has a method 
 				// with the right name and number of arguments
-				ConstantTypeSet possibleReceiverTypeSet = new ConstantTypeSet(possibleReceiverTypes);
-				constraintSystem.addUpperBound(receiverTypeVar, possibleReceiverTypeSet);
-				
+				ConstantTypeSet possibleReceiverTypeSet = new ConstantTypeSet(
+						possibleReceiverTypes);
+				constraintSystem.addUpperBound(receiverTypeVar,
+						possibleReceiverTypeSet);
+
 				return returnTypeVar;
 			}
 			
