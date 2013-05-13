@@ -59,7 +59,6 @@ abstract public class AbstractTestSamplePrograms {
 
 		boolean isParseFailureRef = referenceData.isParseFailure();
 		boolean isParseFailure = false;
-		Optional<Cause> semanticFailureCauseRef = Optional.absent();
 		Optional<Cause> semanticFailureCause = Optional.absent();
 
 		try {
@@ -75,8 +74,10 @@ abstract public class AbstractTestSamplePrograms {
 		if (isParseFailureRef || isParseFailure) {
 			Assert.assertEquals(isParseFailureRef, isParseFailure);
 		} else {
-			// Only run the remaining tests if parsing was successful
-			semanticFailureCauseRef = referenceData.getSemanticFailureCause();
+			// Only fetch the semantic failure reference data and run the
+			// remaining tests if parsing was successful
+			Optional<Cause> semanticFailureCauseRef = referenceData
+					.getSemanticFailureCause();
 			Assert.assertEquals(semanticFailureCauseRef, semanticFailureCause);
 
 			if (!semanticFailureCause.isPresent()) {
