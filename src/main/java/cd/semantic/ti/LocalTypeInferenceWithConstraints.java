@@ -180,7 +180,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			public Void returnStmt(ReturnStmt ast, Void arg) {
 				if (ast.arg() != null) {
 					TypeVariable exprType = exprVisitor.visit(ast.arg(), null);
-					constraintSystem.addVarEquality(exprType,
+					constraintSystem.addVarInequality(exprType,
 							returnTypeVariable);
 				}
 				return null;
