@@ -29,8 +29,8 @@ public class ConstantTypeSetFactory {
 	 * Constructs a new factory for constant type symbols.
 	 * 
 	 * @param typeSymbols
-	 *            The table with all type symbols to construct the sets from. it
-	 *            It must be final at this point in time.
+	 *            The table with all type symbols to construct the constant type
+	 *            sets from. It must be final at this point in time.
 	 */
 	public ConstantTypeSetFactory(TypeSymbolTable typeSymbols) {
 		super();
