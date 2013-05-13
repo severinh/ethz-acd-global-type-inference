@@ -33,6 +33,7 @@ import cd.ir.ast.NewObject;
 import cd.ir.ast.NullConst;
 import cd.ir.ast.ReturnStmt;
 import cd.ir.ast.ThisRef;
+import cd.ir.ast.UnaryOp;
 import cd.ir.ast.Var;
 import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
@@ -228,8 +229,6 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				}
 				return null;
 			}
-			
-			// TODO: other statements which are necessary
 		}
 
 		public class ConstraintExprVisitor extends
@@ -348,20 +347,21 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			
 			@Override
 			public TypeVariable index(Index idx, Void arg) {
-				Expr lhs = idx.left();
+				Expr arrayExpr = idx.left();
+				TypeVariable indexTypeVar = visit(idx.right(), null);
+				constraintSystem.addConstEquality(indexTypeVar, new ConstantTypeSet(typeSymbols.getIntType()));
+
 				// TODO: handle other lhs cases, generalize this
-				if (lhs instanceof Var) {
-					VariableSymbol varSym = ((Var) lhs).getSymbol();
+				if (arrayExpr instanceof Var) {
+					VariableSymbol varSym = ((Var) arrayExpr).getSymbol();
 					TypeVariable resultVar = constraintSystem.addTypeVariable();
 					if (varSym.getKind().equals(Kind.LOCAL)) {
 						TypeVariable localTypeVar = localSymbolVariables
 								.get(varSym);
-						TypeVariable indexTypeVar = visit(idx.right(), null);
-						constraintSystem.addConstEquality(indexTypeVar, new ConstantTypeSet(typeSymbols.getIntType()));
 						// TODO: maybe exclude types like _bottom[]?
 						Set<ArrayTypeSymbol> allArraySyms = new HashSet<>(typeSymbols.getArrayTypeSymbols());
 						ConstantTypeSet arrayTypesSet = new ConstantTypeSet(allArraySyms);
-						constraintSystem.addConstEquality(localTypeVar, arrayTypesSet);
+						constraintSystem.addUpperBound(localTypeVar, arrayTypesSet);
 						// TODO: Constrain resultVar to have the same types as arrayTypesSet, but with the "[]" removed.
 						//	 	 We probably need a new constraint type for that.
 						return resultVar;
@@ -489,8 +489,11 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				return returnTypeVar;
 			}
 			
-
-			// TODO: all expression cases
+			@Override
+			public TypeVariable unaryOp(UnaryOp ast, Void arg) {
+				// TODO implement this (and test! there are no tests for this case)
+				return super.unaryOp(ast, arg);
+			}
 		}
 	}
 
