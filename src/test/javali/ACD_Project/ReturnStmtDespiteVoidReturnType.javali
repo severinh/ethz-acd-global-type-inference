@@ -1,0 +1,13 @@
+// Assert that if a method contains a return statement even though the
+// return type is void, then a semantic failure is triggered.
+
+class Main {
+	void main() {
+		foo();
+	}
+	
+	void foo() {
+		// Should not type-check
+		return 1;
+	}
+}
