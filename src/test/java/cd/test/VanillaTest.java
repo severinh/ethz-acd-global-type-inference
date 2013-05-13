@@ -8,6 +8,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import cd.CompilerOptions;
+import cd.test.fileprovider.RecursiveTestFileProvider;
+import cd.test.fileprovider.TestFileProvider;
 import cd.test.reference.ReferenceData;
 import cd.test.reference.ReferenceDataFactory;
 
@@ -19,8 +21,11 @@ public class VanillaTest extends TestSamplePrograms {
 
 	@Parameters(name = "{index}: {0}")
 	public static Collection<Object[]> getParameters() {
+		TestFileProvider testFileProvider = RecursiveTestFileProvider
+				.withExcludedDir(TEST_FOLDER, "newsyntax");
 		CompilerOptions options = new CompilerOptions();
-		return buildParameters(options, ReferenceDataFactory.makeRemote());
+		return buildParameters(testFileProvider, options,
+				ReferenceDataFactory.makeRemote());
 	}
 
 	public VanillaTest(String testName, File file, CompilerOptions options,

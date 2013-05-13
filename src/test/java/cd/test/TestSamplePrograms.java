@@ -6,30 +6,24 @@ import java.util.Collection;
 import java.util.List;
 
 import cd.CompilerOptions;
-import cd.test.fileprovider.RecursiveTestFileProvider;
 import cd.test.fileprovider.TestFileProvider;
 import cd.test.reference.ReferenceData;
 import cd.test.reference.ReferenceDataFactory;
 
 public abstract class TestSamplePrograms extends AbstractTestSamplePrograms {
 
-	private static final TestFileProvider TEST_FILE_PROVIDER;
+	protected static final File TEST_FOLDER;
 
 	static {
-		// Run the tests on just one file
-		// String filePath = "test.javali";
-		// TEST_FILE_PROVIDER = new SingleTestFileProvider(new File(filePath));
-
-		// Run the tests on all files in a directory (search recursively)
 		String folderPath = TestSamplePrograms.class.getResource("/").getPath();
-		TEST_FILE_PROVIDER = RecursiveTestFileProvider.withExcludedDir(
-				new File(folderPath), "global");
+		TEST_FOLDER = new File(folderPath);
 	}
 
 	protected static Collection<Object[]> buildParameters(
-			CompilerOptions options, ReferenceDataFactory referenceDataFactory) {
+			TestFileProvider testFileProvider, CompilerOptions options,
+			ReferenceDataFactory referenceDataFactory) {
 		List<Object[]> result = new ArrayList<>();
-		for (File file : TEST_FILE_PROVIDER.getTestFiles()) {
+		for (File file : testFileProvider.getTestFiles()) {
 			result.add(new Object[] { file.getName(), file, options,
 					referenceDataFactory.of(file) });
 		}

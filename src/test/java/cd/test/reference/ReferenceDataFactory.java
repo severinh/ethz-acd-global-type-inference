@@ -19,9 +19,9 @@ public abstract class ReferenceDataFactory {
 
 			@Override
 			public ReferenceData of(File sourceFile) {
-				ReferenceData remoteData = new RemoteReferenceData(sourceFile);
-				ReferenceData cachedRemoteData = new CachedReferenceData(
-						remoteData, "");
+				ReferenceData remoteData, cachedRemoteData;
+				remoteData = new RemoteReferenceData(sourceFile);
+				cachedRemoteData = new CachedReferenceData(remoteData, "");
 				return cachedRemoteData;
 			}
 
@@ -37,11 +37,10 @@ public abstract class ReferenceDataFactory {
 
 			@Override
 			public ReferenceData of(File sourceFile) {
-				ReferenceData remoteData = new RemoteReferenceData(sourceFile);
-				ReferenceData cachedRemoteData = new CachedReferenceData(
-						remoteData, "");
-				ReferenceData localData = new LocalReferenceData(sourceFile,
-						"override");
+				ReferenceData remoteData, cachedRemoteData, localData;
+				remoteData = new RemoteReferenceData(sourceFile);
+				cachedRemoteData = new CachedReferenceData(remoteData, "");
+				localData = new LocalReferenceData(sourceFile, "override");
 				return new FallbackReferenceData(localData, cachedRemoteData);
 			}
 
