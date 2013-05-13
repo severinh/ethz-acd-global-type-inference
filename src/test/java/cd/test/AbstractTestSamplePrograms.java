@@ -59,6 +59,7 @@ abstract public class AbstractTestSamplePrograms {
 
 		Optional<ParseFailure> parseFailure = Optional.absent();
 		Optional<SemanticFailure> semanticFailure = Optional.absent();
+		Optional<Cause> semanticFailureCause = Optional.absent();
 
 		try {
 			compiler.compile();
@@ -66,6 +67,7 @@ abstract public class AbstractTestSamplePrograms {
 			parseFailure = Optional.of(failure);
 		} catch (SemanticFailure failure) {
 			semanticFailure = Optional.of(failure);
+			semanticFailureCause = Optional.of(failure.cause);
 		}
 
 		boolean isParseFailureRef = referenceData.isParseFailure();
@@ -79,13 +81,7 @@ abstract public class AbstractTestSamplePrograms {
 			// remaining tests if parsing was successful
 			Optional<Cause> semanticFailureCauseRef = referenceData
 					.getSemanticFailureCause();
-			Optional<Cause> semanticFailureCause;
 
-			if (semanticFailure.isPresent()) {
-				semanticFailureCause = Optional.of(semanticFailure.get().cause);
-			} else {
-				semanticFailureCause = Optional.absent();
-			}
 			assertEqualsWithException(semanticFailure, semanticFailureCauseRef,
 					semanticFailureCause);
 
