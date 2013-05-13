@@ -156,6 +156,10 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
 			// type variable and constraints for return value (if any)
 			if (msym.returnType == typeSymbols.getVoidType()) {
+				// TODO: Requiring the return type variable to be equal to the
+				// empty constant type set seems like an unnecessary
+				// indirection. Would it be possible to directly use a constant
+				// type set instead?
 				constraintSystem.addConstEquality(returnTypeVariable,
 						constantTypeSetFactory.makeEmpty());
 			} else {
