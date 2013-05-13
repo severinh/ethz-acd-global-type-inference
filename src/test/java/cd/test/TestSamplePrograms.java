@@ -5,16 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-
 import cd.CompilerOptions;
-import cd.TypeErasureMode;
-import cd.TypeInferenceMode;
 
-@RunWith(Parameterized.class)
-public class TestSamplePrograms extends AbstractTestSamplePrograms {
+public abstract class TestSamplePrograms extends AbstractTestSamplePrograms {
 
 	private static final TestFileProvider TEST_FILE_PROVIDER;
 
@@ -29,11 +22,9 @@ public class TestSamplePrograms extends AbstractTestSamplePrograms {
 				new File(folderPath), "global");
 	}
 
-	@Parameters(name = "{index}: {0}")
-	public static Collection<Object[]> testFiles() {
+	protected static Collection<Object[]> buildParameters(
+			CompilerOptions options) {
 		List<Object[]> result = new ArrayList<>();
-		CompilerOptions options = new CompilerOptions(TypeErasureMode.LOCAL,
-				TypeInferenceMode.LOCAL_CONSTRAINTS);
 		for (File file : TEST_FILE_PROVIDER.getTestFiles()) {
 			result.add(new Object[] { file.getName(), file, options });
 		}
