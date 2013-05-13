@@ -36,10 +36,11 @@ abstract public class AbstractTestSamplePrograms {
 	private final File inputFile;
 	private final TestConfig testConfig;
 
-	public AbstractTestSamplePrograms(File sourceFile, CompilerOptions options) {
+	public AbstractTestSamplePrograms(File sourceFile, CompilerOptions options,
+			ReferenceData referenceData) {
 		CompilationContext context = new CompilationContext(sourceFile, options);
 		this.compiler = CompilerToolchain.forContext(context);
-		this.referenceData = ReferenceData.localOverridingRemote(sourceFile);
+		this.referenceData = referenceData;
 		this.inputFile = new File(context.getSourceFile().getPath() + ".in");
 		this.testConfig = new TestConfig(); // Could be passed as parameter
 	}

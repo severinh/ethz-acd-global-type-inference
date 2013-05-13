@@ -10,6 +10,8 @@ import org.junit.runners.Parameterized.Parameters;
 import cd.CompilerOptions;
 import cd.TypeErasureMode;
 import cd.TypeInferenceMode;
+import cd.test.reference.ReferenceData;
+import cd.test.reference.ReferenceDataFactory;
 
 /**
  * Performs all end-to-end tests with local type erasure and lightweight local
@@ -22,12 +24,13 @@ public class LocalTypeInferenceLightweightTest extends TestSamplePrograms {
 	public static Collection<Object[]> getParameters() {
 		CompilerOptions options = new CompilerOptions(TypeErasureMode.LOCAL,
 				TypeInferenceMode.LOCAL_LIGHTWEIGHT);
-		return buildParameters(options);
+		return buildParameters(options,
+				ReferenceDataFactory.makeLocalOverridingRemote());
 	}
 
 	public LocalTypeInferenceLightweightTest(String testName, File file,
-			CompilerOptions options) {
-		super(testName, file, options);
+			CompilerOptions options, ReferenceData referenceData) {
+		super(testName, file, options, referenceData);
 	}
 
 }

@@ -8,6 +8,8 @@ import java.util.List;
 import cd.CompilerOptions;
 import cd.test.fileprovider.RecursiveTestFileProvider;
 import cd.test.fileprovider.TestFileProvider;
+import cd.test.reference.ReferenceData;
+import cd.test.reference.ReferenceDataFactory;
 
 public abstract class TestSamplePrograms extends AbstractTestSamplePrograms {
 
@@ -25,10 +27,11 @@ public abstract class TestSamplePrograms extends AbstractTestSamplePrograms {
 	}
 
 	protected static Collection<Object[]> buildParameters(
-			CompilerOptions options) {
+			CompilerOptions options, ReferenceDataFactory referenceDataFactory) {
 		List<Object[]> result = new ArrayList<>();
 		for (File file : TEST_FILE_PROVIDER.getTestFiles()) {
-			result.add(new Object[] { file.getName(), file, options });
+			result.add(new Object[] { file.getName(), file, options,
+					referenceDataFactory.of(file) });
 		}
 		return result;
 	}
@@ -43,8 +46,8 @@ public abstract class TestSamplePrograms extends AbstractTestSamplePrograms {
 	 *            The javali file to test.
 	 */
 	public TestSamplePrograms(String testName, File file,
-			CompilerOptions options) {
-		super(file, options);
+			CompilerOptions options, ReferenceData referenceData) {
+		super(file, options, referenceData);
 	}
 
 }
