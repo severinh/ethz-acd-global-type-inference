@@ -1,0 +1,14 @@
+class A {
+  int m() {
+    return 1;
+  }
+}
+
+class Main {
+  void main() {
+    A a;
+    int value;
+    a = new A();
+    value = a.m();
+  }
+}
