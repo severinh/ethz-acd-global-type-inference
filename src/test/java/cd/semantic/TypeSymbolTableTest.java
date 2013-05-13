@@ -1,6 +1,6 @@
 package cd.semantic;
 
-import java.util.List;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -9,7 +9,6 @@ import org.junit.Test;
 import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.TypeSymbol;
-import cd.semantic.TypeSymbolTable;
 
 /**
  * Tests {@link TypeSymbolTable}.
@@ -86,7 +85,7 @@ public class TypeSymbolTableTest {
 		}
 
 		// Assert that arrays are invariant
-		List<ArrayTypeSymbol> arrayTypes = typeSymbols.getArrayTypeSymbols();
+		Set<ArrayTypeSymbol> arrayTypes = typeSymbols.getArrayTypeSymbols();
 		for (ArrayTypeSymbol arrayType : arrayTypes) {
 			for (ArrayTypeSymbol otherArrayType : arrayTypes) {
 				if (arrayType != otherArrayType) {

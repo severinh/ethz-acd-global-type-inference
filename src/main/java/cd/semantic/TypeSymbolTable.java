@@ -1,8 +1,9 @@
 package cd.semantic;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import com.google.common.collect.ImmutableSet;
 
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
@@ -151,52 +152,52 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	}
 
 	/**
-	 * Returns a list of all type symbols that represent primitive numerical
+	 * Returns a set of all type symbols that represent primitive numerical
 	 * types.
 	 * 
-	 * @return the list of numerical type symbols
+	 * @return the set of numerical type symbols
 	 */
-	public List<PrimitiveTypeSymbol> getNumericalTypeSymbols() {
-		return Arrays.asList(getIntType(), getFloatType());
+	public ImmutableSet<PrimitiveTypeSymbol> getNumericalTypeSymbols() {
+		return ImmutableSet.of(getIntType(), getFloatType());
 	}
 
 	/**
-	 * Returns a list of all primitive type symbols in this symbol table.
+	 * Returns a set of all primitive type symbols in this symbol table.
 	 */
-	public List<PrimitiveTypeSymbol> getPrimitiveTypeSymbols() {
-		List<PrimitiveTypeSymbol> result = new ArrayList<>();
+	public ImmutableSet<PrimitiveTypeSymbol> getPrimitiveTypeSymbols() {
+		ImmutableSet.Builder<PrimitiveTypeSymbol> builder = ImmutableSet.builder();
 		for (TypeSymbol typeSymbol : localSymbols()) {
 			if (typeSymbol instanceof PrimitiveTypeSymbol) {
-				result.add((PrimitiveTypeSymbol) typeSymbol);
+				builder.add((PrimitiveTypeSymbol) typeSymbol);
 			}
 		}
-		return result;
+		return builder.build();
 	}
 
 	/**
-	 * Returns a list of all reference type symbols in this symbol table.
+	 * Returns a set of all reference type symbols in this symbol table.
 	 */
-	public List<TypeSymbol> getReferenceTypeSymbols() {
-		List<TypeSymbol> result = new ArrayList<>();
+	public ImmutableSet<TypeSymbol> getReferenceTypeSymbols() {
+		ImmutableSet.Builder<TypeSymbol> builder = ImmutableSet.builder();
 		for (TypeSymbol typeSymbol : localSymbols()) {
 			if (typeSymbol.isReferenceType()) {
-				result.add(typeSymbol);
+				builder.add(typeSymbol);
 			}
 		}
-		return result;
+		return builder.build();
 	}
 
 	/**
-	 * Returns a list of all array type symbols in this symbol table.
+	 * Returns a set of all array type symbols in this symbol table.
 	 */
-	public List<ArrayTypeSymbol> getArrayTypeSymbols() {
-		List<ArrayTypeSymbol> result = new ArrayList<>();
+	public ImmutableSet<ArrayTypeSymbol> getArrayTypeSymbols() {
+		ImmutableSet.Builder<ArrayTypeSymbol> builder = ImmutableSet.builder();
 		for (TypeSymbol typeSymbol : localSymbols()) {
 			if (typeSymbol instanceof ArrayTypeSymbol) {
-				result.add((ArrayTypeSymbol) typeSymbol);
+				builder.add((ArrayTypeSymbol) typeSymbol);
 			}
 		}
-		return result;
+		return builder.build();
 	}
 
 	/**
@@ -274,7 +275,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 			return getTopType();
 		}
 	}
-	
+
 	public TypeSymbol getLCA(TypeSymbol... symbols) {
 		TypeSymbol result = getBottomType();
 		for (TypeSymbol sym : symbols) {
