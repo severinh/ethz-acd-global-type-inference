@@ -13,7 +13,9 @@ import cd.ir.symbols.VariableSymbol;
  * variable or a field of the class that the method is declared in.
  * 
  * The resolution process can only take place after all symbols have already
- * been created.
+ * been created. Besides the symbols, it does not require any kind of
+ * information. So the resolver is also expected to work in the face of both
+ * globally and locally missing type annotations.
  */
 public final class VarSymbolResolver {
 
