@@ -60,15 +60,14 @@ public class ConstantTypeSetFactory {
 		if (!typeSymbols.isDeclarableType(typeSymbol)) 
 			return new ConstantTypeSet();		
 		
-		// add the type itself
-		Set<TypeSymbol> subTypes = new HashSet<>();
-		subTypes.add(typeSymbol);
-		
 		if (typeSymbol instanceof ClassSymbol) {
 			ClassSymbol classSym = (ClassSymbol) typeSymbol;
-			subTypes.addAll(typeSymbols.getClassSymbolSubtypes(classSym));
+			Set<ClassSymbol> classSymbolSubtypes = typeSymbols.getClassSymbolSubtypes(classSym);
+			return new ConstantTypeSet(classSymbolSubtypes);
+		} else {
+			// all other types do not have any strict subtypes (that may be used in a program)
+			return new ConstantTypeSet(typeSymbol);
 		}
-		return new ConstantTypeSet(subTypes);
 	}
 
 	/**
