@@ -19,6 +19,10 @@ public class ConstantTypeSet implements TypeSet {
 	public ConstantTypeSet(Set<? extends TypeSymbol> types) {
 		this.types = ImmutableSet.copyOf(types);
 	}
+	
+	public ConstantTypeSet(ImmutableSet<TypeSymbol> types) {
+		this.types = types;
+	}
 
 	@Override
 	public ImmutableSet<TypeSymbol> getTypes() {

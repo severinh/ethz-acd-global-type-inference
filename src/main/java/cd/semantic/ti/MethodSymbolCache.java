@@ -17,6 +17,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * Cache that makes it possible to efficiently look up all method symbols with a
  * certain name and a certain number of parameters.
+ * 
+ * Note that some of the method symbol that share the same name and number of
+ * parameters may override each other, because there may be a subtype relation
+ * between the class symbols that own the method symbols.
  */
 public final class MethodSymbolCache {
 
@@ -50,7 +54,7 @@ public final class MethodSymbolCache {
 	 *            the name that the method symbols must share
 	 * @param parameterCount
 	 *            the number of parameters that the method symbols must have
-	 * @return the newly-constructed cache
+	 * @return the requested collection of method symbols
 	 */
 	public ImmutableCollection<MethodSymbol> get(String name, int parameterCount) {
 		Key key = new Key(name, parameterCount);
