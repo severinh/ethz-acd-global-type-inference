@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 
 import cd.CompilerOptions;
+import cd.test.fileprovider.RecursiveTestFileProvider;
+import cd.test.fileprovider.TestFileProvider;
 
 public abstract class TestSamplePrograms extends AbstractTestSamplePrograms {
 

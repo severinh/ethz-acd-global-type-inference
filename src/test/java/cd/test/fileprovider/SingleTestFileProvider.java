@@ -1,4 +1,4 @@
-package cd.test;
+package cd.test.fileprovider;
 
 import java.io.File;
 import java.util.Collection;
