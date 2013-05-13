@@ -28,17 +28,6 @@ import com.google.common.collect.ImmutableSet;
 public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 
 	/**
-	 * Allow static access to the special type names from the parser.
-	 * 
-	 * The underscore prefix ensures that there will be no name clash with any
-	 * type in user programs. Also, underscores are safe to use in assembly
-	 * mnemonics, in contrast to "<" and ">".
-	 */
-	public static final String TOP_TYPE_NAME = "_top";
-	public static final String NULL_TYPE_NAME = "_null";
-	public static final String BOTTOM_TYPE_NAME = "_bottom";
-
-	/**
 	 * Symbols for the built-in primitive types.
 	 */
 	private final PrimitiveTypeSymbol intType;
@@ -50,13 +39,6 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	 * Symbols for the built-in Object and null types.
 	 */
 	private final ClassSymbol objectType;
-	private final NullTypeSymbol nullType;
-
-	/**
-	 * Symbol for the built-in top and bottom type.
-	 */
-	private final TypeSymbol topType;
-	private final TypeSymbol bottomType;
 
 	public TypeSymbolTable() {
 		super();
@@ -66,20 +48,17 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		booleanType = new PrimitiveTypeSymbol("boolean");
 		voidType = new PrimitiveTypeSymbol("void");
 		objectType = new ClassSymbol("Object");
-		nullType = new NullTypeSymbol(NULL_TYPE_NAME);
-		topType = new TopTypeSymbol(TOP_TYPE_NAME);
-		bottomType = new BottomTypeSymbol(BOTTOM_TYPE_NAME);
 
 		add(intType);
 		add(booleanType);
 		add(floatType);
 		add(voidType);
 		add(objectType);
-		add(nullType);
-		add(topType);
-		add(bottomType);
+		add(NullTypeSymbol.INSTANCE);
+		add(TopTypeSymbol.INSTANCE);
+		add(BottomTypeSymbol.INSTANCE);
 	}
-	
+
 	public PrimitiveTypeSymbol getIntType() {
 		return intType;
 	}
@@ -101,15 +80,15 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	}
 
 	public TypeSymbol getNullType() {
-		return nullType;
+		return NullTypeSymbol.INSTANCE;
 	}
 
 	public TypeSymbol getTopType() {
-		return topType;
+		return TopTypeSymbol.INSTANCE;
 	}
 
 	public TypeSymbol getBottomType() {
-		return bottomType;
+		return BottomTypeSymbol.INSTANCE;
 	}
 
 	/**
@@ -168,7 +147,8 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	 * Returns a set of all primitive type symbols in this symbol table.
 	 */
 	public ImmutableSet<PrimitiveTypeSymbol> getPrimitiveTypeSymbols() {
-		ImmutableSet.Builder<PrimitiveTypeSymbol> builder = ImmutableSet.builder();
+		ImmutableSet.Builder<PrimitiveTypeSymbol> builder = ImmutableSet
+				.builder();
 		for (TypeSymbol typeSymbol : localSymbols()) {
 			if (typeSymbol instanceof PrimitiveTypeSymbol) {
 				builder.add((PrimitiveTypeSymbol) typeSymbol);
@@ -189,10 +169,10 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		}
 		return builder.build();
 	}
-	
+
 	public ImmutableSet<TypeSymbol> getDeclarableReferenceTypeSymbols() {
 		Set<TypeSymbol> refTypes = new HashSet<>(getReferenceTypeSymbols());
-		refTypes.remove(nullType);
+		refTypes.remove(getNullType());
 		return ImmutableSet.copyOf(refTypes);
 	}
 
@@ -208,14 +188,14 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		}
 		return builder.build();
 	}
-	
+
 	/**
-	 * Returns all ClassSymbols a given ClassSymbol has as subtypes.
-	 * (This does include the symbol itself, but _not_ the NullTypeSymbol)
+	 * Returns all ClassSymbols a given ClassSymbol has as subtypes. (This does
+	 * include the symbol itself, but _not_ the NullTypeSymbol)
 	 */
 	public ImmutableSet<ClassSymbol> getClassSymbolSubtypes(ClassSymbol typeSym) {
 		ImmutableSet.Builder<ClassSymbol> builder = ImmutableSet.builder();
-		
+
 		for (ClassSymbol classSym : getClassSymbols()) {
 			if (isSubType(typeSym, classSym)) {
 				builder.add(classSym);

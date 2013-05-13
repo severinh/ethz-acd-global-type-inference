@@ -11,6 +11,7 @@ import cd.ir.ast.ClassDecl;
 import cd.ir.ast.MethodDecl;
 import cd.ir.ast.Seq;
 import cd.ir.ast.VarDecl;
+import cd.ir.symbols.BottomTypeSymbol;
 import cd.semantic.TypeSymbolTable;
 import cd.semantic.UntypedSemanticAnalyzer;
 
@@ -104,7 +105,7 @@ public class TypeInferenceEvaluationVisitorTest {
 
 	@Test
 	public void testUnknownType() {
-		String unknownTypeName = TypeSymbolTable.BOTTOM_TYPE_NAME;
+		String unknownTypeName = BottomTypeSymbol.NAME;
 		evaluateTypeInference(new VarDecl(unknownTypeName, "unknown"));
 	}
 
