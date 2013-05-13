@@ -214,8 +214,10 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				Collection<MethodSymbol> methodSymbols = methodSymbolCache.get(call.methodName, arguments.size());
 				Expr receiver = call.receiver();
 				TypeVariable receiverTypeVar = exprVisitor.visit(receiver, null);
+				Set<ClassSymbol> possibleReceiverTypes = new HashSet<>();
 				
 				for (MethodSymbol msym : methodSymbols) {
+					possibleReceiverTypes.add(msym.owner);
 					for (int argNum = 0; argNum < arguments.size(); argNum++) {
 						Expr argument = arguments.get(argNum);
 						TypeVariable argTypeVar = exprVisitor.visit(argument, null);
@@ -227,6 +229,12 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 						constraintSystem.addUpperBound(argTypeVar, expectedArgType, condition);
 					}
 				}
+				
+				// the receiver _must_ be one of the classes that have a method 
+				// with the right name and number of arguments
+				ConstantTypeSet possibleReceiverTypeSet = new ConstantTypeSet(possibleReceiverTypes);
+				constraintSystem.addUpperBound(receiverTypeVar, possibleReceiverTypeSet);
+				
 				return null;
 			}
 		}
@@ -459,9 +467,10 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				Expr receiver = call.receiver();
 				TypeVariable receiverTypeVar = visit(receiver, null);
 				TypeVariable returnTypeVar = constraintSystem.addTypeVariable();
-
+				Set<ClassSymbol> possibleReceiverTypes = new HashSet<>();
 
 				for (MethodSymbol msym : methodSymbols) {
+					possibleReceiverTypes.add(msym.owner);
 					ConstraintCondition condition = new ConstraintCondition(msym.owner, receiverTypeVar);
 					for (int argNum = 0; argNum < arguments.size(); argNum++) {
 						TypeVariable argTypeVar = visit(arguments.get(argNum),
@@ -486,6 +495,12 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 								expectedResultTypes, condition);
 					}
 				}
+				
+				// the receiver _must_ be one of the classes that have a method 
+				// with the right name and number of arguments
+				ConstantTypeSet possibleReceiverTypeSet = new ConstantTypeSet(possibleReceiverTypes);
+				constraintSystem.addUpperBound(receiverTypeVar, possibleReceiverTypeSet);
+				
 				return returnTypeVar;
 			}
 			
