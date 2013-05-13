@@ -44,10 +44,11 @@ public class TypeSymbolTableTest {
 
 	@Test
 	public void testArrayTypes() {
-		// Test that for each non-array type, there is a corresponding array
+		// Test that for each non-array type (except for _bottom, _top, void and null), there is a corresponding array
 		// type in the type symbol table
 		for (TypeSymbol elementType : typeSymbols.localSymbols()) {
-			if (!(elementType instanceof ArrayTypeSymbol)) {
+			if (!(elementType instanceof ArrayTypeSymbol) 
+					&& elementType.isDeclarableType() && elementType != typeSymbols.getVoidType()) {
 				ArrayTypeSymbol arrayType = typeSymbols
 						.getArrayTypeSymbol(elementType);
 				Assert.assertEquals(elementType, arrayType.elementType);
