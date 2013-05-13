@@ -110,7 +110,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 		private final ClassSymbolFieldCache classFieldSymbolCache;
 		private final ConstantTypeSetFactory constantTypeSetFactory;
 		
-		private TypeVariable returnTypeVariable;
+		private final TypeVariable returnTypeVariable;
 		
 		// Map to remember the type variables for our parameters and locals,
 		// i.e. what we are eventually interested in.
@@ -127,6 +127,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			this.methodSymbolCache = MethodSymbolCache.of(typeSymbols);
 			this.classFieldSymbolCache = ClassSymbolFieldCache.of(typeSymbols);
 			this.constantTypeSetFactory = new ConstantTypeSetFactory(typeSymbols);
+			this.returnTypeVariable = constraintSystem.addTypeVariable();
 		}
 
 		public ConstraintSystem getConstraintSystem() {
@@ -154,9 +155,12 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			}
 
 			// type variable and constraints for return value (if any)
-			if (msym.returnType != typeSymbols.getVoidType()) {
-				returnTypeVariable = constraintSystem.addTypeVariable();
-				ConstantTypeSet typeConst = constantTypeSetFactory.make(msym.returnType);
+			if (msym.returnType == typeSymbols.getVoidType()) {
+				constraintSystem.addConstEquality(returnTypeVariable,
+						constantTypeSetFactory.makeEmpty());
+			} else {
+				ConstantTypeSet typeConst = constantTypeSetFactory
+						.make(msym.returnType);
 				constraintSystem
 						.addConstEquality(returnTypeVariable, typeConst);
 			}
