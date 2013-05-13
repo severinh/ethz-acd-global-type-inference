@@ -1,0 +1,69 @@
+// Test VarSymbolResolver.
+// Doing so thoroughly using a unit test would be too tedious.
+
+class A {
+	int x;
+	
+	void setX(int p) {
+		// x must be resolved to the field symbol
+		x = p;
+	}
+	
+	int getX() {
+		// x must be resolved to the field symbol
+		return x;
+	}
+	
+	void dontSetX(int p) {
+		int x;
+		// x must be resolved to the local variable symbol
+		// (as the local variable shadows the field)
+		x = p;
+	}
+	
+	void dontGetX() {
+		int x;
+		// x must be resolved to the local variable symbol
+		// (as the local variable shadows the field)
+		x = 42;
+		return x;
+	}
+}
+
+class B extends A {
+	void setX(int p) {
+		// x must be resolved to the field symbol of A
+		x = p;
+	}
+	
+	int getX() {
+		// x must be resolved to the field symbol of A
+		return x;
+	}
+}
+
+class Main {
+	void main() {
+		A a;
+		B b;
+		
+		a = new A();
+		test(a);
+		
+		b = new A();
+		test(b);
+	}
+	
+	void test(A a) {
+		a.setX(1);
+		write(a.getX()); // Should print 1
+		writeln();
+		
+		a.dontSetX(2);
+		write(a.getX()); // Should still print 1
+		writeln();
+		
+		write(a.dontGetX()); // Should print 42
+		writeln();
+	}
+}
