@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import cd.ir.ast.*;
 import cd.ir.ast.UnaryOp.UOp;
 import cd.ir.ast.BinaryOp.BOp;
-import cd.semantic.TypeSymbolTable;
+import cd.ir.symbols.BottomTypeSymbol;
 import cd.util.Pair;
 import cd.exceptions.ParseFailure;
 }
@@ -116,12 +116,12 @@ methodDecl returns [MethodDecl mth]
    ;
 
 methodHeading returns [String returnType, String mthName, List<Pair<String>> formalParams]
-   :	r=type? n=Identifier { $returnType = ($r.typeName == null ? BottomTypeSymbol.NAME : $r.typeName) ; $mthName = $n.text; $formalParams = emptyList(); }
-   |	r=type? n=Identifier { $returnType = ($r.typeName == null ? BottomTypeSymbol.NAME : $r.typeName) ; $mthName = $n.text; $formalParams = new ArrayList<Pair<String>>(); } formalParamList[$formalParams]
+   :	r=type? n=Identifier { $returnType = ($r.typeName == null ? BottomTypeSymbol.INSTANCE.getName() : $r.typeName) ; $mthName = $n.text; $formalParams = emptyList(); }
+   |	r=type? n=Identifier { $returnType = ($r.typeName == null ? BottomTypeSymbol.INSTANCE.getName() : $r.typeName) ; $mthName = $n.text; $formalParams = new ArrayList<Pair<String>>(); } formalParamList[$formalParams]
    ;
 
 formalParamList[List<Pair<String>> formalParams]
-	:	( ^( VarDecl t=type? n=Identifier ) { $formalParams.add(new Pair<String>($t.typeName == null ? BottomTypeSymbol.NAME : $t.typeName, $n.text)); } )+
+	:	( ^( VarDecl t=type? n=Identifier ) { $formalParams.add(new Pair<String>($t.typeName == null ? BottomTypeSymbol.INSTANCE.getName() : $t.typeName, $n.text)); } )+
 	;
 
 methodBody returns [Seq decls, Seq stmts]

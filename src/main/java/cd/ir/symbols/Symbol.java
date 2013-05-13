@@ -8,4 +8,11 @@ public abstract class Symbol {
 		this.name = name;
 	}
 
+	/**
+	 * Returns the name of the symbol.
+	 */
+	public String getName() {
+		return name;
+	}
+
 }

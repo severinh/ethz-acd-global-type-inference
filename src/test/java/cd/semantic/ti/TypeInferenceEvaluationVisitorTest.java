@@ -105,7 +105,7 @@ public class TypeInferenceEvaluationVisitorTest {
 
 	@Test
 	public void testUnknownType() {
-		String unknownTypeName = BottomTypeSymbol.NAME;
+		String unknownTypeName = BottomTypeSymbol.INSTANCE.getName();
 		evaluateTypeInference(new VarDecl(unknownTypeName, "unknown"));
 	}
 
