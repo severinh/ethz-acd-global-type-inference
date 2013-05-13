@@ -21,8 +21,11 @@ import cd.semantic.TypeSymbolTable;
  */
 public class ConstantTypeSetFactory {
 
+	private static final ConstantTypeSet EMPTY_TYPE_SET = new ConstantTypeSet();
+
 	private final TypeSymbolTable typeSymbols;
 	private final Map<TypeSymbol, ConstantTypeSet> singletonTypeSets;
+	private final Map<TypeSymbol, ConstantTypeSet> declarableSubtypeSets;
 
 	private ConstantTypeSet numericalTypeSet;
 	private ConstantTypeSet referenceTypeSet;
@@ -39,6 +42,14 @@ public class ConstantTypeSetFactory {
 		super();
 		this.typeSymbols = checkNotNull(typeSymbols);
 		this.singletonTypeSets = new HashMap<>();
+		this.declarableSubtypeSets = new HashMap<>();
+	}
+
+	/**
+	 * Returns an empty constant type set.s
+	 */
+	public ConstantTypeSet makeEmpty() {
+		return EMPTY_TYPE_SET;
 	}
 
 	/**
@@ -54,20 +65,30 @@ public class ConstantTypeSetFactory {
 		}
 		return result;
 	}
-	
+
 	public ConstantTypeSet makeDeclarableSubtypes(TypeSymbol typeSymbol) {
 		checkNotNull(typeSymbol);
-		if (!typeSymbol.isDeclarableType()) 
-			return new ConstantTypeSet();	
-		
-		if (typeSymbol instanceof ClassSymbol) {
-			ClassSymbol classSym = (ClassSymbol) typeSymbol;
-			Set<ClassSymbol> classSymbolSubtypes = typeSymbols.getClassSymbolSubtypes(classSym);
-			return new ConstantTypeSet(classSymbolSubtypes);
-		} else {
-			// all other types do not have any strict subtypes (that may be used in a program)
-			return new ConstantTypeSet(typeSymbol);
+
+		if (!typeSymbol.isDeclarableType()) {
+			return makeEmpty();
 		}
+
+		ConstantTypeSet result = declarableSubtypeSets.get(typeSymbol);
+		if (result == null) {
+			if (typeSymbol instanceof ClassSymbol) {
+				ClassSymbol classSym = (ClassSymbol) typeSymbol;
+				Set<ClassSymbol> classSymbolSubtypes = typeSymbols
+						.getClassSymbolSubtypes(classSym);
+				result = new ConstantTypeSet(classSymbolSubtypes);
+			} else {
+				// All other types do not have any strict subtypes (that may be
+				// used in a program)
+				result = make(typeSymbol);
+			}
+			declarableSubtypeSets.put(typeSymbol, result);
+		}
+
+		return result;
 	}
 
 	/**
