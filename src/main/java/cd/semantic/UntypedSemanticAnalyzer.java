@@ -11,6 +11,7 @@ import cd.CompilationContext;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.ast.ClassDecl;
+import cd.ir.ast.MethodDecl;
 import cd.ir.symbols.ClassSymbol;
 
 /**
@@ -34,6 +35,7 @@ public class UntypedSemanticAnalyzer {
 
 	public void check(List<ClassDecl> classDecls) throws SemanticFailure {
 		context.setTypeSymbols(createSymbols(classDecls));
+		resolveVarSymbols(classDecls);
 		checkUntypedInheritance(classDecls);
 	}
 
@@ -103,6 +105,15 @@ public class UntypedSemanticAnalyzer {
 		}
 
 		return typeSymbols;
+	}
+
+	private void resolveVarSymbols(List<ClassDecl> classDecls) {
+		VarSymbolResolver varSymbolResolver = new VarSymbolResolver();
+		for (ClassDecl classDecl : classDecls) {
+			for (MethodDecl methodDecl : classDecl.methods()) {
+				varSymbolResolver.resolveVars(methodDecl);
+			}
+		}
 	}
 
 	/**

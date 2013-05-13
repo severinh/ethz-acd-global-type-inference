@@ -1,13 +1,8 @@
 package cd.semantic.ti;
 
 import cd.CompilationContext;
-import cd.ir.AstVisitor;
 import cd.ir.ast.ClassDecl;
-import cd.ir.ast.Expr;
 import cd.ir.ast.MethodDecl;
-import cd.ir.symbols.VariableSymbol;
-import cd.semantic.ExprTypingVisitor;
-import cd.semantic.SymbolTable;
 import cd.semantic.TypeSymbolTable;
 
 /**
@@ -21,25 +16,9 @@ public abstract class LocalTypeInference implements TypeInference {
 
 	@Override
 	public void inferTypes(CompilationContext context) {
-		final TypeSymbolTable typeSymbols = context.getTypeSymbols();
-		final ExprTypingVisitor exprTypingVisitor = new ExprTypingVisitor(
-				typeSymbols);
-
+		TypeSymbolTable typeSymbols = context.getTypeSymbols();
 		for (ClassDecl classDecl : context.getAstRoots()) {
 			for (final MethodDecl mdecl : classDecl.methods()) {
-				// Run the expression typing visitor over the method once,
-				// such that type symbols are set to something non-null.
-				final SymbolTable<VariableSymbol> scope = mdecl.sym.getScope();
-				mdecl.accept(new AstVisitor<Void, Void>() {
-
-					@Override
-					protected Void dfltExpr(Expr expr, Void arg) {
-						exprTypingVisitor.type(expr, scope);
-						return null;
-					}
-
-				}, null);
-
 				inferTypes(mdecl, typeSymbols);
 			}
 		}
