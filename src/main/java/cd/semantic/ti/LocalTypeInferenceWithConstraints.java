@@ -58,18 +58,18 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
 	@Override
 	public void inferTypes(MethodDecl mdecl, TypeSymbolTable typeSymbols) {
-		ConstraintGenerator constraintGen = new ConstraintGenerator(mdecl,
+		ConstraintGenerator generator = new ConstraintGenerator(mdecl,
 				typeSymbols);
-		constraintGen.generate();
-		ConstraintSolver solver = new ConstraintSolver(
-				constraintGen.getConstraintSystem());
+		generator.generate();
+		ConstraintSystem constraintSystem = generator.getConstraintSystem();
+		ConstraintSolver solver = new ConstraintSolver(constraintSystem);
 		solver.solve();
 		if (!solver.hasSolution()) {
 			throw new SemanticFailure(Cause.TYPE_INFERENCE_ERROR,
 					"Type inference was unable to resolve type constraints");
 		} else {
 			for (VariableSymbol varSym : mdecl.sym.getLocals()) {
-				Set<TypeSymbol> possibleTypes = constraintGen
+				Set<TypeSymbol> possibleTypes = generator
 						.getPossibleTypes(varSym);
 				TypeSymbol type = null;
 				if (possibleTypes.isEmpty()) {
@@ -108,13 +108,13 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 		private final TypeSymbolTable typeSymbols;
 		private final MethodDecl mdecl;
 		private final ConstraintSystem constraintSystem;
-		
+
 		private final MethodSymbolCache methodSymbolCache;
 		private final ClassSymbolFieldCache classFieldSymbolCache;
 		private final ConstantTypeSetFactory constantTypeSetFactory;
-		
+
 		private ConstantTypeSet allowedReturnTypeSet;
-		
+
 		// Map to remember the type variables for our parameters and locals,
 		// i.e. what we are eventually interested in.
 		// Note to avoid confusion: VariableSymbols are symbols for program
@@ -129,7 +129,8 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			this.constraintSystem = new ConstraintSystem();
 			this.methodSymbolCache = MethodSymbolCache.of(typeSymbols);
 			this.classFieldSymbolCache = ClassSymbolFieldCache.of(typeSymbols);
-			this.constantTypeSetFactory = new ConstantTypeSetFactory(typeSymbols);
+			this.constantTypeSetFactory = new ConstantTypeSetFactory(
+					typeSymbols);
 		}
 
 		public ConstraintSystem getConstraintSystem() {
@@ -144,15 +145,18 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			// variables and constraints for parameters (types given!)
 			MethodSymbol msym = mdecl.sym;
 			for (VariableSymbol varSym : msym.getParameters()) {
-				TypeVariable typeVar = constraintSystem.addTypeVariable("param_" + varSym.name);
-				ConstantTypeSet typeConst = constantTypeSetFactory.make(varSym.getType());
+				TypeVariable typeVar = constraintSystem
+						.addTypeVariable("param_" + varSym.name);
+				ConstantTypeSet typeConst = constantTypeSetFactory.make(varSym
+						.getType());
 				constraintSystem.addEquality(typeVar, typeConst);
 				localSymbolVariables.put(varSym, typeVar);
 			}
 
 			// type variables for local variables
 			for (VariableSymbol varSym : msym.getLocals()) {
-				TypeVariable typeVar = constraintSystem.addTypeVariable("local_" + varSym.name);
+				TypeVariable typeVar = constraintSystem
+						.addTypeVariable("local_" + varSym.name);
 				localSymbolVariables.put(varSym, typeVar);
 			}
 
@@ -160,7 +164,8 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			if (msym.returnType == typeSymbols.getVoidType()) {
 				allowedReturnTypeSet = constantTypeSetFactory.makeEmpty();
 			} else {
-				allowedReturnTypeSet = constantTypeSetFactory.makeDeclarableSubtypes(msym.returnType);
+				allowedReturnTypeSet = constantTypeSetFactory
+						.makeDeclarableSubtypes(msym.returnType);
 			}
 
 			ConstraintStmtVisitor constraintVisitor = new ConstraintStmtVisitor();
@@ -196,7 +201,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				}
 				return null;
 			}
-			
+
 			@Override
 			public Void builtInWrite(BuiltInWrite ast, Void arg) {
 				TypeSet argTypeSet = exprVisitor.visit(ast.arg(), null);
@@ -204,15 +209,16 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				constraintSystem.addEquality(argTypeSet, intTypeSet);
 				return null;
 			}
-			
+
 			@Override
 			public Void builtInWriteFloat(BuiltInWriteFloat ast, Void arg) {
 				TypeSet argTypeSet = exprVisitor.visit(ast.arg(), null);
-				ConstantTypeSet floatTypeSet = constantTypeSetFactory.makeFloat();
+				ConstantTypeSet floatTypeSet = constantTypeSetFactory
+						.makeFloat();
 				constraintSystem.addEquality(argTypeSet, floatTypeSet);
 				return null;
 			}
-			
+
 			@Override
 			public Void methodCall(MethodCall call, Void arg) {
 				exprVisitor.createMethodCallConstraints(call.methodName,
@@ -247,61 +253,67 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			public TypeSet booleanConst(BooleanConst ast, Void arg) {
 				return constantTypeSetFactory.makeBoolean();
 			}
-			
+
 			@Override
 			public TypeSet nullConst(NullConst ast, Void arg) {
 				return constantTypeSetFactory.makeNull();
 			}
-			
+
 			@Override
 			public TypeSet newObject(NewObject ast, Void arg) {
 				TypeSymbol classSym = typeSymbols.getType(ast.typeName);
 				return constantTypeSetFactory.make(classSym);
 			}
-			
+
 			@Override
 			public TypeSet newArray(NewArray ast, Void arg) {
 				TypeSymbol arraySym = typeSymbols.get(ast.typeName);
 				return constantTypeSetFactory.make(arraySym);
 			}
-			
+
 			@Override
 			public TypeSet thisRef(ThisRef ast, Void arg) {
 				ClassSymbol classSymbol = mdecl.sym.owner;
-				return constantTypeSetFactory.makeDeclarableSubtypes(classSymbol);
+				return constantTypeSetFactory
+						.makeDeclarableSubtypes(classSymbol);
 			}
-			
+
 			@Override
 			public TypeSet cast(Cast ast, Void arg) {
 				TypeSet exprTypeSet = visit(ast.arg(), null);
 				// only reference types can be casted
-				ConstantTypeSet allRefTyes = constantTypeSetFactory.makeReferenceTypeSet();
+				ConstantTypeSet allRefTyes = constantTypeSetFactory
+						.makeReferenceTypeSet();
 				constraintSystem.addUpperBound(exprTypeSet, allRefTyes);
-				
+
 				TypeSymbol castResultType = typeSymbols.getType(ast.typeName);
-				return constantTypeSetFactory.makeDeclarableSubtypes(castResultType);
+				return constantTypeSetFactory
+						.makeDeclarableSubtypes(castResultType);
 			}
-			
+
 			@Override
 			public TypeSet field(Field ast, Void arg) {
 				String fieldName = ast.fieldName;
 				Expr receiver = ast.arg();
 				TypeSet receiverTypeSet = visit(receiver, null);
 
-				Collection<ClassSymbol> classSymbols = classFieldSymbolCache.get(fieldName);
+				Collection<ClassSymbol> classSymbols = classFieldSymbolCache
+						.get(fieldName);
 				TypeVariable resultType = constraintSystem.addTypeVariable();
 
 				for (ClassSymbol classSym : classSymbols) {
 					VariableSymbol fieldSymbol = classSym.getField(fieldName);
 					TypeSymbol fieldType = fieldSymbol.getType();
-					ConstraintCondition condition = new ConstraintCondition(classSym, receiverTypeSet);
-					ConstantTypeSet fieldTypeSet = constantTypeSetFactory.make(fieldType);
-					constraintSystem.addEquality(resultType, fieldTypeSet, condition);
+					ConstraintCondition condition = new ConstraintCondition(
+							classSym, receiverTypeSet);
+					ConstantTypeSet fieldTypeSet = constantTypeSetFactory
+							.make(fieldType);
+					constraintSystem.addEquality(resultType, fieldTypeSet,
+							condition);
 				}
 				return resultType;
 			}
-			
-			
+
 			@Override
 			public TypeSet index(Index idx, Void arg) {
 				Expr arrayExpr = idx.left();
@@ -325,26 +337,28 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				}
 				return resultVar;
 			}
-			
+
 			@Override
 			public TypeSet builtInRead(BuiltInRead ast, Void arg) {
 				return constantTypeSetFactory.makeInt();
 			}
-			
+
 			@Override
 			public TypeSet builtInReadFloat(BuiltInReadFloat ast, Void arg) {
 				return constantTypeSetFactory.makeFloat();
 			}
-			
+
 			@Override
 			public TypeSet binaryOp(BinaryOp binaryOp, Void arg) {
 				BOp op = binaryOp.operator;
 				TypeSet leftTypeSet = visit(binaryOp.left(), null);
 				TypeSet rightTypeSet = visit(binaryOp.right(), null);
 				TypeSet resultSet;
-				
-				ConstantTypeSet numTypes = constantTypeSetFactory.makeNumericalTypeSet();
-				ConstantTypeSet booleanType = constantTypeSetFactory.makeBoolean();
+
+				ConstantTypeSet numTypes = constantTypeSetFactory
+						.makeNumericalTypeSet();
+				ConstantTypeSet booleanType = constantTypeSetFactory
+						.makeBoolean();
 
 				switch (op) {
 				case B_TIMES:
@@ -376,12 +390,13 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 					resultSet = booleanType;
 					break;
 				default:
-					throw new IllegalStateException("binary operator " + op + " not supported");
+					throw new IllegalStateException("binary operator " + op
+							+ " not supported");
 				}
-				
+
 				return resultSet;
 			}
-			
+
 			public void createMethodCallConstraints(String methodName,
 					Expr receiver, List<Expr> arguments,
 					Optional<TypeVariable> methodCallResultTypeVar) {
@@ -425,7 +440,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				constraintSystem.addUpperBound(receiverTypeSet,
 						possibleReceiverTypeSet);
 			}
-			
+
 			@Override
 			public TypeSet methodCall(MethodCallExpr call, Void arg) {
 				TypeVariable methodCallResultTypeVar = constraintSystem
@@ -435,14 +450,16 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 						Optional.of(methodCallResultTypeVar));
 				return methodCallResultTypeVar;
 			}
-			
+
 			@Override
 			public TypeSet unaryOp(UnaryOp unaryOp, Void arg) {
 				UOp op = unaryOp.operator;
 				TypeSet subExprTypeSet = visit(unaryOp.arg(), null);
-				
-				ConstantTypeSet numTypes = constantTypeSetFactory.makeNumericalTypeSet();
-				ConstantTypeSet booleanType = constantTypeSetFactory.makeBoolean();
+
+				ConstantTypeSet numTypes = constantTypeSetFactory
+						.makeNumericalTypeSet();
+				ConstantTypeSet booleanType = constantTypeSetFactory
+						.makeBoolean();
 
 				switch (op) {
 				case U_BOOL_NOT:
