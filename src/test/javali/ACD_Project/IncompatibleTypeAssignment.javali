@@ -9,7 +9,8 @@ class B extends A {
 
 class Main {
 	void main() {
+		// The following must not type-check UNLESS type erasure is enabled
 		B b;
-		b = new A(); // must not type-check
+		b = new A();
 	}
 }
