@@ -51,6 +51,9 @@ import cd.semantic.ti.constraintSolving.TypeSet;
 import cd.semantic.ti.constraintSolving.TypeVariable;
 import cd.semantic.ti.constraintSolving.constraints.ConstraintCondition;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
+
 public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
 	@Override
@@ -210,33 +213,11 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				return null;
 			}
 			
-			// TODO: Contains almost the same code as ConstraintExprVisitor.methodCall
 			@Override
 			public Void methodCall(MethodCall call, Void arg) {
-				List<Expr> arguments = call.argumentsWithoutReceiver();
-				Collection<MethodSymbol> methodSymbols = methodSymbolCache.get(call.methodName, arguments.size());
-				Expr receiver = call.receiver();
-				TypeSet receiverTypeSet = exprVisitor.visit(receiver, null);
-				Set<ClassSymbol> possibleReceiverTypes = new HashSet<>();
-				
-				for (MethodSymbol msym : methodSymbols) {
-					possibleReceiverTypes.addAll(typeSymbols.getClassSymbolSubtypes(msym.owner));
-					for (int argNum = 0; argNum < arguments.size(); argNum++) {
-						Expr argument = arguments.get(argNum);
-						TypeSet argTypeSet = exprVisitor.visit(argument, null);
-						VariableSymbol paramSym = msym.getParameter(argNum);
-						TypeSymbol paramType = paramSym.getType();
-						ConstantTypeSet expectedArgType = constantTypeSetFactory.makeDeclarableSubtypes(paramType);
-						ConstraintCondition condition = new ConstraintCondition(msym.owner, receiverTypeSet);
-						constraintSystem.addUpperBound(argTypeSet, expectedArgType, condition);
-					}
-				}
-				
-				// the receiver _must_ be a subtype of any class that has a method 
-				// with the right name and number of arguments
-				ConstantTypeSet possibleReceiverTypeSet = new ConstantTypeSet(possibleReceiverTypes);
-				constraintSystem.addUpperBound(receiverTypeSet, possibleReceiverTypeSet);
-				
+				exprVisitor.createMethodCallConstraints(call.methodName,
+						call.receiver(), call.argumentsWithoutReceiver(),
+						Optional.<TypeVariable> absent());
 				return null;
 			}
 		}
@@ -404,22 +385,23 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				return resultSet;
 			}
 			
-			@Override
-			public TypeSet methodCall(MethodCallExpr call, Void arg) {
-				List<Expr> arguments = call.argumentsWithoutReceiver();
+			public void createMethodCallConstraints(String methodName,
+					Expr receiver, List<Expr> arguments,
+					Optional<TypeVariable> methodCallResultTypeVar) {
 				Collection<MethodSymbol> methodSymbols = methodSymbolCache.get(
-						call.methodName, arguments.size());
-				Expr receiver = call.receiver();
+						methodName, arguments.size());
 				TypeSet receiverTypeSet = visit(receiver, null);
-				TypeVariable methodCallResultTypeVar = constraintSystem.addTypeVariable();
 				Set<ClassSymbol> possibleReceiverTypes = new HashSet<>();
 
 				for (MethodSymbol msym : methodSymbols) {
-					possibleReceiverTypes.addAll(typeSymbols.getClassSymbolSubtypes(msym.owner));
+					ImmutableSet<ClassSymbol> msymClassSubtypes = typeSymbols
+							.getClassSymbolSubtypes(msym.owner);
+					possibleReceiverTypes.addAll(msymClassSubtypes);
 					ConstraintCondition condition = new ConstraintCondition(
 							msym.owner, receiverTypeSet);
 					for (int argNum = 0; argNum < arguments.size(); argNum++) {
-						TypeSet argTypeSet = visit(arguments.get(argNum), null);
+						Expr argument = arguments.get(argNum);
+						TypeSet argTypeSet = visit(argument, null);
 						VariableSymbol paramSym = msym.getParameter(argNum);
 						TypeSymbol paramType = paramSym.getType();
 						ConstantTypeSet expectedArgType = constantTypeSetFactory
@@ -427,20 +409,33 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 						constraintSystem.addUpperBound(argTypeSet,
 								expectedArgType, condition);
 					}
-					TypeSymbol resultSym = msym.returnType;
-					ConstantTypeSet expectedResultTypes = constantTypeSetFactory
-							.make(resultSym);
-					constraintSystem.addLowerBound(methodCallResultTypeVar,
-							expectedResultTypes, condition);
+
+					if (methodCallResultTypeVar.isPresent()) {
+						TypeSymbol resultSym = msym.returnType;
+						ConstantTypeSet expectedResultTypes = constantTypeSetFactory
+								.make(resultSym);
+						constraintSystem.addLowerBound(
+								methodCallResultTypeVar.get(),
+								expectedResultTypes, condition);
+					}
 				}
 
-				// the receiver _must_ be a subtype of any class that has a method 
+				// the receiver _must_ be a subtype of any class that has a
+				// method
 				// with the right name and number of arguments
 				ConstantTypeSet possibleReceiverTypeSet = new ConstantTypeSet(
 						possibleReceiverTypes);
 				constraintSystem.addUpperBound(receiverTypeSet,
 						possibleReceiverTypeSet);
-
+			}
+			
+			@Override
+			public TypeSet methodCall(MethodCallExpr call, Void arg) {
+				TypeVariable methodCallResultTypeVar = constraintSystem
+						.addTypeVariable();
+				createMethodCallConstraints(call.methodName, call.receiver(),
+						call.argumentsWithoutReceiver(),
+						Optional.of(methodCallResultTypeVar));
 				return methodCallResultTypeVar;
 			}
 			
