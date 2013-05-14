@@ -1,0 +1,12 @@
+class Main {
+  int[] foo() {
+    int[] x;
+    x = new int[1];
+    x[0] = 7;
+    return x;
+  }
+  
+  void main() {
+    write(this.foo()[0]);
+  }
+}
