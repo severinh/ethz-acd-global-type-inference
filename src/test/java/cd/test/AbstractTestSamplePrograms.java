@@ -2,6 +2,9 @@ package cd.test;
 
 import java.io.File;
 import java.io.IOException;
+
+import javax.annotation.Nonnull;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.After;
@@ -36,8 +39,8 @@ abstract public class AbstractTestSamplePrograms {
 	private final File inputFile;
 	private final TestConfig testConfig;
 
-	public AbstractTestSamplePrograms(File sourceFile, CompilerOptions options,
-			ReferenceData referenceData) {
+	public AbstractTestSamplePrograms(@Nonnull File sourceFile,
+			@Nonnull CompilerOptions options, ReferenceData referenceData) {
 		CompilationContext context = new CompilationContext(sourceFile, options);
 		this.compiler = CompilerToolchain.forContext(context);
 		this.referenceData = referenceData;

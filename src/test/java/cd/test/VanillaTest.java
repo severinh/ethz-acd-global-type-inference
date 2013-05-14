@@ -3,6 +3,8 @@ package cd.test;
 import java.io.File;
 import java.util.Collection;
 
+import javax.annotation.Nonnull;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -28,8 +30,8 @@ public class VanillaTest extends TestSamplePrograms {
 				ReferenceDataFactory.makeRemote());
 	}
 
-	public VanillaTest(String testName, File file, CompilerOptions options,
-			ReferenceData referenceData) {
+	public VanillaTest(String testName, @Nonnull File file,
+			@Nonnull CompilerOptions options, ReferenceData referenceData) {
 		super(testName, file, options, referenceData);
 	}
 

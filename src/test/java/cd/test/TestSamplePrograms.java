@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import cd.CompilerOptions;
 import cd.test.fileprovider.TestFileProvider;
 import cd.test.reference.ReferenceData;
@@ -39,8 +41,8 @@ public abstract class TestSamplePrograms extends AbstractTestSamplePrograms {
 	 * @param file
 	 *            The javali file to test.
 	 */
-	public TestSamplePrograms(String testName, File file,
-			CompilerOptions options, ReferenceData referenceData) {
+	public TestSamplePrograms(String testName, @Nonnull File file,
+			@Nonnull CompilerOptions options, ReferenceData referenceData) {
 		super(file, options, referenceData);
 	}
 
