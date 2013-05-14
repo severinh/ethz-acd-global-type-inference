@@ -1,6 +1,10 @@
 // Assert that a reference to an object of type A cannot be assigned
 // to a reference of the subtype B of A.
 
+// NOTE: If type erasure is enabled, the code WILL type-check, because
+// type inference will choose a type for the local variable that is different
+// from the declared one.
+
 class A {
 }
 
@@ -9,7 +13,6 @@ class B extends A {
 
 class Main {
 	void main() {
-		// The following must not type-check UNLESS type erasure is enabled
 		B b;
 		b = new A();
 	}
