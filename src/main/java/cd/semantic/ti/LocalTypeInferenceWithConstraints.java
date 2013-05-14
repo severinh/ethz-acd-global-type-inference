@@ -295,10 +295,13 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			
 			@Override
 			public TypeSet cast(Cast ast, Void arg) {
-				// TODO: generate constraints for the expression, too
-				visit(ast.arg(), null);
+				TypeSet exprTypeSet = visit(ast.arg(), null);
+				// only reference types can be casted
+				ConstantTypeSet allRefTyes = constantTypeSetFactory.makeReferenceTypeSet();
+				constraintSystem.addUpperBound(exprTypeSet, allRefTyes);
+				
 				TypeSymbol castResultType = typeSymbols.getType(ast.typeName);
-				return constantTypeSetFactory.make(castResultType);
+				return constantTypeSetFactory.makeDeclarableSubtypes(castResultType);
 			}
 			
 			@Override
