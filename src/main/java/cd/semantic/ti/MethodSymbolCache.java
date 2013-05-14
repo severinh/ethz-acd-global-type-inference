@@ -2,6 +2,8 @@ package cd.semantic.ti;
 
 import java.util.Objects;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
@@ -80,7 +82,7 @@ public final class MethodSymbolCache {
 		}
 
 		@Override
-		public boolean equals(Object obj) {
+		public boolean equals(@Nullable Object obj) {
 			if (obj instanceof Key) {
 				Key other = (Key) obj;
 				return Objects.equals(name, other.name)

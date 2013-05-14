@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
-import cd.CompilationContext;
 import cd.ir.ast.Ast;
 import cd.ir.ast.ClassDecl;
 import cd.ir.ast.MethodDecl;
@@ -40,9 +39,9 @@ public class TypeInferenceEvaluationVisitorTest {
 		classDecl = new ClassDecl("Main", "Object", Arrays.asList(methodDecl,
 				fieldDecl));
 
-		CompilationContext context = new CompilationContext();
-		new UntypedSemanticAnalyzer(context).check(Arrays.asList(classDecl));
-		typeSymbols = context.getTypeSymbols();
+		typeSymbols = new TypeSymbolTable();
+		new UntypedSemanticAnalyzer(typeSymbols)
+				.check(Arrays.asList(classDecl));
 
 		evaluationVisitor = new TypeInferenceEvaluationVisitor(typeSymbols);
 	}

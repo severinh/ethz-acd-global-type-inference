@@ -1,5 +1,7 @@
 package cd.semantic.ti;
 
+import javax.annotation.Nonnull;
+
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.TypeSymbol;
@@ -15,8 +17,10 @@ import cd.semantic.TypeSymbolTable;
  */
 public class GlobalTypeEraser extends LocalTypeEraser {
 
+	@Nonnull
 	private static final GlobalTypeEraser INSTANCE = new GlobalTypeEraser();
 
+	@Nonnull
 	public static GlobalTypeEraser getInstance() {
 		return INSTANCE;
 	}
@@ -32,7 +36,7 @@ public class GlobalTypeEraser extends LocalTypeEraser {
 	 *            the symbol table
 	 */
 	@Override
-	public void eraseTypesFrom(TypeSymbolTable symbolTable) {
+	public void eraseTypesFrom(@Nonnull TypeSymbolTable symbolTable) {
 		super.eraseTypesFrom(symbolTable);
 
 		TypeSymbol bottomType = symbolTable.getBottomType();

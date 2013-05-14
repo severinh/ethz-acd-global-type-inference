@@ -1,5 +1,7 @@
 package cd.semantic.ti;
 
+import javax.annotation.Nonnull;
+
 import cd.CompilationContext;
 import cd.ir.ast.ClassDecl;
 import cd.ir.ast.MethodDecl;
@@ -15,7 +17,7 @@ public abstract class LocalTypeInference implements TypeInference {
 	}
 
 	@Override
-	public void inferTypes(CompilationContext context) {
+	public void inferTypes(@Nonnull CompilationContext context) {
 		TypeSymbolTable typeSymbols = context.getTypeSymbols();
 		for (ClassDecl classDecl : context.getAstRoots()) {
 			for (final MethodDecl mdecl : classDecl.methods()) {
