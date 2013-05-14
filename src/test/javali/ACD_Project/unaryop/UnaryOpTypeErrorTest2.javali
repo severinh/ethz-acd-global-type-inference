@@ -1,0 +1,10 @@
+// Assert that the boolean not operator cannot be applied to a float.
+
+class Main {
+	void main() {
+		int x;
+		boolean b;
+		x = 0.0;
+		b = !x;
+	}
+}

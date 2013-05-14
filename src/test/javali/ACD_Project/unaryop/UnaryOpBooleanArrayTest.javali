@@ -1,0 +1,15 @@
+// Assert that the boolean not operator also properly works on array elements
+
+class Main {
+	void main() {
+		boolean[] arr;
+		boolean b;
+		arr = new boolean[10];
+		arr[0] = false;
+		b = !arr[0];
+		if (b) {
+			write(1);
+			writeln();
+		}
+	}
+}

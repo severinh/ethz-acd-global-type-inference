@@ -1,0 +1,9 @@
+// Assert that the unary minus operator cannot be applied to a boolean value.
+
+class Main {
+	void main() {
+		boolean b;
+		b = false;
+		b = +b;
+	}
+}

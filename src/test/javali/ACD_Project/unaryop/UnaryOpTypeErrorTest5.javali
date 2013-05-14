@@ -1,0 +1,10 @@
+// Assert that the unary minus operator cannot be applied to a null-reference.
+
+class Main {
+	void main() {
+		int i;
+		Object o;
+		o = null;
+		i = +o;
+	}
+}

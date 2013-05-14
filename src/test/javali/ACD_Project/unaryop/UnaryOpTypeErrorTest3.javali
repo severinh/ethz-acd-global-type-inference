@@ -1,0 +1,10 @@
+// Assert that the boolean not operator cannot be applied to a null-reference.
+
+class Main {
+	void main() {
+		Object o;
+		boolean b;
+		o = null;
+		b = !o;
+	}
+}

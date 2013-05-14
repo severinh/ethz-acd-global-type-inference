@@ -1,0 +1,64 @@
+// Test correct use of unary operators.
+
+class Main {
+	boolean field_b;
+
+	void main() {
+		testUPlus();
+		testUMinus();
+		testUBoolNot();
+	}
+	
+	void testUPlus() {
+		int i;
+		float x;
+		i = +2;
+		x = +16.0;
+		i = +i;
+		x = +x;
+		
+		write(i);
+		writeln();
+		if (x == 16.0) {
+			write(1);
+			writeln();
+		}
+	}
+	
+	void testUMinus() {
+		int i;
+		float x;
+		i = -2;
+		x = -16.0;
+		i = -i;
+		x = -x;
+		
+		write(i);
+		writeln();
+		if (x == 16.0) {
+			write(1);
+			writeln();
+		}
+	}
+	
+	void testUBoolNot() {
+		boolean local_b;
+		local_b = !true;
+		local_b = !local_b;
+		writeb(local_b);
+		writeln();
+		
+		field_b = !false;
+		field_b = !field_b;
+		writeb(field_b);
+		writeln();
+	}
+	
+	void writeb(boolean b) {
+		if (b) {
+			write(1);
+		} else {
+			write(0);
+		}
+	}
+}

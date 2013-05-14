@@ -1,0 +1,8 @@
+// Assert that the unary minus operator cannot be applied to an uninitialized variable.
+
+class Main {
+	void main() {
+		int i;
+		i = +i;
+	}
+}
