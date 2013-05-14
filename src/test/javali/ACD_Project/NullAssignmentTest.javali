@@ -1,0 +1,23 @@
+// Assert that the compiler allows null to be assigned to a reference variable
+// and optionally later allow that variable to later point to an actual object
+
+class A {
+}
+
+class Main {
+	void main() {
+		foo();
+		bar();
+	}
+	
+	void foo() {
+		A a;
+		a = null;
+	}
+	
+	void bar() {
+		A a;
+		a = null;
+		a = new A();
+	}
+}
