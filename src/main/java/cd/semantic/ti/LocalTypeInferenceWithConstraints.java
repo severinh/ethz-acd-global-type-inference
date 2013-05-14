@@ -104,13 +104,11 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 		private final MethodDecl mdecl;
 		private final ConstraintSystem constraintSystem;
 		
-		// TODO: The following caches could and should be reused for the
-		// type inference in all methods
 		private final MethodSymbolCache methodSymbolCache;
 		private final ClassSymbolFieldCache classFieldSymbolCache;
 		private final ConstantTypeSetFactory constantTypeSetFactory;
 		
-		private final TypeVariable returnTypeVariable;
+		private ConstantTypeSet allowedReturnTypeSet;
 		
 		// Map to remember the type variables for our parameters and locals,
 		// i.e. what we are eventually interested in.
@@ -127,7 +125,6 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			this.methodSymbolCache = MethodSymbolCache.of(typeSymbols);
 			this.classFieldSymbolCache = ClassSymbolFieldCache.of(typeSymbols);
 			this.constantTypeSetFactory = new ConstantTypeSetFactory(typeSymbols);
-			this.returnTypeVariable = constraintSystem.addTypeVariable("return_type");
 		}
 
 		public ConstraintSystem getConstraintSystem() {
@@ -156,17 +153,9 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
 			// type variable and constraints for return value (if any)
 			if (msym.returnType == typeSymbols.getVoidType()) {
-				// TODO: Requiring the return type variable to be equal to the
-				// empty constant type set seems like an unnecessary
-				// indirection. Would it be possible to directly use a constant
-				// type set instead?
-				constraintSystem.addConstEquality(returnTypeVariable,
-						constantTypeSetFactory.makeEmpty());
+				allowedReturnTypeSet = constantTypeSetFactory.makeEmpty();
 			} else {
-				ConstantTypeSet typeConst = constantTypeSetFactory
-						.makeDeclarableSubtypes(msym.returnType);
-				constraintSystem
-						.addConstEquality(returnTypeVariable, typeConst);
+				allowedReturnTypeSet = constantTypeSetFactory.makeDeclarableSubtypes(msym.returnType);
 			}
 
 			ConstraintStmtVisitor constraintVisitor = new ConstraintStmtVisitor();
@@ -180,8 +169,8 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			public Void returnStmt(ReturnStmt ast, Void arg) {
 				if (ast.arg() != null) {
 					TypeVariable exprType = exprVisitor.visit(ast.arg(), null);
-					constraintSystem.addVarInequality(exprType,
-							returnTypeVariable);
+					constraintSystem.addUpperBound(exprType,
+							allowedReturnTypeSet);
 				}
 				return null;
 			}
