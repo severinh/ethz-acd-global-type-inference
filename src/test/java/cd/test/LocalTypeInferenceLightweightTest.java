@@ -9,6 +9,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import com.google.common.collect.ImmutableList;
+
 import cd.CompilerOptions;
 import cd.TypeErasureMode;
 import cd.TypeInferenceMode;
@@ -30,8 +32,10 @@ public class LocalTypeInferenceLightweightTest extends TestSamplePrograms {
 				.withExcludedDir(TEST_FOLDER, "global");
 		CompilerOptions options = new CompilerOptions(TypeErasureMode.LOCAL,
 				TypeInferenceMode.LOCAL_LIGHTWEIGHT);
+		ImmutableList<String> suffixOrder = ImmutableList.of("overriding.ltil",
+				"overriding");
 		return buildParameters(testFileProvider, options,
-				ReferenceDataFactory.makeLocalOverridingRemote());
+				ReferenceDataFactory.makeLocalOverridingRemote(suffixOrder));
 	}
 
 	public LocalTypeInferenceLightweightTest(String testName,

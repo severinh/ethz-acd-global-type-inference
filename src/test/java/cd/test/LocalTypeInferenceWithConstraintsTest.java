@@ -9,6 +9,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import com.google.common.collect.ImmutableList;
+
 import cd.CompilerOptions;
 import cd.TypeErasureMode;
 import cd.TypeInferenceMode;
@@ -30,12 +32,15 @@ public class LocalTypeInferenceWithConstraintsTest extends TestSamplePrograms {
 				.withExcludedDir(TEST_FOLDER, "global");
 		CompilerOptions options = new CompilerOptions(TypeErasureMode.LOCAL,
 				TypeInferenceMode.LOCAL_CONSTRAINTS);
+		ImmutableList<String> suffixOrder = ImmutableList.of(
+				"overriding.ltiwc", "overriding");
 		return buildParameters(testFileProvider, options,
-				ReferenceDataFactory.makeLocalOverridingRemote());
+				ReferenceDataFactory.makeLocalOverridingRemote(suffixOrder));
 	}
 
-	public LocalTypeInferenceWithConstraintsTest(String testName, @Nonnull File file,
-			@Nonnull CompilerOptions options, ReferenceData referenceData) {
+	public LocalTypeInferenceWithConstraintsTest(String testName,
+			@Nonnull File file, @Nonnull CompilerOptions options,
+			ReferenceData referenceData) {
 		super(testName, file, options, referenceData);
 	}
 
