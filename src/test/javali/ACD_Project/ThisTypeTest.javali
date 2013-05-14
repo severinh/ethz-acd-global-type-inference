@@ -1,0 +1,38 @@
+class A {
+
+}
+
+class B extends A {
+  A a1;
+  A a2;
+  void test1() {
+    a1 = new A();
+    a1 = this;
+  }
+  
+  void test2() {
+    a2 = this;
+  }
+  
+  A test3() {
+    return this;
+  }
+  
+  A test4() {
+    A x;
+    x = this;
+    return x;
+  }
+}
+
+class Main {
+  void main() {
+    B b;
+    A a;
+    b = new B();
+    b.test1();
+    b.test2();
+    a = b.test3();
+    a = b.test4();
+  }
+}

@@ -164,7 +164,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 						constantTypeSetFactory.makeEmpty());
 			} else {
 				ConstantTypeSet typeConst = constantTypeSetFactory
-						.make(msym.returnType);
+						.makeDeclarableSubtypes(msym.returnType);
 				constraintSystem
 						.addConstEquality(returnTypeVariable, typeConst);
 			}
