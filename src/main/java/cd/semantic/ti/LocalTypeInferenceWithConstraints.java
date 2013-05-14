@@ -324,39 +324,24 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			public TypeSet index(Index idx, Void arg) {
 				Expr arrayExpr = idx.left();
 				TypeSet indexTypeSet = visit(idx.right(), null);
-				constraintSystem.addEquality(indexTypeSet, constantTypeSetFactory.makeInt());
+				constraintSystem.addEquality(indexTypeSet,
+						constantTypeSetFactory.makeInt());
 
-				// TODO: handle other lhs cases, generalize this
-				if (arrayExpr instanceof Var) {
-					VariableSymbol varSym = ((Var) arrayExpr).getSymbol();
-					TypeVariable resultVar = constraintSystem.addTypeVariable();
-					if (varSym.getKind().equals(Kind.LOCAL)) {
-						TypeVariable localTypeVar = localSymbolVariables
-								.get(varSym);
-						ConstantTypeSet arrayTypesSet = constantTypeSetFactory.makeArrayTypeSet();
-						constraintSystem.addUpperBound(localTypeVar, arrayTypesSet);
-						
-						// TODO: Probably not finished yet as Quicksort is still failing
-						for (ArrayTypeSymbol arrayType : typeSymbols.getArrayTypeSymbols()) {
-							ConstraintCondition condition = new ConstraintCondition(arrayType, localTypeVar);
-							ConstantTypeSet arrayElementTypeSet = constantTypeSetFactory.make(arrayType.elementType);
-							constraintSystem.addEquality(resultVar, arrayElementTypeSet, condition);
-						}
-						return resultVar;
-					} else if (varSym.getKind() == Kind.FIELD) {
-						TypeSymbol arrayType = varSym.getType();
-						// We check field type here even if type checker does that too, since we don't want to fail with Cast exceptions 
-						if (!(arrayType instanceof ArrayTypeSymbol)) {
-							throw new SemanticFailure(Cause.TYPE_ERROR,
-									"An array type was required, but %s was found", arrayType);						
-						}
-						TypeSymbol elemType = ((ArrayTypeSymbol) arrayType).elementType;
-						ConstantTypeSet elemTypeSet = constantTypeSetFactory.make(elemType);
-						constraintSystem.addEquality(resultVar, elemTypeSet);
-						return resultVar;
-					}
+				TypeVariable resultVar = constraintSystem.addTypeVariable();
+				TypeSet arrayExprTypeSet = visit(arrayExpr, null);
+				ConstantTypeSet arrayTypesSet = constantTypeSetFactory
+						.makeArrayTypeSet();
+				constraintSystem.addUpperBound(arrayExprTypeSet, arrayTypesSet);
+				for (ArrayTypeSymbol arrayType : typeSymbols
+						.getArrayTypeSymbols()) {
+					ConstraintCondition condition = new ConstraintCondition(
+							arrayType, arrayExprTypeSet);
+					ConstantTypeSet arrayElementTypeSet = constantTypeSetFactory
+							.make(arrayType.elementType);
+					constraintSystem.addEquality(resultVar,
+							arrayElementTypeSet, condition);
 				}
-				return null;
+				return resultVar;
 			}
 			
 			@Override
