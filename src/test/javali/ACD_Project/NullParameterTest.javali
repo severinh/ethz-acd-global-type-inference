@@ -1,0 +1,11 @@
+// Assert that the compiler allows null to be passed as an argument
+// to a method that requires a reference as a parameter.
+
+class Main {
+	void main() {
+		foo(null);
+	}
+	
+	void foo(Main main) {
+	}
+}
