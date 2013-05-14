@@ -36,6 +36,8 @@ import cd.semantic.ti.TypeInference;
 import cd.util.FileUtil;
 
 public class CompilerToolchain {
+
+	@SuppressWarnings("null")
 	public static final Logger LOG = LoggerFactory
 			.getLogger(CompilerToolchain.class);
 
@@ -93,7 +95,11 @@ public class CompilerToolchain {
 				List<ClassDecl> result = walker.unit();
 				LOG.debug(AstDump.toString(result));
 
-				context.setAstRoots(result);
+				if (result == null) {
+					throw new ParseFailure(0, "list of class declarations is null");
+				} else {
+					context.addClassDecls(result);
+				}
 			}
 		} catch (RecognitionException e) {
 			ParseFailure pf = new ParseFailure(0, "?");
@@ -113,7 +119,7 @@ public class CompilerToolchain {
 	 */
 	public void semanticCheck() throws SemanticFailure {
 		List<ClassDecl> astRoots = context.getAstRoots();
-		new UntypedSemanticAnalyzer(context).check(astRoots);
+		new UntypedSemanticAnalyzer(context.getTypeSymbols()).check(astRoots);
 
 		CompilerOptions options = context.getOptions();
 

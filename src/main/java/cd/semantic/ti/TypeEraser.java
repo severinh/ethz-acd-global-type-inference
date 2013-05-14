@@ -1,6 +1,7 @@
 package cd.semantic.ti;
 
 import cd.semantic.TypeSymbolTable;
+import cd.util.NonnullByDefault;
 
 /**
  * Sets the type of certain variable symbols to the unknown type.
@@ -8,6 +9,7 @@ import cd.semantic.TypeSymbolTable;
  * This mimics the behavior of the programmer omitting type information. Type
  * erasure must not be performed after type checking has taken place.
  */
+@NonnullByDefault
 public interface TypeEraser {
 
 	/**

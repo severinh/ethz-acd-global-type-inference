@@ -1,5 +1,7 @@
 package cd.semantic.ti;
 
+import javax.annotation.Nonnull;
+
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.TypeSymbol;
@@ -14,9 +16,9 @@ import cd.semantic.TypeSymbolTable;
  */
 public class LocalTypeEraser implements TypeEraser {
 
-	private static final LocalTypeEraser INSTANCE = new LocalTypeEraser();
+	private static final @Nonnull LocalTypeEraser INSTANCE = new LocalTypeEraser();
 
-	public static LocalTypeEraser getInstance() {
+	public static @Nonnull LocalTypeEraser getInstance() {
 		return INSTANCE;
 	}
 
@@ -24,7 +26,7 @@ public class LocalTypeEraser implements TypeEraser {
 	}
 
 	@Override
-	public void eraseTypesFrom(TypeSymbolTable symbolTable) {
+	public void eraseTypesFrom(@Nonnull TypeSymbolTable symbolTable) {
 		TypeSymbol bottomType = symbolTable.getBottomType();
 		for (ClassSymbol classSymbol : symbolTable.getClassSymbols()) {
 			for (MethodSymbol methodSymbol : classSymbol.getDeclaredMethods()) {

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Main {
 
+	@SuppressWarnings("null")
 	public static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
 	/** Parse command line, invoke compile() routine */

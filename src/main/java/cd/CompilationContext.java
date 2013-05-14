@@ -1,7 +1,10 @@
 package cd;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import cd.ir.ast.ClassDecl;
 import cd.ir.symbols.ClassSymbol;
@@ -9,7 +12,6 @@ import cd.semantic.TypeSymbolTable;
 
 /**
  * The data that comprises a single run of the compiler on a file.
- * 
  */
 public class CompilationContext {
 
@@ -26,20 +28,10 @@ public class CompilationContext {
 	private TypeSymbolTable typeSymbols;
 
 	/** Symbol for the Main type */
+	@Nullable
 	private ClassSymbol mainType;
 
-	private List<ClassDecl> astRoots;
-
-	/**
-	 * Constructor to be used for testing purposes
-	 */
-	public CompilationContext() {
-		this.sourceFile = null;
-		this.assemblyFile = null;
-		this.binaryFile = null;
-		this.cfgDumpBase = null;
-		this.options = new CompilerOptions();
-	}
+	private List<ClassDecl> classDecls;
 
 	public CompilationContext(File file) {
 		this(file, new CompilerOptions());
@@ -51,6 +43,8 @@ public class CompilationContext {
 		this.binaryFile = new File(file.getPath() + Config.BINARYEXT);
 		this.cfgDumpBase = file;
 		this.options = options;
+		this.typeSymbols = new TypeSymbolTable();
+		this.classDecls = new ArrayList<>();
 	}
 
 	public TypeSymbolTable getTypeSymbols() {
@@ -83,11 +77,8 @@ public class CompilationContext {
 		return binaryFile;
 	}
 
-	public void setTypeSymbols(TypeSymbolTable typeSymbols) {
-		this.typeSymbols = typeSymbols;
-	}
-
-	public ClassSymbol getMainType() {
+	public @Nullable
+	ClassSymbol getMainType() {
 		return mainType;
 	}
 
@@ -96,17 +87,27 @@ public class CompilationContext {
 	}
 
 	public List<ClassDecl> getAstRoots() {
-		return astRoots;
+		return classDecls;
 	}
 
 	/**
-	 * Sets the AST roots (class declarations) that are present in this context.
+	 * Add a class declaration to the context.
 	 * 
 	 * The method is package-private because it is meant to be called by the
-	 * {@link CompilerToolchain}. It is only meant to be called once.
+	 * {@link CompilerToolchain}.
 	 */
-	void setAstRoots(List<ClassDecl> astRoots) {
-		this.astRoots = astRoots;
+	void addClassDecl(ClassDecl classDecl) {
+		this.classDecls.add(classDecl);
+	}
+
+	/**
+	 * Add a list of class declarations to the context.
+	 * 
+	 * The method is package-private because it is meant to be called by the
+	 * {@link CompilerToolchain}.
+	 */
+	void addClassDecls(List<ClassDecl> classDecls) {
+		this.classDecls.addAll(classDecls);
 	}
 
 	public CompilerOptions getOptions() {

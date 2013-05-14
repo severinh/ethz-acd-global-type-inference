@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import cd.CompilationContext;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.ast.ClassDecl;
@@ -27,14 +26,14 @@ import cd.ir.symbols.ClassSymbol;
  */
 public class UntypedSemanticAnalyzer {
 
-	private final CompilationContext context;
-
-	public UntypedSemanticAnalyzer(CompilationContext context) {
-		this.context = context;
+	private final TypeSymbolTable typeSymbols;
+	
+	public UntypedSemanticAnalyzer(TypeSymbolTable typeSymbols) {
+		this.typeSymbols = typeSymbols;
 	}
 
 	public void check(List<ClassDecl> classDecls) throws SemanticFailure {
-		context.setTypeSymbols(createSymbols(classDecls));
+		createSymbols(classDecls);
 		resolveVarSymbols(classDecls);
 		checkUntypedInheritance(classDecls);
 	}
@@ -46,9 +45,7 @@ public class UntypedSemanticAnalyzer {
 	 * 
 	 * @see SymbolCreator
 	 */
-	private TypeSymbolTable createSymbols(List<ClassDecl> classDecls) {
-		TypeSymbolTable typeSymbols = new TypeSymbolTable();
-
+	private void createSymbols(List<ClassDecl> classDecls) {
 		// Create the ClassSymbols in the "right" order, meaning that a class is
 		// always created before its subclasses. This allows us to pass the
 		// superclass to the ClassSymbol constructor. Furthermore, the taken
@@ -103,8 +100,6 @@ public class UntypedSemanticAnalyzer {
 		for (ClassDecl classDecl : classDecls) {
 			sc.createSymbols(classDecl);
 		}
-
-		return typeSymbols;
 	}
 
 	private void resolveVarSymbols(List<ClassDecl> classDecls) {

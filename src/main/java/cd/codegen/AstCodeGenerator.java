@@ -206,7 +206,13 @@ public class AstCodeGenerator {
 		newMain.setType(context.getMainType());
 		MethodCall callMain = new MethodCall(newMain, "main",
 				Collections.<Expr> emptyList());
-		callMain.sym = context.getMainType().getMethod("main");
+		
+		ClassSymbol mainType = context.getMainType();
+		if (mainType == null) {
+			throw new IllegalStateException("the main type must be set before code generation");
+		} else {
+			callMain.sym = mainType.getMethod("main");
+		}
 
 		// Emit the main() method:
 		// new Main().main();
