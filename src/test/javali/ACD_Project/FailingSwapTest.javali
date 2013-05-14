@@ -1,0 +1,16 @@
+class Foo {
+    int a ;
+}
+
+class Main {
+    void swap(Foo f1, Foo f2) {
+        int temp;
+   
+        temp = f1.a;
+        f1.a = f2.a;
+        f2.a = temp;
+    }
+
+    void main() {
+    }
+}
