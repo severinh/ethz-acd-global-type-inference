@@ -17,7 +17,7 @@ public class ConstantConstraint extends TypeConstraint {
 
 	@Override
 	public boolean isSatisfied() {
-		return isActive() || isSatisfiedIfActive;
+		return !isActive() || isSatisfiedIfActive;
 	}
 
 	@Override
