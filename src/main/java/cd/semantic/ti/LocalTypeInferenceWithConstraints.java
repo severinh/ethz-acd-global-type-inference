@@ -449,7 +449,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
 				switch (op) {
 				case U_BOOL_NOT:
-					constraintSystem.addUpperBound(subExprTypeSet, booleanType);
+					constraintSystem.addEquality(subExprTypeSet, booleanType);
 					break;
 				case U_MINUS:
 				case U_PLUS:
