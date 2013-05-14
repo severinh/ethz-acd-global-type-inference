@@ -288,11 +288,8 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			
 			@Override
 			public TypeSet thisRef(ThisRef ast, Void arg) {
-				// TODO: This is obviously not correct yet
-				// The actual type of this may of course be a subtype of the
-				// class in which the current method is defined in.
 				ClassSymbol classSymbol = mdecl.sym.owner;
-				return constantTypeSetFactory.make(classSymbol);
+				return constantTypeSetFactory.makeDeclarableSubtypes(classSymbol);
 			}
 			
 			@Override
