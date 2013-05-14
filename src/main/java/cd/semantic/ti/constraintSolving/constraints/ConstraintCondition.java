@@ -2,36 +2,36 @@ package cd.semantic.ti.constraintSolving.constraints;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import cd.ir.symbols.TypeSymbol;
-import cd.semantic.ti.constraintSolving.TypeVariable;
+import cd.semantic.ti.constraintSolving.TypeSet;
 
 /**
  * Condition that constraints may depend on. It is of the form a \in v, where a
- * is a type symbol (an atom) and v is a type variable.
+ * is a type symbol (an atom) and v is a type set (usually variable).
  */
 public class ConstraintCondition {
 	private final TypeSymbol typeAtom;
-	private final TypeVariable typeVariable;
+	private final TypeSet typeSet;
 
-	public ConstraintCondition(TypeSymbol typeAtom, TypeVariable typeVariable) {
+	public ConstraintCondition(TypeSymbol typeAtom, TypeSet typeSet) {
 		this.typeAtom = checkNotNull(typeAtom);
-		this.typeVariable = checkNotNull(typeVariable);
+		this.typeSet = checkNotNull(typeSet);
 	}
 
 	public TypeSymbol getTypeAtom() {
 		return typeAtom;
 	}
 
-	public TypeVariable getTypeVariable() {
-		return typeVariable;
+	public TypeSet getTypeSet() {
+		return typeSet;
 	}
 
 	public boolean isSatisfied() {
-		boolean result = getTypeVariable().getTypes().contains(getTypeAtom());
+		boolean result = getTypeSet().getTypes().contains(getTypeAtom());
 		return result;
 	}
 
 	@Override
 	public String toString() {
-		return typeAtom + "\u2208" + typeVariable;
+		return typeAtom + "\u2208" + typeSet;
 	}
 }

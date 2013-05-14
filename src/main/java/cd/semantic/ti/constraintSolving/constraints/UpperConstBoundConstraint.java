@@ -38,7 +38,7 @@ public class UpperConstBoundConstraint extends TypeConstraint {
 
 	@Override
 	public <R, A> R accept(TypeConstraintVisitor<R, A> visitor, A arg) {
-		return visitor.visitUpperConstBoundConstraint(this, arg);
+		return visitor.visit(this, arg);
 	}
 
 	@Override

@@ -45,4 +45,10 @@ public class TypeVariable implements TypeSet {
 	public String getDescription() {
 		return description;
 	}
+
+	@Override
+	public <R, A> R accept(TypeSetVisitor<R, A> visitor, A arg) {
+		return visitor.visit(this, arg);
+	}
+
 }

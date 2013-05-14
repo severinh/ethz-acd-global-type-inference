@@ -35,7 +35,7 @@ public class VariableInequalityConstraint extends TypeConstraint {
 
 	@Override
 	public <R, A> R accept(TypeConstraintVisitor<R, A> visitor, A arg) {
-		return visitor.visitVariableInequalityConstraint(this, arg);
+		return visitor.visit(this, arg);
 	}
 
 	@Override
