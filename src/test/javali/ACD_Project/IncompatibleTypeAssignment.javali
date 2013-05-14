@@ -1,0 +1,15 @@
+// Assert that a reference to an object of type A cannot be assigned
+// to a reference of the subtype B of A.
+
+class A {
+}
+
+class B extends A {
+}
+
+class Main {
+	void main() {
+		B b;
+		b = new A(); // must not type-check
+	}
+}
