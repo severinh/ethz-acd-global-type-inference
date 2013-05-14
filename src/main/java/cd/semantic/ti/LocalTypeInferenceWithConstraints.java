@@ -345,8 +345,13 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 								.get(varSym);
 						ConstantTypeSet arrayTypesSet = constantTypeSetFactory.makeArrayTypeSet();
 						constraintSystem.addUpperBound(localTypeVar, arrayTypesSet);
-						// TODO: Constrain resultVar to have the same types as arrayTypesSet, but with the "[]" removed.
-						//	 	 We probably need a new constraint type for that.
+						
+						// TODO: Probably not finished yet as Quicksort is still failing
+						for (ArrayTypeSymbol arrayType : typeSymbols.getArrayTypeSymbols()) {
+							ConstraintCondition condition = new ConstraintCondition(arrayType, localTypeVar);
+							ConstantTypeSet arrayElementTypeSet = constantTypeSetFactory.make(arrayType.elementType);
+							constraintSystem.addEquality(resultVar, arrayElementTypeSet, condition);
+						}
 						return resultVar;
 					} else if (varSym.getKind() == Kind.FIELD) {
 						TypeSymbol arrayType = varSym.getType();
