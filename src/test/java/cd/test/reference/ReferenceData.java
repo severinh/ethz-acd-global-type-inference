@@ -3,6 +3,8 @@ package cd.test.reference;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.base.Enums;
 import com.google.common.base.Optional;
 
@@ -31,7 +33,11 @@ public abstract class ReferenceData {
 	public abstract String getSemanticReference() throws IOException;
 
 	public Optional<Cause> getSemanticFailureCause() throws IOException {
-		return Enums.getIfPresent(Cause.class, getSemanticReference());
+		// If there are multiple lines, only use the first one to determine the
+		// semantic failure cause
+		String[] lines = StringUtils.split(getSemanticReference(), "\n");
+		String causeString = lines[0];
+		return Enums.getIfPresent(Cause.class, causeString);
 	}
 
 	public abstract String getExecutionReference(String inputText)
