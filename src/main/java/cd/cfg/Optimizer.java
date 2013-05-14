@@ -42,7 +42,7 @@ public class Optimizer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Optimizer.class);
 
-	private static final boolean INTENSE_DEBUG = true;
+	private static final boolean INTENSE_DEBUG = false;
 	private static final int MAX_INNER = 16, MAX_OUTER = 16;
 
 	private final CompilationContext compilationContext;

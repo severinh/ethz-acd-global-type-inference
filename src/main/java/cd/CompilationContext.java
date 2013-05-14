@@ -18,8 +18,6 @@ public class CompilationContext {
 	private final File sourceFile;
 	private final File assemblyFile;
 	private final File binaryFile;
-
-	// Set to non-null to write dump of control flow graph
 	private final File cfgDumpBase;
 
 	private final CompilerOptions options;
@@ -77,8 +75,8 @@ public class CompilationContext {
 		return binaryFile;
 	}
 
-	public @Nullable
-	ClassSymbol getMainType() {
+	@Nullable
+	public ClassSymbol getMainType() {
 		return mainType;
 	}
 
@@ -113,4 +111,5 @@ public class CompilationContext {
 	public CompilerOptions getOptions() {
 		return options;
 	}
+
 }
