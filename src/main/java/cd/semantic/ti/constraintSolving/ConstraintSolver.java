@@ -2,12 +2,12 @@ package cd.semantic.ti.constraintSolving;
 
 import java.util.Set;
 
+import cd.semantic.ti.constraintSolving.constraints.ConstantConstraint;
 import cd.semantic.ti.constraintSolving.constraints.LowerConstBoundConstraint;
 import cd.semantic.ti.constraintSolving.constraints.TypeConstraint;
 import cd.semantic.ti.constraintSolving.constraints.TypeConstraintVisitor;
 import cd.semantic.ti.constraintSolving.constraints.UpperConstBoundConstraint;
 import cd.semantic.ti.constraintSolving.constraints.VariableInequalityConstraint;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ConstraintSolver {
@@ -42,25 +42,29 @@ public class ConstraintSolver {
 			TypeConstraintVisitor<Void, Void> {
 
 		@Override
-		public Void visitLowerConstBoundConstraint(
-				LowerConstBoundConstraint constraint, Void arg) {
+		public Void visit(LowerConstBoundConstraint constraint, Void arg) {
 			constraint.getTypeVariable().extend(constraint.getLowerBound());
 			return null;
 		}
 
 		@Override
-		public Void visitUpperConstBoundConstraint(
-				UpperConstBoundConstraint constraint, Void arg) {
+		public Void visit(UpperConstBoundConstraint constraint, Void arg) {
 			hasSolution = false;
 			return null;
 		}
 
 		@Override
-		public Void visitVariableInequalityConstraint(
-				VariableInequalityConstraint constraint, Void arg) {
+		public Void visit(VariableInequalityConstraint constraint, Void arg) {
 			constraint.getRight().extend(constraint.getLeft());
 			return null;
 		}
+
+		@Override
+		public Void visit(ConstantConstraint constraint, Void arg) {
+			hasSolution = false;
+			return null;
+		}
+
 	}
 
 }
