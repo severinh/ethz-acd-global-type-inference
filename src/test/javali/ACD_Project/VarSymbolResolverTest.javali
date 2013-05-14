@@ -50,7 +50,7 @@ class Main {
 		a = new A();
 		test(a);
 		
-		b = new A();
+		b = new B();
 		test(b);
 	}
 	
