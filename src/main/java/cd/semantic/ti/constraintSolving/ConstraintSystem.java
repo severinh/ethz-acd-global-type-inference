@@ -16,6 +16,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableSet;
 
 public class ConstraintSystem {
+	
+	public static int COUNTER = 0;
+	
 	// all type variables, including the "helper" variables that are used to
 	// constraint the types of expressions
 	private final Set<TypeVariable> typeVariables = new LinkedHashSet<>();
@@ -74,6 +77,8 @@ public class ConstraintSystem {
 	public TypeVariable addTypeVariable(String varDescription) {
 		TypeVariable typeVar = new TypeVariable(varDescription);
 		typeVariables.add(typeVar);
+		COUNTER++;
+		System.out.println(COUNTER);
 		return typeVar;
 	}
 

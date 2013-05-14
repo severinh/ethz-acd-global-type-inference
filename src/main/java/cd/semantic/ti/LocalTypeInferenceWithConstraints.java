@@ -252,11 +252,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			public TypeSet var(Var ast, Void arg) {
 				VariableSymbol varSym = ast.getSymbol();
 				if (varSym.getKind() == Kind.FIELD) {
-					// TODO: maybe also save these variables in a map to reuse, like locals?
-					TypeVariable resultVar = constraintSystem.addTypeVariable();
-					ConstantTypeSet fieldTypeSet = constantTypeSetFactory.make(varSym.getType());
-					constraintSystem.addEquality(resultVar, fieldTypeSet);
-					return resultVar;
+					return constantTypeSetFactory.make(varSym.getType());
 				} else {
 					return localSymbolVariables.get(varSym);
 				}
@@ -287,43 +283,31 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			
 			@Override
 			public TypeSet newObject(NewObject ast, Void arg) {
-				TypeVariable typeVar = constraintSystem.addTypeVariable();
 				TypeSymbol classSym = typeSymbols.getType(ast.typeName);
-				ConstantTypeSet classTypeSet = constantTypeSetFactory.make(classSym);
-				constraintSystem.addEquality(typeVar, classTypeSet);
-				return typeVar;
+				return constantTypeSetFactory.make(classSym);
 			}
 			
 			@Override
 			public TypeSet newArray(NewArray ast, Void arg) {
-				TypeVariable typeVar = constraintSystem.addTypeVariable();
 				TypeSymbol arraySym = typeSymbols.get(ast.typeName);
-				ConstantTypeSet arrayTypeSet = constantTypeSetFactory.make(arraySym);
-				constraintSystem.addEquality(typeVar, arrayTypeSet);
-				return typeVar;
+				return constantTypeSetFactory.make(arraySym);
 			}
 			
 			@Override
 			public TypeSet thisRef(ThisRef ast, Void arg) {
-				TypeVariable typeVar = constraintSystem.addTypeVariable();
-				ClassSymbol classSymbol = mdecl.sym.owner;
 				// TODO: This is obviously not correct yet
 				// The actual type of this may of course be a subtype of the
 				// class in which the current method is defined in.
-				ConstantTypeSet classTypeSet = constantTypeSetFactory.make(classSymbol);
-				constraintSystem.addEquality(typeVar, classTypeSet);
-				return typeVar;
+				ClassSymbol classSymbol = mdecl.sym.owner;
+				return constantTypeSetFactory.make(classSymbol);
 			}
 			
 			@Override
 			public TypeSet cast(Cast ast, Void arg) {
-				TypeVariable typeVar = constraintSystem.addTypeVariable();
-				// generate constraints for the expression, too
+				// TODO: generate constraints for the expression, too
 				visit(ast.arg(), null);
 				TypeSymbol castResultType = typeSymbols.getType(ast.typeName);
-				ConstantTypeSet resultTypeSet = constantTypeSetFactory.make(castResultType);
-				constraintSystem.addEquality(typeVar, resultTypeSet);
-				return typeVar;
+				return constantTypeSetFactory.make(castResultType);
 			}
 			
 			@Override
@@ -382,18 +366,12 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			
 			@Override
 			public TypeSet builtInRead(BuiltInRead ast, Void arg) {
-				TypeVariable typeVar = constraintSystem.addTypeVariable();
-				ConstantTypeSet intTypeSet = constantTypeSetFactory.makeInt();
-				constraintSystem.addEquality(typeVar, intTypeSet);
-				return typeVar;
+				return constantTypeSetFactory.makeInt();
 			}
 			
 			@Override
 			public TypeSet builtInReadFloat(BuiltInReadFloat ast, Void arg) {
-				TypeVariable typeVar = constraintSystem.addTypeVariable();
-				ConstantTypeSet floatTypeSet = constantTypeSetFactory.makeFloat();
-				constraintSystem.addEquality(typeVar, floatTypeSet);
-				return typeVar;
+				return constantTypeSetFactory.makeFloat();
 			}
 			
 			@Override
