@@ -24,5 +24,10 @@ public class ConstantConstraint extends TypeConstraint {
 	public <R, A> R accept(TypeConstraintVisitor<R, A> visitor, A arg) {
 		return visitor.visit(this, arg);
 	}
+	
+	@Override
+	public String toString () {
+		return buildString(Boolean.toString(isSatisfiedIfActive));
+	}
 
 }
