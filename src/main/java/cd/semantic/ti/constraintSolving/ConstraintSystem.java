@@ -2,8 +2,13 @@ package cd.semantic.ti.constraintSolving;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
+import cd.ir.symbols.TypeSymbol;
 import cd.semantic.ti.constraintSolving.constraints.ConstraintCondition;
 import cd.semantic.ti.constraintSolving.constraints.LowerConstBoundConstraint;
 import cd.semantic.ti.constraintSolving.constraints.TypeConstraint;
@@ -82,11 +87,41 @@ public class ConstraintSystem {
 		addVarInequality(var1, var2, conditions);
 		addVarInequality(var2, var1, conditions);
 	}
-
+	
 	public TypeVariable addTypeVariable() {
-		TypeVariable typeVar = new TypeVariable();
+		String newDesc = "typeVar" + typeVariables.size();
+		return addTypeVariable(newDesc);
+	}
+
+
+	public TypeVariable addTypeVariable(String varDescription) {
+		TypeVariable typeVar = new TypeVariable(varDescription);
 		typeVariables.add(typeVar);
 		return typeVar;
+	}
+	
+	@Override
+	public String toString() {
+		List<String> typeVarContents = new LinkedList<>();
+		for (TypeVariable typeVar : typeVariables) {
+			String content;
+			Set<TypeSymbol> typeVarTypes = typeVar.getTypes();
+			if (typeVarTypes.isEmpty()) {
+				content = "\u2205";
+			} else {
+				content = "{" + StringUtils.join(typeVarTypes, ",") + "}";
+			}
+			typeVarContents.add(typeVar + " = " + content);
+		}
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append("Type variables: \n");
+		builder.append(StringUtils.join(typeVarContents, ", "));
+		builder.append("\n");
+		builder.append("Type constraints: \n");
+		builder.append(typeConstraints.toString());
+		builder.append("\n");
+		return builder.toString();
 	}
 
 }

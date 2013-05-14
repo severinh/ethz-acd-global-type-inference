@@ -127,7 +127,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			this.methodSymbolCache = MethodSymbolCache.of(typeSymbols);
 			this.classFieldSymbolCache = ClassSymbolFieldCache.of(typeSymbols);
 			this.constantTypeSetFactory = new ConstantTypeSetFactory(typeSymbols);
-			this.returnTypeVariable = constraintSystem.addTypeVariable();
+			this.returnTypeVariable = constraintSystem.addTypeVariable("return_type");
 		}
 
 		public ConstraintSystem getConstraintSystem() {
@@ -142,7 +142,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			// variables and constraints for parameters (types given!)
 			MethodSymbol msym = mdecl.sym;
 			for (VariableSymbol varSym : msym.getParameters()) {
-				TypeVariable typeVar = constraintSystem.addTypeVariable();
+				TypeVariable typeVar = constraintSystem.addTypeVariable("param_" + varSym.name);
 				ConstantTypeSet typeConst = constantTypeSetFactory.make(varSym.getType());
 				constraintSystem.addConstEquality(typeVar, typeConst);
 				localSymbolVariables.put(varSym, typeVar);
@@ -150,7 +150,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
 			// type variables for local variables
 			for (VariableSymbol varSym : msym.getLocals()) {
-				TypeVariable typeVar = constraintSystem.addTypeVariable();
+				TypeVariable typeVar = constraintSystem.addTypeVariable("local_" + varSym.name);
 				localSymbolVariables.put(varSym, typeVar);
 			}
 
@@ -481,7 +481,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				}
 				Expr receiver = call.receiver();
 				TypeVariable receiverTypeVar = visit(receiver, null);
-				TypeVariable returnTypeVar = constraintSystem.addTypeVariable();
+				TypeVariable methodCallResultTypeVar = constraintSystem.addTypeVariable();
 				Set<ClassSymbol> possibleReceiverTypes = new HashSet<>();
 
 				for (MethodSymbol msym : methodSymbols) {
@@ -501,7 +501,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 					TypeSymbol resultSym = msym.returnType;
 					ConstantTypeSet expectedResultTypes = constantTypeSetFactory
 							.make(resultSym);
-					constraintSystem.addUpperBound(returnTypeVar,
+					constraintSystem.addLowerBound(methodCallResultTypeVar,
 							expectedResultTypes, condition);
 				}
 
@@ -512,7 +512,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				constraintSystem.addUpperBound(receiverTypeVar,
 						possibleReceiverTypeSet);
 
-				return returnTypeVar;
+				return methodCallResultTypeVar;
 			}
 			
 			@Override

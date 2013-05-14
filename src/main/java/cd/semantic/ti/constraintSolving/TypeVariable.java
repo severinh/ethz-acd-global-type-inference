@@ -3,8 +3,6 @@ package cd.semantic.ti.constraintSolving;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-
 import cd.ir.symbols.TypeSymbol;
 
 import com.google.common.collect.ImmutableSet;
@@ -15,9 +13,11 @@ import com.google.common.collect.ImmutableSet;
  */
 public class TypeVariable implements TypeSet {
 	private final Set<TypeSymbol> types;
+	private final String description;
 
-	public TypeVariable() {
+	public TypeVariable(String description) {
 		this.types = new HashSet<>();
+		this.description = description;
 	}
 
 	@Override
@@ -39,10 +39,10 @@ public class TypeVariable implements TypeSet {
 
 	@Override
 	public String toString() {
-		if (types.isEmpty()) {
-			return "\u2205";
-		} else {
-			return "{" + StringUtils.join(types, ",") + "}";
-		}
+		return getDescription();
+	}
+
+	public String getDescription() {
+		return description;
 	}
 }
