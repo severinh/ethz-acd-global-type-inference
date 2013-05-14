@@ -398,14 +398,12 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				case B_OR:
 					constraintSystem.addEquality(leftTypeSet, rightTypeSet);
 					constraintSystem.addEquality(leftTypeSet, booleanType);
-					resultSet = constraintSystem.addTypeVariable();
-					constraintSystem.addEquality(resultSet, booleanType);
+					resultSet = booleanType;
 					break;
 				case B_EQUAL:
 				case B_NOT_EQUAL:
 					constraintSystem.addEquality(leftTypeSet, rightTypeSet);
-					resultSet = constraintSystem.addTypeVariable();
-					constraintSystem.addEquality(resultSet, booleanType);
+					resultSet = booleanType;
 					break;
 				case B_LESS_THAN:
 				case B_LESS_OR_EQUAL:
@@ -413,14 +411,12 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				case B_GREATER_OR_EQUAL:
 					constraintSystem.addUpperBound(leftTypeSet, numTypes);
 					constraintSystem.addEquality(leftTypeSet, rightTypeSet);
-					resultSet = constraintSystem.addTypeVariable();
-					constraintSystem.addEquality(resultSet, booleanType);
+					resultSet = booleanType;
 					break;
 				default:
-					resultSet = null;
+					throw new IllegalStateException("binary operator " + op + " not supported");
 				}
 				
-				assert(resultSet != null);
 				return resultSet;
 			}
 			
