@@ -312,7 +312,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				for (ClassSymbol classSym : classSymbols) {
 					VariableSymbol fieldSymbol = classSym.getField(fieldName);
 					TypeSymbol fieldType = fieldSymbol.getType();
-					ConstraintCondition condition = new ConstraintCondition(fieldType, receiverTypeSet);
+					ConstraintCondition condition = new ConstraintCondition(classSym, receiverTypeSet);
 					ConstantTypeSet fieldTypeSet = constantTypeSetFactory.make(fieldType);
 					constraintSystem.addEquality(resultType, fieldTypeSet, condition);
 				}
