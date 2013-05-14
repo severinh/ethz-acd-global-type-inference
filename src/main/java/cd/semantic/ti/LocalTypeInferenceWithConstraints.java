@@ -250,10 +250,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			
 			@Override
 			public TypeSet nullConst(NullConst ast, Void arg) {
-				ConstantTypeSet allReferenceTypeSet = constantTypeSetFactory.makeReferenceTypeSet();
-				TypeVariable nullTypeVar = constraintSystem.addTypeVariable();
-				constraintSystem.addUpperBound(nullTypeVar, allReferenceTypeSet);
-				return nullTypeVar;
+				return constantTypeSetFactory.makeNull();
 			}
 			
 			@Override
@@ -450,7 +447,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				switch (op) {
 				case U_BOOL_NOT:
 					constraintSystem.addEquality(subExprTypeSet, booleanType);
-					break;
+					return booleanType;
 				case U_MINUS:
 				case U_PLUS:
 					constraintSystem.addUpperBound(subExprTypeSet, numTypes);
