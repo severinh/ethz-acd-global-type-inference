@@ -13,7 +13,7 @@ import cd.CompilerOptions;
 import cd.test.fileprovider.RecursiveTestFileProvider;
 import cd.test.fileprovider.TestFileProvider;
 import cd.test.reference.ReferenceData;
-import cd.test.reference.ReferenceDataFactory;
+import cd.test.reference.RemoteReferenceDataFactory;
 
 /**
  * Performs all end-to-end tests with neither type erasure nor type inference.
@@ -27,7 +27,7 @@ public class VanillaTest extends TestSamplePrograms {
 				.withExcludedDir(TEST_FOLDER, "newsyntax");
 		CompilerOptions options = new CompilerOptions();
 		return buildParameters(testFileProvider, options,
-				ReferenceDataFactory.makeRemote());
+				new RemoteReferenceDataFactory());
 	}
 
 	public VanillaTest(String testName, @Nonnull File file,

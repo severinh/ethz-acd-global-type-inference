@@ -16,8 +16,8 @@ import cd.TypeErasureMode;
 import cd.TypeInferenceMode;
 import cd.test.fileprovider.RecursiveTestFileProvider;
 import cd.test.fileprovider.TestFileProvider;
+import cd.test.reference.LocalOverridingReferenceDataFactory;
 import cd.test.reference.ReferenceData;
-import cd.test.reference.ReferenceDataFactory;
 
 /**
  * Performs all end-to-end tests with local type erasure and lightweight local
@@ -32,10 +32,10 @@ public class LocalTypeInferenceLightweightTest extends TestSamplePrograms {
 				.withExcludedDir(TEST_FOLDER, "global");
 		CompilerOptions options = new CompilerOptions(TypeErasureMode.LOCAL,
 				TypeInferenceMode.LOCAL_LIGHTWEIGHT);
-		ImmutableList<String> suffixOrder = ImmutableList.of("overriding.ltil",
-				"overriding");
+		ImmutableList<String> suffixOrder = ImmutableList.of("override.ltil",
+				"override");
 		return buildParameters(testFileProvider, options,
-				ReferenceDataFactory.makeLocalOverridingRemote(suffixOrder));
+				new LocalOverridingReferenceDataFactory(suffixOrder));
 	}
 
 	public LocalTypeInferenceLightweightTest(String testName,

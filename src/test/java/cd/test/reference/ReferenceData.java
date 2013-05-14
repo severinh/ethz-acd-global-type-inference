@@ -37,7 +37,8 @@ public abstract class ReferenceData {
 		// semantic failure cause
 		String[] lines = StringUtils.split(getSemanticReference(), "\n");
 		String causeString = lines[0];
-		return Enums.getIfPresent(Cause.class, causeString);
+		Optional<Cause> cause = Enums.getIfPresent(Cause.class, causeString);
+		return cause;
 	}
 
 	public abstract String getExecutionReference(String inputText)

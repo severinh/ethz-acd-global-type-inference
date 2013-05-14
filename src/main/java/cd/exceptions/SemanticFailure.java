@@ -71,6 +71,15 @@ public class SemanticFailure extends RuntimeException {
 		TYPE_ERROR,
 
 		/**
+		 * Represents a {@link #TYPE_ERROR} that is caught during type
+		 * inference.
+		 * 
+		 * Ideally, type inference should catch all type error and produce a
+		 * correct typing.
+		 */
+		TYPE_INFERENCE_ERROR,
+
+		/**
 		 * A class is its own super class
 		 */
 		CIRCULAR_INHERITANCE,

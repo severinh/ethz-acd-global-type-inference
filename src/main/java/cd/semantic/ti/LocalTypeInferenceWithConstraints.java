@@ -65,7 +65,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				constraintGen.getConstraintSystem());
 		solver.solve();
 		if (!solver.hasSolution()) {
-			throw new SemanticFailure(Cause.TYPE_ERROR,
+			throw new SemanticFailure(Cause.TYPE_INFERENCE_ERROR,
 					"Type inference was unable to resolve type constraints");
 		} else {
 			for (VariableSymbol varSym : mdecl.sym.getLocals()) {
@@ -89,7 +89,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 					if (lca != typeSymbols.getTopType()) {
 						type = lca;
 					} else {
-						throw new SemanticFailure(Cause.TYPE_ERROR,
+						throw new SemanticFailure(Cause.TYPE_INFERENCE_ERROR,
 								"Type inference resulted in ambiguous type for "
 										+ varSym.name);
 					}
