@@ -264,26 +264,17 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
 			@Override
 			public TypeSet intConst(IntConst ast, Void arg) {
-				TypeVariable typeVar = constraintSystem.addTypeVariable();
-				ConstantTypeSet intTypeSet = constantTypeSetFactory.makeInt();
-				constraintSystem.addEquality(typeVar, intTypeSet);
-				return typeVar;
+				return constantTypeSetFactory.makeInt();
 			}
 
 			@Override
 			public TypeSet floatConst(FloatConst ast, Void arg) {
-				TypeVariable typeVar = constraintSystem.addTypeVariable();
-				ConstantTypeSet floatTypeSet = constantTypeSetFactory.makeFloat();
-				constraintSystem.addEquality(typeVar, floatTypeSet);
-				return typeVar;
+				return constantTypeSetFactory.makeFloat();
 			}
 
 			@Override
 			public TypeSet booleanConst(BooleanConst ast, Void arg) {
-				TypeVariable typeVar = constraintSystem.addTypeVariable();
-				ConstantTypeSet booleanTypeSet = constantTypeSetFactory.makeBoolean();
-				constraintSystem.addEquality(typeVar, booleanTypeSet);
-				return typeVar;
+				return constantTypeSetFactory.makeBoolean();
 			}
 			
 			@Override
