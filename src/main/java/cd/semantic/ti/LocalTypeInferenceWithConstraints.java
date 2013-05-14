@@ -214,13 +214,6 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			public Void methodCall(MethodCall call, Void arg) {
 				List<Expr> arguments = call.argumentsWithoutReceiver();
 				Collection<MethodSymbol> methodSymbols = methodSymbolCache.get(call.methodName, arguments.size());
-				// TODO: This is a very coarse approximation
-				if (methodSymbols.isEmpty()) {
-					throw new SemanticFailure(
-							Cause.WRONG_NUMBER_OF_ARGUMENTS,
-							"no method with name '%s' and '%d' parameters",
-							call.methodName, arguments.size());
-				}
 				Expr receiver = call.receiver();
 				TypeSet receiverTypeSet = exprVisitor.visit(receiver, null);
 				Set<ClassSymbol> possibleReceiverTypes = new HashSet<>();
@@ -425,19 +418,11 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				return resultSet;
 			}
 			
-			
 			@Override
 			public TypeSet methodCall(MethodCallExpr call, Void arg) {
 				List<Expr> arguments = call.argumentsWithoutReceiver();
 				Collection<MethodSymbol> methodSymbols = methodSymbolCache.get(
 						call.methodName, arguments.size());
-				// TODO: This is a very coarse approximation
-				if (methodSymbols.isEmpty()) {
-					throw new SemanticFailure(
-							Cause.WRONG_NUMBER_OF_ARGUMENTS,
-							"no method with name '%s' and '%d' parameters",
-							call.methodName, arguments.size());
-				}
 				Expr receiver = call.receiver();
 				TypeSet receiverTypeSet = visit(receiver, null);
 				TypeVariable methodCallResultTypeVar = constraintSystem.addTypeVariable();
