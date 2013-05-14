@@ -34,6 +34,7 @@ import cd.ir.ast.NullConst;
 import cd.ir.ast.ReturnStmt;
 import cd.ir.ast.ThisRef;
 import cd.ir.ast.UnaryOp;
+import cd.ir.ast.UnaryOp.UOp;
 import cd.ir.ast.Var;
 import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
@@ -441,9 +442,23 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			}
 			
 			@Override
-			public TypeSet unaryOp(UnaryOp ast, Void arg) {
-				// TODO implement this (and test! there are no tests for this case)
-				return super.unaryOp(ast, arg);
+			public TypeSet unaryOp(UnaryOp unaryOp, Void arg) {
+				UOp op = unaryOp.operator;
+				TypeSet subExprTypeSet = visit(unaryOp.arg(), null);
+				
+				ConstantTypeSet numTypes = constantTypeSetFactory.makeNumericalTypeSet();
+				ConstantTypeSet booleanType = constantTypeSetFactory.makeBoolean();
+
+				switch (op) {
+				case U_BOOL_NOT:
+					constraintSystem.addUpperBound(subExprTypeSet, booleanType);
+					break;
+				case U_MINUS:
+				case U_PLUS:
+					constraintSystem.addUpperBound(subExprTypeSet, numTypes);
+					break;
+				}
+				return subExprTypeSet;
 			}
 		}
 	}
