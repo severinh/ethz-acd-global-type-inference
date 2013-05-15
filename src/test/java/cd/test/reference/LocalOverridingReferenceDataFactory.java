@@ -26,7 +26,9 @@ public class LocalOverridingReferenceDataFactory extends ReferenceDataFactory {
 	 *            suffix and so on. If no local reference file with any of the
 	 *            suffixes can be found, the remote reference data will be used.
 	 */
-	public LocalOverridingReferenceDataFactory(ImmutableList<String> suffixOrder) {
+	public LocalOverridingReferenceDataFactory(
+			ImmutableList<String> suffixOrder,
+			ReferenceDataFactory remoteFactory) {
 		super();
 
 		checkNotNull(suffixOrder);
@@ -35,8 +37,18 @@ public class LocalOverridingReferenceDataFactory extends ReferenceDataFactory {
 			checkArgument(!suffix.isEmpty());
 		}
 
-		this.remoteFactory = new RemoteReferenceDataFactory();
+		this.remoteFactory = remoteFactory;
 		this.suffixOrder = suffixOrder;
+	}
+
+	/**
+	 * Constructs a new reference data factory that uses the default remote
+	 * reference data factory.
+	 * 
+	 * @param suffixOrder
+	 */
+	public LocalOverridingReferenceDataFactory(ImmutableList<String> suffixOrder) {
+		this(suffixOrder, new RemoteReferenceDataFactory());
 	}
 
 	@Override

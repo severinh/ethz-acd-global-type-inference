@@ -6,7 +6,7 @@ import java.io.File;
  * Abstract base class for reference data providers that utilize a file for each
  * of the several kinds of reference data.
  */
-public abstract class FileBasedReferenceData extends ReferenceData {
+public abstract class FileBasedReferenceData extends RawReferenceData {
 
 	private final File sourceFile;
 

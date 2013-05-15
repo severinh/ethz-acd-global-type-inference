@@ -13,10 +13,8 @@ public class RemoteReferenceDataFactory extends ReferenceDataFactory {
 	public ReferenceData of(File sourceFile) {
 		checkNotNull(sourceFile);
 
-		ReferenceData remoteData, cachedRemoteData;
-		remoteData = new RemoteReferenceData(sourceFile);
-		cachedRemoteData = new CachedReferenceData(remoteData, "");
-		return cachedRemoteData;
+		RemoteReferenceData remoteData = new RemoteReferenceData(sourceFile);
+		return new CachedReferenceData(remoteData, "");
 	}
 
 }

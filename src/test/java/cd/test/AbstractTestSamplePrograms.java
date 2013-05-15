@@ -63,7 +63,6 @@ abstract public class AbstractTestSamplePrograms {
 
 		Optional<ParseFailure> parseFailure = Optional.absent();
 		Optional<SemanticFailure> semanticFailure = Optional.absent();
-		Optional<Cause> semanticFailureCause = Optional.absent();
 
 		try {
 			compiler.compile();
@@ -71,20 +70,21 @@ abstract public class AbstractTestSamplePrograms {
 			parseFailure = Optional.of(failure);
 		} catch (SemanticFailure failure) {
 			semanticFailure = Optional.of(failure);
-			semanticFailureCause = Optional.of(failure.cause);
 		}
 
-		boolean isParseFailureRef = referenceData.isParseFailure();
-		boolean isParseFailure = parseFailure.isPresent();
+		Optional<ParseFailure> parseFailureRef = referenceData
+				.getParseFailure();
 
-		if (isParseFailureRef || isParseFailure) {
-			assertEqualsWithException(parseFailure, isParseFailureRef,
-					isParseFailure);
+		if (parseFailureRef.isPresent() || parseFailure.isPresent()) {
+			assertEqualsWithException(parseFailure,
+					parseFailureRef.isPresent(), parseFailure.isPresent());
 		} else {
 			// Only fetch the semantic failure reference data and run the
 			// remaining tests if parsing was successful
-			Optional<Cause> semanticFailureCauseRef = referenceData
-					.getSemanticFailureCause();
+			Optional<SemanticFailure> semanticFailureRef = referenceData
+					.getSemanticFailure();
+			Optional<Cause> semanticFailureCauseRef = getSemanticFailureCause(semanticFailureRef);
+			Optional<Cause> semanticFailureCause = getSemanticFailureCause(semanticFailure);
 
 			assertEqualsWithException(semanticFailure, semanticFailureCauseRef,
 					semanticFailureCause);
@@ -119,6 +119,15 @@ abstract public class AbstractTestSamplePrograms {
 			message = ExceptionUtils.getStackTrace(exception.get());
 		}
 		Assert.assertEquals(message, expected, actual);
+	}
+
+	private static Optional<Cause> getSemanticFailureCause(
+			Optional<SemanticFailure> semanticFailure) {
+		if (semanticFailure.isPresent()) {
+			return Optional.of(semanticFailure.get().cause);
+		} else {
+			return Optional.absent();
+		}
 	}
 
 	/**

@@ -17,13 +17,14 @@ public class LocalReferenceData extends FileBasedReferenceData {
 	}
 
 	@Override
-	public String getParserReference() throws IOException {
+	public String getParseFailureString() throws IOException {
 		return FileUtils.readFileToString(getParserRefFile());
 	}
 
 	@Override
-	public String getSemanticReference() throws IOException {
+	public String getSemanticFailureString() throws IOException {
 		// Only return the first line
+		// The second line is usually a comment why the override exists
 		String result = FileUtils.readFileToString(getSemanticRefFile());
 		String[] lines = result.split("\n");
 		return lines[0].trim();

@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableList;
 import cd.CompilerOptions;
 import cd.TypeErasureMode;
 import cd.TypeInferenceMode;
+import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.test.fileprovider.RecursiveTestFileProvider;
 import cd.test.fileprovider.TestFileProvider;
@@ -23,6 +24,7 @@ import cd.test.reference.LocalOverridingReferenceDataFactory;
 import cd.test.reference.ReferenceData;
 import cd.test.reference.ReferenceDataFactory;
 import cd.test.reference.ReferenceDataWrapper;
+import cd.test.reference.RemoteReferenceDataFactory;
 
 /**
  * Performs all end-to-end tests with local type erasure and constraint-based
@@ -37,7 +39,10 @@ public class LocalTypeInferenceWithConstraintsTest extends TestSamplePrograms {
 				.withExcludedDir(TEST_FOLDER, "global");
 		CompilerOptions options = new CompilerOptions(TypeErasureMode.LOCAL,
 				TypeInferenceMode.LOCAL_CONSTRAINTS);
-		ReferenceDataFactory factory = new CustomReferenceDataFactory();
+		ImmutableList<String> suffixOrder = ImmutableList.of("override.ltiwc",
+				"override");
+		ReferenceDataFactory factory = new LocalOverridingReferenceDataFactory(
+				suffixOrder, new CustomRemoteReferenceDataFactory());
 		return buildParameters(testFileProvider, options, factory);
 	}
 
@@ -56,37 +61,41 @@ public class LocalTypeInferenceWithConstraintsTest extends TestSamplePrograms {
 	 * {@code ReferenceData} objects will always return a
 	 * {@code Cause#TYPE_INFERENCE_ERROR} rather than a {@link Cause#TYPE_ERROR}
 	 */
-	private static class CustomReferenceDataFactory extends
-			LocalOverridingReferenceDataFactory {
-
-		public CustomReferenceDataFactory() {
-			super(ImmutableList.of("override.ltiwc", "override"));
-		}
+	private static class CustomRemoteReferenceDataFactory extends
+			RemoteReferenceDataFactory {
 
 		@Override
 		public ReferenceData of(File sourceFile) {
 			ReferenceData result = super.of(sourceFile);
-			result = new ReferenceDataWrapper(result) {
-
-				@Override
-				public Optional<Cause> getSemanticFailureCause()
-						throws IOException {
-					Optional<Cause> cause = super.getSemanticFailureCause();
-					if (cause.isPresent()) {
-						switch (cause.get()) {
-						case TYPE_ERROR:
-						case NO_SUCH_FIELD:
-							cause = Optional.of(Cause.TYPE_INFERENCE_ERROR);
-							break;
-						default:
-							break;
-						}
-					}
-					return cause;
-				}
-
-			};
+			result = new RemoteReferenceDataWrapper(result);
 			return result;
+		}
+
+	}
+
+	private static class RemoteReferenceDataWrapper extends
+			ReferenceDataWrapper {
+
+		public RemoteReferenceDataWrapper(ReferenceData backingData) {
+			super(backingData);
+		}
+
+		@Override
+		public Optional<SemanticFailure> getSemanticFailure()
+				throws IOException {
+			Optional<SemanticFailure> semanticFailure = super
+					.getSemanticFailure();
+			if (semanticFailure.isPresent()) {
+				switch (semanticFailure.get().cause) {
+				case TYPE_ERROR:
+				case NO_SUCH_FIELD:
+					return Optional.of(new SemanticFailure(
+							Cause.TYPE_INFERENCE_ERROR));
+				default:
+					break;
+				}
+			}
+			return semanticFailure;
 		}
 
 	}

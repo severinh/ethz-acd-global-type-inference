@@ -14,7 +14,7 @@ import cd.test.Reference;
 /**
  * Fetches reference data directly from the remote reference compiler.
  */
-public class RemoteReferenceData extends ReferenceData {
+public class RemoteReferenceData extends RawReferenceData {
 
 	private final File sourceFile;
 
@@ -33,7 +33,7 @@ public class RemoteReferenceData extends ReferenceData {
 	}
 
 	@Override
-	public String getParserReference() throws IOException {
+	public String getParseFailureString() throws IOException {
 		Reference ref = openClient();
 		try {
 			return ref.parserReference(getSource());
@@ -43,7 +43,7 @@ public class RemoteReferenceData extends ReferenceData {
 	}
 
 	@Override
-	public String getSemanticReference() throws IOException {
+	public String getSemanticFailureString() throws IOException {
 		Reference ref = openClient();
 		try {
 			return ref.semanticReference(getSource());

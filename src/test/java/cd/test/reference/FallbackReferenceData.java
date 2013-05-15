@@ -5,6 +5,11 @@ import java.io.IOException;
 
 import org.junit.Assert;
 
+import cd.exceptions.ParseFailure;
+import cd.exceptions.SemanticFailure;
+
+import com.google.common.base.Optional;
+
 /**
  * Wraps two providers of reference data for the same source file, a primary and
  * a secondary one. When accessing certain reference data from the primary one
@@ -13,7 +18,7 @@ import org.junit.Assert;
  * In other words, this makes it possible for the primary source of reference
  * data to <em>override</em> the secondary source of reference data.
  */
-public class FallbackReferenceData extends ReferenceData {
+public class FallbackReferenceData implements ReferenceData {
 
 	private final ReferenceData primaryData;
 	private final ReferenceData secondaryData;
@@ -35,20 +40,20 @@ public class FallbackReferenceData extends ReferenceData {
 	}
 
 	@Override
-	public String getParserReference() throws IOException {
+	public Optional<ParseFailure> getParseFailure() throws IOException {
 		try {
-			return primaryData.getParserReference();
+			return primaryData.getParseFailure();
 		} catch (IOException e) {
-			return secondaryData.getParserReference();
+			return secondaryData.getParseFailure();
 		}
 	}
 
 	@Override
-	public String getSemanticReference() throws IOException {
+	public Optional<SemanticFailure> getSemanticFailure() throws IOException {
 		try {
-			return primaryData.getSemanticReference();
+			return primaryData.getSemanticFailure();
 		} catch (IOException e) {
-			return secondaryData.getSemanticReference();
+			return secondaryData.getSemanticFailure();
 		}
 	}
 

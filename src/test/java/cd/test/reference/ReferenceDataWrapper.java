@@ -3,13 +3,18 @@ package cd.test.reference;
 import java.io.File;
 import java.io.IOException;
 
+import cd.exceptions.ParseFailure;
+import cd.exceptions.SemanticFailure;
+
+import com.google.common.base.Optional;
+
 /**
  * Simply wraps a {@link ReferenceData} object.
  * 
  * This class is abstract (because it serves no purpose on its own), but is
  * meant to be the basis for other classes.
  */
-public abstract class ReferenceDataWrapper extends ReferenceData {
+public abstract class ReferenceDataWrapper implements ReferenceData {
 
 	private final ReferenceData backingData;
 
@@ -23,13 +28,13 @@ public abstract class ReferenceDataWrapper extends ReferenceData {
 	}
 
 	@Override
-	public String getParserReference() throws IOException {
-		return backingData.getParserReference();
+	public Optional<ParseFailure> getParseFailure() throws IOException {
+		return backingData.getParseFailure();
 	}
 
 	@Override
-	public String getSemanticReference() throws IOException {
-		return backingData.getSemanticReference();
+	public Optional<SemanticFailure> getSemanticFailure() throws IOException {
+		return backingData.getSemanticFailure();
 	}
 
 	@Override

@@ -15,37 +15,37 @@ import org.apache.commons.io.FileUtils;
  */
 public class CachedReferenceData extends FileBasedReferenceData {
 
-	private final ReferenceData backingData;
+	private final RemoteReferenceData remoteData;
 
-	public CachedReferenceData(ReferenceData backingData, String suffix) {
-		super(backingData.getSourceFile(), suffix);
+	public CachedReferenceData(RemoteReferenceData remoteData, String suffix) {
+		super(remoteData.getSourceFile(), suffix);
 
-		this.backingData = backingData;
+		this.remoteData = remoteData;
 	}
 
 	@Override
-	public String getParserReference() throws IOException {
+	public String getParseFailureString() throws IOException {
 		// Check for a .ref file
 		if (isNewerThanSourceFile(getParserRefFile())) {
 			return FileUtils.readFileToString(getParserRefFile());
 		}
 
 		// If no file exists, contact reference server
-		String result = backingData.getParserReference();
+		String result = remoteData.getParseFailureString();
 		FileUtils.writeStringToFile(getParserRefFile(), result);
 
 		return result;
 	}
 
 	@Override
-	public String getSemanticReference() throws IOException {
+	public String getSemanticFailureString() throws IOException {
 		// Check for a .ref file
 		if (isNewerThanSourceFile(getSemanticRefFile())) {
 			return FileUtils.readFileToString(getSemanticRefFile());
 		}
 
 		// If no file exists, contact reference server
-		String result = backingData.getSemanticReference();
+		String result = remoteData.getSemanticFailureString();
 		FileUtils.writeStringToFile(getSemanticRefFile(), result);
 
 		return result;
@@ -59,7 +59,7 @@ public class CachedReferenceData extends FileBasedReferenceData {
 		}
 
 		// If no file exists, use the interpreter to generate one.
-		String result = backingData.getExecutionReference(inputText);
+		String result = remoteData.getExecutionReference(inputText);
 		FileUtils.writeStringToFile(getExecutionRefFile(), result);
 
 		return result;
