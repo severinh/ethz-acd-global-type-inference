@@ -220,11 +220,12 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 		}
 
 		public class ConstraintExprVisitor extends ExprVisitor<TypeSet, Void> {
+			
 			@Override
 			public TypeSet var(Var ast, Void arg) {
 				VariableSymbol varSym = ast.getSymbol();
 				if (varSym.getKind() == Kind.FIELD) {
-					return constantTypeSetFactory.make(varSym.getType());
+					return constantTypeSetFactory.makeDeclarableSubtypes(varSym.getType());
 				} else {
 					return localSymbolVariables.get(varSym);
 				}
