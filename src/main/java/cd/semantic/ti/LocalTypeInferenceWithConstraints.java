@@ -409,7 +409,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 					return booleanTypeSet;
 				case B_EQUAL:
 				case B_NOT_EQUAL:
-					// The following only prevent primitive types from being
+					// The following only prevents primitive types from being
 					// compared with reference types and different primitive
 					// types. However, it is possible to compare references of
 					// any type, even if neither is a subtype of the other.
