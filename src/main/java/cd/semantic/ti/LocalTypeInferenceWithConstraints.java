@@ -41,7 +41,6 @@ import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
-import cd.ir.symbols.VariableSymbol.Kind;
 import cd.semantic.TypeSymbolTable;
 import cd.semantic.ti.constraintSolving.ConstantTypeSet;
 import cd.semantic.ti.constraintSolving.ConstantTypeSetFactory;
@@ -220,15 +219,20 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 		}
 
 		public class ConstraintExprVisitor extends ExprVisitor<TypeSet, Void> {
-			
+
 			@Override
 			public TypeSet var(Var ast, Void arg) {
 				VariableSymbol varSym = ast.getSymbol();
-				if (varSym.getKind() == Kind.FIELD) {
-					return constantTypeSetFactory.makeDeclarableSubtypes(varSym.getType());
-				} else {
-					// Handles both local variables and parameters
+				switch (varSym.getKind()) {
+				case FIELD:
+					TypeSymbol type = varSym.getType();
+					return constantTypeSetFactory.makeDeclarableSubtypes(type);
+				case LOCAL:
+				case PARAM:
 					return localSymbolVariables.get(varSym);
+				default:
+					throw new IllegalStateException(
+							"cannot handle variable kind " + varSym.getKind());
 				}
 			}
 
