@@ -8,8 +8,10 @@ class B extends A {
 
 class Main {
 	void main () {
-		foo(new B(), new B());
-		bar(new B());
+	    B b;
+	    b = new B();
+		foo(b, b);
+		bar(b);
 	}
 	
 	void foo(A a, B b) {
