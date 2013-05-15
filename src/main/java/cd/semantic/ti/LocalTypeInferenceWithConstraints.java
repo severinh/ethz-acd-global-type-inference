@@ -227,6 +227,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				if (varSym.getKind() == Kind.FIELD) {
 					return constantTypeSetFactory.makeDeclarableSubtypes(varSym.getType());
 				} else {
+					// Handles both local variables and parameters
 					return localSymbolVariables.get(varSym);
 				}
 			}
