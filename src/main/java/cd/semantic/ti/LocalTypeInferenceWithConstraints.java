@@ -187,18 +187,9 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
 			@Override
 			public Void assign(Assign assign, Void arg) {
-				Expr lhs = assign.left();
-				if (lhs instanceof Var) {
-					VariableSymbol varSym = ((Var) lhs).getSymbol();
-					if (varSym.getKind().equals(Kind.LOCAL)) {
-						TypeSet exprTypeSet = exprVisitor.visit(assign.right(),
-								null);
-						TypeVariable localTypeVar = localSymbolVariables
-								.get(varSym);
-						constraintSystem.addInequality(exprTypeSet,
-								localTypeVar);
-					}
-				}
+				TypeSet lhsTypeSet = exprVisitor.visit(assign.left(), arg);
+				TypeSet exprTypeSet = exprVisitor.visit(assign.right(), arg);
+				constraintSystem.addInequality(exprTypeSet, lhsTypeSet);
 				return null;
 			}
 
