@@ -1,0 +1,17 @@
+class A {
+	void foo() {
+		this.x = 10;
+	}
+}
+
+class B extends A {
+	int x;
+}
+
+class Main {
+	void main() {
+		A a;
+		a = new A();
+		a.foo();
+	}
+}

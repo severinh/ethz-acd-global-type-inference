@@ -271,8 +271,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			@Override
 			public TypeSet thisRef(ThisRef ast, Void arg) {
 				ClassSymbol classSymbol = mdecl.sym.owner;
-				return constantTypeSetFactory
-						.makeDeclarableSubtypes(classSymbol);
+				return constantTypeSetFactory.make(classSymbol);
 			}
 
 			@Override
@@ -294,11 +293,15 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				Expr receiver = ast.arg();
 				TypeSet receiverTypeSet = visit(receiver, null);
 
-				Collection<ClassSymbol> classSymbols = classFieldSymbolCache
+				Collection<ClassSymbol> declaringClassSymbols = classFieldSymbolCache
 						.get(fieldName);
+				Set<ClassSymbol> possibleClassSymbols = new HashSet<>();
+
 				TypeVariable resultType = constraintSystem.addTypeVariable();
 
-				for (ClassSymbol classSym : classSymbols) {
+				for (ClassSymbol classSym : declaringClassSymbols) {
+					possibleClassSymbols.addAll(typeSymbols
+							.getClassSymbolSubtypes(classSym));
 					VariableSymbol fieldSymbol = classSym.getField(fieldName);
 					TypeSymbol fieldType = fieldSymbol.getType();
 					ConstraintCondition condition = new ConstraintCondition(
@@ -308,6 +311,14 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 					constraintSystem.addEquality(resultType, fieldTypeSet,
 							condition);
 				}
+
+				// The receiver *must* be a subtype of any class that has a
+				// field with the right name
+				ConstantTypeSet possibleClassTypeSet = new ConstantTypeSet(
+						possibleClassSymbols);
+				constraintSystem.addUpperBound(receiverTypeSet,
+						possibleClassTypeSet);
+
 				return resultType;
 			}
 
@@ -430,8 +441,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				}
 
 				// the receiver _must_ be a subtype of any class that has a
-				// method
-				// with the right name and number of arguments
+				// method with the right name and number of arguments
 				ConstantTypeSet possibleReceiverTypeSet = new ConstantTypeSet(
 						possibleReceiverTypes);
 				constraintSystem.addUpperBound(receiverTypeSet,

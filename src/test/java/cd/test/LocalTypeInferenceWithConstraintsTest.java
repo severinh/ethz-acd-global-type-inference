@@ -72,8 +72,15 @@ public class LocalTypeInferenceWithConstraintsTest extends TestSamplePrograms {
 				public Optional<Cause> getSemanticFailureCause()
 						throws IOException {
 					Optional<Cause> cause = super.getSemanticFailureCause();
-					if (cause.equals(Optional.of(Cause.TYPE_ERROR))) {
-						cause = Optional.of(Cause.TYPE_INFERENCE_ERROR);
+					if (cause.isPresent()) {
+						switch (cause.get()) {
+						case TYPE_ERROR:
+						case NO_SUCH_FIELD:
+							cause = Optional.of(Cause.TYPE_INFERENCE_ERROR);
+							break;
+						default:
+							break;
+						}
 					}
 					return cause;
 				}
