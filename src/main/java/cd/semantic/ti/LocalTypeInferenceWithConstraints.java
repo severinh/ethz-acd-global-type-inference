@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.lang.model.type.PrimitiveType;
+
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.AstVisitor;
@@ -42,6 +44,7 @@ import cd.ir.ast.Var;
 import cd.ir.symbols.ArrayTypeSymbol;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
+import cd.ir.symbols.PrimitiveTypeSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.semantic.TypeSymbolTable;
@@ -307,7 +310,8 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				constraintSystem.addUpperBound(exprTypeSet, allRefTyes);
 
 				TypeSymbol castResultType = typeSymbols.getType(ast.typeName);
-				return constantTypeSetFactory.makeDeclarableSubtypes(castResultType);
+				return constantTypeSetFactory
+						.makeDeclarableSubtypes(castResultType);
 			}
 
 			@Override
@@ -405,7 +409,23 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 					return booleanTypeSet;
 				case B_EQUAL:
 				case B_NOT_EQUAL:
-					constraintSystem.addEquality(leftTypeSet, rightTypeSet);
+					// The following only prevent primitive types from being
+					// compared with reference types and different primitive
+					// types. However, it is possible to compare references of
+					// any type, even if neither is a subtype of the other.
+					for (PrimitiveTypeSymbol primitiveType : typeSymbols
+							.getPrimitiveTypeSymbols()) {
+						ConstraintCondition leftCondition = new ConstraintCondition(
+								primitiveType, leftTypeSet);
+						ConstraintCondition rightCondition = new ConstraintCondition(
+								primitiveType, rightTypeSet);
+						ConstantTypeSet primitiveTypeSet = constantTypeSetFactory
+								.make(primitiveType);
+						constraintSystem.addEquality(rightTypeSet,
+								primitiveTypeSet, leftCondition);
+						constraintSystem.addEquality(leftTypeSet,
+								primitiveTypeSet, rightCondition);
+					}
 					return booleanTypeSet;
 				case B_LESS_THAN:
 				case B_LESS_OR_EQUAL:
