@@ -1,0 +1,23 @@
+// Assert that a number of valid assignments to parameters type-check
+
+class A {
+}
+
+class B extends A {
+}
+
+class Main {
+	void main () {
+		foo(null, null);
+		bar(null);
+	}
+	
+	void foo(A a, B b) {
+		a = new A();
+		b = new B();
+	}
+	
+	void bar(A a) {
+		a = new B();
+	}
+}
