@@ -1,0 +1,32 @@
+// Assert that a number of valid assignments to fields type-check
+
+class A {
+}
+
+class B extends A {
+}
+
+class Main {
+	A field_a;
+	B field_b;
+
+	void main () {
+		foo();
+		bar();
+	}
+	
+	void foo() {
+		A a;
+		B b;
+		a = new A();
+		field_a = a;
+		b = new B();
+		field_b = b;
+	}
+	
+	void bar() {
+		B b;
+		b = new B();
+		field_a = new B();
+	}
+}

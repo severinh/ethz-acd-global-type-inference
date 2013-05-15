@@ -1,0 +1,9 @@
+// Assert that a float value cannot be assigned to an int field
+
+class Main {
+	int int_field;
+	
+	void main() {
+		int_field = 2.0;
+	}
+}
