@@ -5,13 +5,12 @@ import com.google.common.collect.ImmutableList;
 import cd.semantic.ti.constraintSolving.ConstantTypeSet;
 import cd.semantic.ti.constraintSolving.TypeVariable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * A lower bound constraint for a type variable v, i.e. L \subseteq v, where L
  * is the lower bound (a constant set).
  */
 public class LowerConstBoundConstraint extends TypeConstraint {
+
 	private final TypeVariable typeVariable;
 	private final ConstantTypeSet lowerBound;
 
@@ -19,8 +18,8 @@ public class LowerConstBoundConstraint extends TypeConstraint {
 			ConstantTypeSet lowerBound,
 			ImmutableList<ConstraintCondition> conditions) {
 		super(conditions);
-		this.typeVariable = checkNotNull(typeVariable);
-		this.lowerBound = checkNotNull(lowerBound);
+		this.typeVariable = typeVariable;
+		this.lowerBound = lowerBound;
 	}
 
 	public TypeVariable getTypeVariable() {
@@ -45,4 +44,5 @@ public class LowerConstBoundConstraint extends TypeConstraint {
 	public String toString() {
 		return buildString(lowerBound + "\u2286" + typeVariable);
 	}
+
 }

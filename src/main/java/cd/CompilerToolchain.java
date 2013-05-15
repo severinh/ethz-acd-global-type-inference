@@ -96,7 +96,8 @@ public class CompilerToolchain {
 				LOG.debug(AstDump.toString(result));
 
 				if (result == null) {
-					throw new ParseFailure(0, "list of class declarations is null");
+					throw new ParseFailure(0,
+							"list of class declarations is null");
 				} else {
 					context.addClassDecls(result);
 				}

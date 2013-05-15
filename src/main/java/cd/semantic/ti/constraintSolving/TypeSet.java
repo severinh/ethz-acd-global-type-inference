@@ -3,7 +3,9 @@ package cd.semantic.ti.constraintSolving;
 import java.util.Set;
 
 import cd.ir.symbols.TypeSymbol;
+import cd.util.NonnullByDefault;
 
+@NonnullByDefault
 public interface TypeSet {
 
 	public Set<TypeSymbol> getTypes();

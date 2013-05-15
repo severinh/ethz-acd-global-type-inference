@@ -1,6 +1,5 @@
 package cd.semantic.ti.constraintSolving.constraints;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import cd.ir.symbols.TypeSymbol;
 import cd.semantic.ti.constraintSolving.TypeSet;
 
@@ -13,8 +12,8 @@ public class ConstraintCondition {
 	private final TypeSet typeSet;
 
 	public ConstraintCondition(TypeSymbol typeAtom, TypeSet typeSet) {
-		this.typeAtom = checkNotNull(typeAtom);
-		this.typeSet = checkNotNull(typeSet);
+		this.typeAtom = typeAtom;
+		this.typeSet = typeSet;
 	}
 
 	public TypeSymbol getTypeAtom() {

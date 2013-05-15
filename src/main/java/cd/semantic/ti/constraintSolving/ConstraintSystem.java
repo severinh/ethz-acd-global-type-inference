@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang.StringUtils;
 
 import cd.ir.symbols.TypeSymbol;
@@ -33,7 +35,7 @@ public class ConstraintSystem {
 	}
 
 	public void addLowerBound(TypeSet typeSet, ConstantTypeSet lowerBound,
-			ConstraintCondition... conditions) {
+			@Nonnull ConstraintCondition... conditions) {
 		checkNotNull(typeSet);
 		checkNotNull(lowerBound);
 
@@ -41,7 +43,7 @@ public class ConstraintSystem {
 	}
 
 	public void addUpperBound(TypeSet typeSet, ConstantTypeSet upperBound,
-			ConstraintCondition... conditions) {
+			@Nonnull ConstraintCondition... conditions) {
 		checkNotNull(typeSet);
 		checkNotNull(upperBound);
 
@@ -49,7 +51,7 @@ public class ConstraintSystem {
 	}
 
 	public void addInequality(TypeSet subTypeSet, TypeSet superTypeSet,
-			ConstraintCondition... conditions) {
+			@Nonnull ConstraintCondition... conditions) {
 		checkNotNull(subTypeSet);
 		checkNotNull(superTypeSet);
 
@@ -59,7 +61,7 @@ public class ConstraintSystem {
 	}
 
 	public void addEquality(TypeSet typeSet, TypeSet otherTypeSet,
-			ConstraintCondition... conditions) {
+			@Nonnull ConstraintCondition... conditions) {
 		checkNotNull(typeSet);
 		checkNotNull(otherTypeSet);
 
@@ -72,7 +74,7 @@ public class ConstraintSystem {
 		return addTypeVariable(newDesc);
 	}
 
-	public TypeVariable addTypeVariable(String varDescription) {
+	public TypeVariable addTypeVariable(@Nonnull String varDescription) {
 		TypeVariable typeVar = new TypeVariable(varDescription);
 		typeVariables.add(typeVar);
 		return typeVar;

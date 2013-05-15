@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import cd.exceptions.SemanticFailure;
 import cd.semantic.SymbolTable;
 
@@ -16,6 +18,7 @@ public class MethodSymbol extends Symbol {
 	private final Map<String, VariableSymbol> locals;
 	private final List<VariableSymbol> parameters;
 
+	@Nonnull
 	public final ClassSymbol owner;
 
 	public TypeSymbol returnType;

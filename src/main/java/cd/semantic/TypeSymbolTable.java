@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.symbols.ArrayTypeSymbol;
@@ -139,8 +141,14 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	 * 
 	 * @return the set of numerical type symbols
 	 */
+	@Nonnull
 	public ImmutableSet<PrimitiveTypeSymbol> getNumericalTypeSymbols() {
-		return ImmutableSet.of(getIntType(), getFloatType());
+		// Third-party library is missing non-null annotations
+		@SuppressWarnings("null")
+		@Nonnull
+		ImmutableSet<PrimitiveTypeSymbol> result = ImmutableSet.of(
+				getIntType(), getFloatType());
+		return result;
 	}
 
 	/**
@@ -179,6 +187,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	/**
 	 * Returns a set of all array type symbols in this symbol table.
 	 */
+	@Nonnull
 	public ImmutableSet<ArrayTypeSymbol> getArrayTypeSymbols() {
 		ImmutableSet.Builder<ArrayTypeSymbol> builder = ImmutableSet.builder();
 		for (TypeSymbol typeSymbol : localSymbols()) {
@@ -186,13 +195,18 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 				builder.add((ArrayTypeSymbol) typeSymbol);
 			}
 		}
-		return builder.build();
+		// Third-party library is missing non-null annotations
+		@SuppressWarnings("null")
+		@Nonnull
+		ImmutableSet<ArrayTypeSymbol> result = builder.build();
+		return result;
 	}
 
 	/**
 	 * Returns all ClassSymbols a given ClassSymbol has as subtypes. (This does
 	 * include the symbol itself, but _not_ the NullTypeSymbol)
 	 */
+	@Nonnull
 	public ImmutableSet<ClassSymbol> getClassSymbolSubtypes(ClassSymbol typeSym) {
 		ImmutableSet.Builder<ClassSymbol> builder = ImmutableSet.builder();
 
@@ -201,7 +215,11 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 				builder.add(classSym);
 			}
 		}
-		return builder.build();
+		// Third-party library is missing non-null annotations
+		@SuppressWarnings("null")
+		@Nonnull
+		ImmutableSet<ClassSymbol> result = builder.build();
+		return result;
 	}
 
 	/**

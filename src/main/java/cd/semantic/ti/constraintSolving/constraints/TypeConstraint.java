@@ -3,16 +3,18 @@ package cd.semantic.ti.constraintSolving.constraints;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang.StringUtils;
 
 import com.google.common.collect.ImmutableList;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class TypeConstraint {
+
 	private final ImmutableList<ConstraintCondition> conditions;
 
 	public TypeConstraint(ImmutableList<ConstraintCondition> conditions) {
-		this.conditions = checkNotNull(conditions);
+		this.conditions = conditions;
 	}
 
 	public ImmutableList<ConstraintCondition> getConditions() {
@@ -32,7 +34,8 @@ public abstract class TypeConstraint {
 
 	public abstract boolean isSatisfied();
 
-	public abstract <R, A> R accept(TypeConstraintVisitor<R, A> visitor, A arg);
+	public abstract <R, A> R accept(TypeConstraintVisitor<R, A> visitor,
+			@Nullable A arg);
 
 	protected String buildString(String inequalityString) {
 		if (conditions.isEmpty()) {
@@ -45,6 +48,6 @@ public abstract class TypeConstraint {
 			return StringUtils.join(conditionStrings, "\u2227") + "\u21D2("
 					+ inequalityString + ")";
 		}
-
 	}
+
 }

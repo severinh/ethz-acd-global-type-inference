@@ -6,6 +6,7 @@ import cd.semantic.ti.constraintSolving.constraints.LowerConstBoundConstraint;
 import cd.semantic.ti.constraintSolving.constraints.TypeConstraint;
 import cd.semantic.ti.constraintSolving.constraints.UpperConstBoundConstraint;
 import cd.semantic.ti.constraintSolving.constraints.VariableInequalityConstraint;
+import cd.util.NonnullByDefault;
 
 import com.google.common.collect.ImmutableList;
 
@@ -19,10 +20,13 @@ import com.google.common.collect.ImmutableList;
  * @todo If it is already clear if that the constraint will always be satisfied,
  *       the builder could also return {@link Optional#absent()}.
  */
+@NonnullByDefault
 public class TypeConstraintBuilder {
 
 	private final ImmutableList<ConstraintCondition> conditions;
 
+	// Third-party library is missing non-null annotations
+	@SuppressWarnings("null")
 	public TypeConstraintBuilder(ConstraintCondition... conditions) {
 		super();
 		this.conditions = ImmutableList.copyOf(conditions);

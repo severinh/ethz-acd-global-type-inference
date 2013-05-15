@@ -17,8 +17,8 @@ public class Main {
 	/** Parse command line, invoke compile() routine */
 	public static void main(String args[]) throws IOException {
 		for (String file : args) {
-			CompilationContext compilationContext = new CompilationContext(new File(file));
-			CompilerToolchain compiler = CompilerToolchain.forContext(compilationContext);
+			CompilationContext context = new CompilationContext(new File(file));
+			CompilerToolchain compiler = CompilerToolchain.forContext(context);
 			compiler.compile();
 		}
 	}

@@ -6,16 +6,23 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import cd.ir.symbols.TypeSymbol;
+import cd.util.NonnullByDefault;
 
 import com.google.common.collect.ImmutableSet;
 
+@NonnullByDefault
 public class ConstantTypeSet implements TypeSet {
+
 	private final ImmutableSet<TypeSymbol> types;
 
+	// Third-party library is missing non-null annotations
+	@SuppressWarnings("null")
 	public ConstantTypeSet(TypeSymbol... syms) {
 		this.types = ImmutableSet.copyOf(syms);
 	}
 
+	// Third-party library is missing non-null annotations
+	@SuppressWarnings("null")
 	public ConstantTypeSet(Set<? extends TypeSymbol> types) {
 		this.types = ImmutableSet.copyOf(types);
 	}
@@ -53,4 +60,5 @@ public class ConstantTypeSet implements TypeSet {
 	public <R, A> R accept(TypeSetVisitor<R, A> visitor, A arg) {
 		return visitor.visit(this, arg);
 	}
+
 }

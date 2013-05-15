@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import cd.ir.symbols.TypeSymbol;
+import cd.util.NonnullByDefault;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -11,6 +12,7 @@ import com.google.common.collect.ImmutableSet;
  * Represents a type variable that holds sets of type symbols that may be
  * manipulated when solving.
  */
+@NonnullByDefault
 public class TypeVariable implements TypeSet {
 	private final Set<TypeSymbol> types;
 	private final String description;
@@ -20,6 +22,8 @@ public class TypeVariable implements TypeSet {
 		this.description = description;
 	}
 
+	// Third-party library is missing non-null annotations
+	@SuppressWarnings("null")
 	@Override
 	public Set<TypeSymbol> getTypes() {
 		return ImmutableSet.copyOf(types);

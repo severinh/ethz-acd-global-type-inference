@@ -111,7 +111,7 @@ public class ConstantTypeSetFactory {
 	public ConstantTypeSet makeFloat() {
 		return make(typeSymbols.getFloatType());
 	}
-	
+
 	/**
 	 * Returns a constant type set containing only the null type.
 	 */
