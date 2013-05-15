@@ -49,4 +49,5 @@ public final class ClassSymbolFieldCache {
 	public ImmutableCollection<ClassSymbol> get(String name) {
 		return map.get(name);
 	}
+
 }
