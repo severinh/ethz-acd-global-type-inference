@@ -1,0 +1,8 @@
+// Assert that casting a null value is allowed
+
+class Main {
+	void main() {
+		Main m;
+		m = (Main) null;
+	}
+}
