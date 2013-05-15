@@ -6,12 +6,16 @@ import com.google.common.collect.ImmutableList;
 
 public class ConstantConstraint extends TypeConstraint {
 
+	private final ConstantTypeSet subTypeSet;
+	private final ConstantTypeSet superTypeSet;
 	private final boolean isSatisfiedIfActive;
 
 	public ConstantConstraint(ConstantTypeSet subTypeSet,
 			ConstantTypeSet superTypeSet,
 			ImmutableList<ConstraintCondition> conditions) {
 		super(conditions);
+		this.subTypeSet = subTypeSet;
+		this.superTypeSet = superTypeSet;
 		this.isSatisfiedIfActive = subTypeSet.isSubsetOf(superTypeSet);
 	}
 
@@ -24,10 +28,10 @@ public class ConstantConstraint extends TypeConstraint {
 	public <R, A> R accept(TypeConstraintVisitor<R, A> visitor, A arg) {
 		return visitor.visit(this, arg);
 	}
-	
+
 	@Override
-	public String toString () {
-		return buildString(Boolean.toString(isSatisfiedIfActive));
+	public String toString() {
+		return buildString(subTypeSet + "\u2286" + superTypeSet);
 	}
 
 }
