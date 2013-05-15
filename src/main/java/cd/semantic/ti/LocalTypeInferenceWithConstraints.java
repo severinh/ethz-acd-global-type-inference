@@ -219,7 +219,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 						Optional.<TypeVariable> absent());
 				return null;
 			}
-			
+
 			@Override
 			public Void ifElse(IfElse ast, Void arg) {
 				visit(ast.then(), null);
@@ -229,13 +229,15 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				constraintSystem.addEquality(ifExprTypeSet, booleanType);
 				return null;
 			}
-			
+
 			@Override
 			public Void whileLoop(WhileLoop ast, Void arg) {
 				visit(ast.body(), null);
-				TypeSet whileConditionExprTypeSet = exprVisitor.visit(ast.condition(), arg);
+				TypeSet whileConditionExprTypeSet = exprVisitor.visit(
+						ast.condition(), arg);
 				TypeSet booleanType = constantTypeSetFactory.makeBoolean();
-				constraintSystem.addEquality(whileConditionExprTypeSet, booleanType);
+				constraintSystem.addEquality(whileConditionExprTypeSet,
+						booleanType);
 				return null;
 			}
 		}
@@ -305,8 +307,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				constraintSystem.addUpperBound(exprTypeSet, allRefTyes);
 
 				TypeSymbol castResultType = typeSymbols.getType(ast.typeName);
-				return constantTypeSetFactory
-						.makeDeclarableSubtypes(castResultType);
+				return constantTypeSetFactory.makeDeclarableSubtypes(castResultType);
 			}
 
 			@Override
@@ -383,12 +384,10 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				BOp op = binaryOp.operator;
 				TypeSet leftTypeSet = visit(binaryOp.left());
 				TypeSet rightTypeSet = visit(binaryOp.right());
-				TypeSet resultSet;
 
-				ConstantTypeSet numTypes = constantTypeSetFactory
-						.makeNumericalTypeSet();
-				ConstantTypeSet booleanType = constantTypeSetFactory
-						.makeBoolean();
+				ConstantTypeSet booleanTypeSet, numTypeSet;
+				numTypeSet = constantTypeSetFactory.makeNumericalTypeSet();
+				booleanTypeSet = constantTypeSetFactory.makeBoolean();
 
 				switch (op) {
 				case B_TIMES:
@@ -396,35 +395,28 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				case B_MOD:
 				case B_PLUS:
 				case B_MINUS:
-					constraintSystem.addUpperBound(leftTypeSet, numTypes);
+					constraintSystem.addUpperBound(leftTypeSet, numTypeSet);
 					constraintSystem.addEquality(leftTypeSet, rightTypeSet);
-					resultSet = leftTypeSet;
-					break;
+					return leftTypeSet;
 				case B_AND:
 				case B_OR:
 					constraintSystem.addEquality(leftTypeSet, rightTypeSet);
-					constraintSystem.addEquality(leftTypeSet, booleanType);
-					resultSet = booleanType;
-					break;
+					constraintSystem.addEquality(leftTypeSet, booleanTypeSet);
+					return booleanTypeSet;
 				case B_EQUAL:
 				case B_NOT_EQUAL:
 					constraintSystem.addEquality(leftTypeSet, rightTypeSet);
-					resultSet = booleanType;
-					break;
+					return booleanTypeSet;
 				case B_LESS_THAN:
 				case B_LESS_OR_EQUAL:
 				case B_GREATER_THAN:
 				case B_GREATER_OR_EQUAL:
-					constraintSystem.addUpperBound(leftTypeSet, numTypes);
+					constraintSystem.addUpperBound(leftTypeSet, numTypeSet);
 					constraintSystem.addEquality(leftTypeSet, rightTypeSet);
-					resultSet = booleanType;
-					break;
+					return booleanTypeSet;
 				default:
-					throw new IllegalStateException("binary operator " + op
-							+ " not supported");
+					throw new IllegalStateException("no such binary operator");
 				}
-
-				return resultSet;
 			}
 
 			public void createMethodCallConstraints(String methodName,

@@ -1,0 +1,14 @@
+// Assert that the compiler does not allow an integer and a reference
+// to be checked for equality
+
+class Main {
+	void main() {
+		Object o;
+		int i;
+		o = new Object();
+		i = 5;
+		if (o == i) {
+			write(1);
+		}
+	}
+}
