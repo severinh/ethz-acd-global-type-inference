@@ -1,0 +1,19 @@
+class A {
+
+}
+
+class B {
+
+}
+
+class Main {
+	void main() {
+		A a;
+		B b;
+		a = new A();
+		b = new B();
+		if (a == b) {
+			write(1);
+		}
+	}
+}
