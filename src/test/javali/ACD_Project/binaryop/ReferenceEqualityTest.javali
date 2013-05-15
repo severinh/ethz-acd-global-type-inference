@@ -1,9 +1,12 @@
-class A {
+// Assert that two references can be checked for equality
+// if there is a subtype relation between them
 
+class A {
+	int x;
 }
 
-class B {
-
+class B extends A {
+	int y;
 }
 
 class Main {
@@ -15,5 +18,10 @@ class Main {
 		if (a == b) {
 			write(1);
 		}
+		if (b == a) {
+			write(1);
+		}
+		// Enforce that the static type of b is B
+		b.y = 2;
 	}
 }

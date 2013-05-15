@@ -1,0 +1,25 @@
+// Assert that two references that do not share
+// any subtype relation cannot be checked for equality
+
+class A {
+	int x;
+}
+
+class B {
+	int y;
+}
+
+class Main {
+	void main() {
+		A a;
+		B b;
+		a = new A();
+		b = new B();
+		if (a == b) {
+			write(1);
+		}
+		// Enforce that the type of a and b is A and B, respectively
+		a.x = 1;
+		b.y = 2;
+	}
+}
