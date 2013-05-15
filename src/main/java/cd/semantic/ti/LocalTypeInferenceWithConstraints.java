@@ -23,6 +23,7 @@ import cd.ir.ast.Cast;
 import cd.ir.ast.Expr;
 import cd.ir.ast.Field;
 import cd.ir.ast.FloatConst;
+import cd.ir.ast.IfElse;
 import cd.ir.ast.Index;
 import cd.ir.ast.IntConst;
 import cd.ir.ast.MethodCall;
@@ -34,6 +35,7 @@ import cd.ir.ast.NullConst;
 import cd.ir.ast.ReturnStmt;
 import cd.ir.ast.ThisRef;
 import cd.ir.ast.UnaryOp;
+import cd.ir.ast.WhileLoop;
 import cd.ir.ast.UnaryOp.UOp;
 import cd.ir.ast.Var;
 import cd.ir.symbols.ArrayTypeSymbol;
@@ -214,6 +216,25 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				exprVisitor.createMethodCallConstraints(call.methodName,
 						call.receiver(), call.argumentsWithoutReceiver(),
 						Optional.<TypeVariable> absent());
+				return null;
+			}
+			
+			@Override
+			public Void ifElse(IfElse ast, Void arg) {
+				visit(ast.then(), null);
+				visit(ast.otherwise(), null);
+				TypeSet ifExprTypeSet = exprVisitor.visit(ast.condition(), arg);
+				TypeSet booleanType = constantTypeSetFactory.makeBoolean();
+				constraintSystem.addEquality(ifExprTypeSet, booleanType);
+				return null;
+			}
+			
+			@Override
+			public Void whileLoop(WhileLoop ast, Void arg) {
+				visit(ast.body(), null);
+				TypeSet whileConditionExprTypeSet = exprVisitor.visit(ast.condition(), arg);
+				TypeSet booleanType = constantTypeSetFactory.makeBoolean();
+				constraintSystem.addEquality(whileConditionExprTypeSet, booleanType);
 				return null;
 			}
 		}
