@@ -7,12 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.lang.model.type.PrimitiveType;
-
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.AstVisitor;
-import cd.ir.ExprVisitor;
 import cd.ir.ExprVisitorWithoutArg;
 import cd.ir.ast.Assign;
 import cd.ir.ast.BinaryOp;
