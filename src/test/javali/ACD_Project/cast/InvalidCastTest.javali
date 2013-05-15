@@ -1,3 +1,8 @@
+// Assert that a reference cannot be cast to an integer value
+
+class A {
+}
+
 class Main {
   void main() {
     A a;

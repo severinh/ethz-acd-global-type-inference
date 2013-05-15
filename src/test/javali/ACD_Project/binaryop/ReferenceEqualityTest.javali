@@ -1,0 +1,27 @@
+// Assert that two references can be checked for equality
+// if there is a subtype relation between them
+
+class A {
+	int x;
+}
+
+class B extends A {
+	int y;
+}
+
+class Main {
+	void main() {
+		A a;
+		B b;
+		a = new A();
+		b = new B();
+		if (a == b) {
+			write(1);
+		}
+		if (b == a) {
+			write(1);
+		}
+		// Enforce that the static type of b is B
+		b.y = 2;
+	}
+}

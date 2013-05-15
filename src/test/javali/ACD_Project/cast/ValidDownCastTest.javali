@@ -1,0 +1,22 @@
+// Assert that it is allowed to downcast references,
+// even though this may be unsafe at runtime
+
+class A {
+}
+
+class B extends A {
+	int x;
+}
+
+class Main {
+	void main() {
+		B b;
+		b = new B();
+	}
+	
+	void foo(A a) {
+		B b;
+		b = (B) a;
+		b.x = 1;
+	}
+}

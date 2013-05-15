@@ -11,6 +11,7 @@ import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.AstVisitor;
 import cd.ir.ExprVisitor;
+import cd.ir.ExprVisitorWithoutArg;
 import cd.ir.ast.Assign;
 import cd.ir.ast.BinaryOp;
 import cd.ir.ast.BinaryOp.BOp;
@@ -179,7 +180,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			@Override
 			public Void returnStmt(ReturnStmt ast, Void arg) {
 				if (ast.arg() != null) {
-					TypeSet exprTypeSet = exprVisitor.visit(ast.arg(), null);
+					TypeSet exprTypeSet = exprVisitor.visit(ast.arg());
 					constraintSystem.addUpperBound(exprTypeSet,
 							allowedReturnTypeSet);
 				}
@@ -188,15 +189,15 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
 			@Override
 			public Void assign(Assign assign, Void arg) {
-				TypeSet lhsTypeSet = exprVisitor.visit(assign.left(), arg);
-				TypeSet exprTypeSet = exprVisitor.visit(assign.right(), arg);
+				TypeSet lhsTypeSet = exprVisitor.visit(assign.left());
+				TypeSet exprTypeSet = exprVisitor.visit(assign.right());
 				constraintSystem.addInequality(exprTypeSet, lhsTypeSet);
 				return null;
 			}
 
 			@Override
 			public Void builtInWrite(BuiltInWrite ast, Void arg) {
-				TypeSet argTypeSet = exprVisitor.visit(ast.arg(), null);
+				TypeSet argTypeSet = exprVisitor.visit(ast.arg());
 				ConstantTypeSet intTypeSet = constantTypeSetFactory.makeInt();
 				constraintSystem.addEquality(argTypeSet, intTypeSet);
 				return null;
@@ -204,7 +205,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
 			@Override
 			public Void builtInWriteFloat(BuiltInWriteFloat ast, Void arg) {
-				TypeSet argTypeSet = exprVisitor.visit(ast.arg(), null);
+				TypeSet argTypeSet = exprVisitor.visit(ast.arg());
 				ConstantTypeSet floatTypeSet = constantTypeSetFactory
 						.makeFloat();
 				constraintSystem.addEquality(argTypeSet, floatTypeSet);
@@ -239,10 +240,11 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			}
 		}
 
-		public class ConstraintExprVisitor extends ExprVisitor<TypeSet, Void> {
+		public class ConstraintExprVisitor extends
+				ExprVisitorWithoutArg<TypeSet> {
 
 			@Override
-			public TypeSet var(Var ast, Void arg) {
+			public TypeSet var(Var ast) {
 				VariableSymbol varSym = ast.getSymbol();
 				switch (varSym.getKind()) {
 				case FIELD:
@@ -252,53 +254,52 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 				case PARAM:
 					return localSymbolVariables.get(varSym);
 				default:
-					throw new IllegalStateException(
-							"cannot handle variable kind " + varSym.getKind());
+					throw new IllegalStateException("no such variable kind");
 				}
 			}
 
 			@Override
-			public TypeSet intConst(IntConst ast, Void arg) {
+			public TypeSet intConst(IntConst ast) {
 				return constantTypeSetFactory.makeInt();
 			}
 
 			@Override
-			public TypeSet floatConst(FloatConst ast, Void arg) {
+			public TypeSet floatConst(FloatConst ast) {
 				return constantTypeSetFactory.makeFloat();
 			}
 
 			@Override
-			public TypeSet booleanConst(BooleanConst ast, Void arg) {
+			public TypeSet booleanConst(BooleanConst ast) {
 				return constantTypeSetFactory.makeBoolean();
 			}
 
 			@Override
-			public TypeSet nullConst(NullConst ast, Void arg) {
+			public TypeSet nullConst(NullConst ast) {
 				return constantTypeSetFactory.makeNull();
 			}
 
 			@Override
-			public TypeSet newObject(NewObject ast, Void arg) {
+			public TypeSet newObject(NewObject ast) {
 				TypeSymbol classSym = typeSymbols.getType(ast.typeName);
 				return constantTypeSetFactory.make(classSym);
 			}
 
 			@Override
-			public TypeSet newArray(NewArray ast, Void arg) {
+			public TypeSet newArray(NewArray ast) {
 				TypeSymbol arraySym = typeSymbols.get(ast.typeName);
 				return constantTypeSetFactory.make(arraySym);
 			}
 
 			@Override
-			public TypeSet thisRef(ThisRef ast, Void arg) {
+			public TypeSet thisRef(ThisRef ast) {
 				ClassSymbol classSymbol = mdecl.sym.owner;
 				return constantTypeSetFactory.make(classSymbol);
 			}
 
 			@Override
-			public TypeSet cast(Cast ast, Void arg) {
-				TypeSet exprTypeSet = visit(ast.arg(), null);
-				// only reference types can be casted
+			public TypeSet cast(Cast ast) {
+				TypeSet exprTypeSet = visit(ast.arg());
+				// only reference types can be cast
 				ConstantTypeSet allRefTyes = constantTypeSetFactory
 						.makeReferenceTypeSet();
 				constraintSystem.addUpperBound(exprTypeSet, allRefTyes);
@@ -309,10 +310,10 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			}
 
 			@Override
-			public TypeSet field(Field ast, Void arg) {
+			public TypeSet field(Field ast) {
 				String fieldName = ast.fieldName;
 				Expr receiver = ast.arg();
-				TypeSet receiverTypeSet = visit(receiver, null);
+				TypeSet receiverTypeSet = visit(receiver);
 
 				Collection<ClassSymbol> declaringClassSymbols = classFieldSymbolCache
 						.get(fieldName);
@@ -344,14 +345,14 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			}
 
 			@Override
-			public TypeSet index(Index idx, Void arg) {
+			public TypeSet index(Index idx) {
 				Expr arrayExpr = idx.left();
-				TypeSet indexTypeSet = visit(idx.right(), null);
+				TypeSet indexTypeSet = visit(idx.right());
 				constraintSystem.addEquality(indexTypeSet,
 						constantTypeSetFactory.makeInt());
 
 				TypeVariable resultVar = constraintSystem.addTypeVariable();
-				TypeSet arrayExprTypeSet = visit(arrayExpr, null);
+				TypeSet arrayExprTypeSet = visit(arrayExpr);
 				ConstantTypeSet arrayTypesSet = constantTypeSetFactory
 						.makeArrayTypeSet();
 				constraintSystem.addUpperBound(arrayExprTypeSet, arrayTypesSet);
@@ -368,20 +369,20 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			}
 
 			@Override
-			public TypeSet builtInRead(BuiltInRead ast, Void arg) {
+			public TypeSet builtInRead(BuiltInRead ast) {
 				return constantTypeSetFactory.makeInt();
 			}
 
 			@Override
-			public TypeSet builtInReadFloat(BuiltInReadFloat ast, Void arg) {
+			public TypeSet builtInReadFloat(BuiltInReadFloat ast) {
 				return constantTypeSetFactory.makeFloat();
 			}
 
 			@Override
-			public TypeSet binaryOp(BinaryOp binaryOp, Void arg) {
+			public TypeSet binaryOp(BinaryOp binaryOp) {
 				BOp op = binaryOp.operator;
-				TypeSet leftTypeSet = visit(binaryOp.left(), null);
-				TypeSet rightTypeSet = visit(binaryOp.right(), null);
+				TypeSet leftTypeSet = visit(binaryOp.left());
+				TypeSet rightTypeSet = visit(binaryOp.right());
 				TypeSet resultSet;
 
 				ConstantTypeSet numTypes = constantTypeSetFactory
@@ -431,7 +432,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 					Optional<TypeVariable> methodCallResultTypeVar) {
 				Collection<MethodSymbol> methodSymbols = methodSymbolCache.get(
 						methodName, arguments.size());
-				TypeSet receiverTypeSet = visit(receiver, null);
+				TypeSet receiverTypeSet = visit(receiver);
 				Set<ClassSymbol> possibleReceiverTypes = new HashSet<>();
 
 				for (MethodSymbol msym : methodSymbols) {
@@ -442,7 +443,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 							msym.owner, receiverTypeSet);
 					for (int argNum = 0; argNum < arguments.size(); argNum++) {
 						Expr argument = arguments.get(argNum);
-						TypeSet argTypeSet = visit(argument, null);
+						TypeSet argTypeSet = visit(argument);
 						VariableSymbol paramSym = msym.getParameter(argNum);
 						TypeSymbol paramType = paramSym.getType();
 						ConstantTypeSet expectedArgType = constantTypeSetFactory
@@ -470,7 +471,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			}
 
 			@Override
-			public TypeSet methodCall(MethodCallExpr call, Void arg) {
+			public TypeSet methodCall(MethodCallExpr call) {
 				TypeVariable methodCallResultTypeVar = constraintSystem
 						.addTypeVariable();
 				createMethodCallConstraints(call.methodName, call.receiver(),
@@ -480,10 +481,9 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			}
 
 			@Override
-			public TypeSet unaryOp(UnaryOp unaryOp, Void arg) {
+			public TypeSet unaryOp(UnaryOp unaryOp) {
 				UOp op = unaryOp.operator;
-				TypeSet subExprTypeSet = visit(unaryOp.arg(), null);
-
+				TypeSet subExprTypeSet = visit(unaryOp.arg());
 				ConstantTypeSet numTypes = constantTypeSetFactory
 						.makeNumericalTypeSet();
 				ConstantTypeSet booleanType = constantTypeSetFactory
