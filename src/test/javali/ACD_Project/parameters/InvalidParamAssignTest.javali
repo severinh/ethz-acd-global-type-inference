@@ -1,0 +1,11 @@
+// Assert that a float value cannot be assigned to an int parameter
+
+class Main {
+	void main() {
+		foo(3);
+	}
+	
+	void foo(int param) {
+		param = 2.0;
+	}
+}

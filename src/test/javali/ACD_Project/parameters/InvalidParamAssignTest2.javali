@@ -1,0 +1,11 @@
+// Assert that an null value cannot be assigned to an int parameter
+
+class Main {
+	void main() {
+		foo(3);
+	}
+	
+	void foo(int param) {
+		param = null;
+	}
+}

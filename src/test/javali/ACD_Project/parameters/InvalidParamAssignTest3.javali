@@ -1,0 +1,11 @@
+// Assert that an reference cannot be assigned to a parameter of incompatible type
+
+class Main {
+	void main() {
+		foo(this);
+	}
+	
+	void foo(Main param) {
+		param = new Object();
+	}
+}
