@@ -1,0 +1,13 @@
+class A {
+	int x;
+}
+
+class Main {
+	void main() {
+		Object obj;
+		Object obj_other;
+		obj = new int[10];
+		obj_other = (Object) obj;
+		obj_other.x = 1;
+	}
+}
