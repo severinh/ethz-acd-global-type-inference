@@ -1,0 +1,9 @@
+class Main {
+    void main() {
+	  int x;
+	  x = 1;
+	  while (x) {
+	    x = 0;  
+      }
+    }
+}
