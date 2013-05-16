@@ -1,0 +1,3 @@
+
+Thanks to global type erasure, global type inference can infer a different type
+than the one that is declared. This leads to a type-correct program.
