@@ -120,8 +120,13 @@ methodHeading returns [String returnType, String mthName, List<Pair<String>> for
    |	r=type? n=Identifier { $returnType = ($r.typeName == null ? BottomTypeSymbol.INSTANCE.getName() : $r.typeName) ; $mthName = $n.text; $formalParams = new ArrayList<Pair<String>>(); } formalParamList[$formalParams]
    ;
 
+formalParam[List<Pair<String>> formalParams]
+	:  ^( ParamType t=type n=Identifier ) { $formalParams.add(new Pair<String>($t.typeName, $n.text)); }
+	|  ^( ParamNoType n=Identifier ) { $formalParams.add(new Pair<String>(BottomTypeSymbol.INSTANCE.getName(), $n.text)); }
+	;
+
 formalParamList[List<Pair<String>> formalParams]
-	:	( ^( VarDecl t=type? n=Identifier ) { $formalParams.add(new Pair<String>($t.typeName == null ? BottomTypeSymbol.INSTANCE.getName() : $t.typeName, $n.text)); } )+
+	:	(p=formalParam[$formalParams])+
 	;
 
 methodBody returns [Seq decls, Seq stmts]

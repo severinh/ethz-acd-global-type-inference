@@ -168,6 +168,8 @@ tokens {
 	ClassDecl;
 	VarDecl;
 	VarDeclList;
+	ParamType;
+	ParamNoType;
 	MethodDecl;
 	MethodBody;
 	Seq;
@@ -297,11 +299,18 @@ methodHeading
       -> Identifier[$methSig, "void"] Identifier formalParamList?
    ;
 
-formalParamList
-	:	type? paramDecl=Identifier ( ',' type? Identifier )*
-		-> ^( VarDecl[$paramDecl, "VarDecl"] type? Identifier )+
+formalParam
+	:	type Identifier
+	  -> ^(ParamType type Identifier)
+	|	Identifier
+	  -> ^(ParamNoType Identifier)
 	;
 
+formalParamList
+    : 	formalParam ( ',' formalParam )*
+      -> formalParam+
+	;
+	
 methodBody
 	:	methodBodyWithDeclList // left-factoring of declList
 		(	stmtSeq=stmtList '}'
