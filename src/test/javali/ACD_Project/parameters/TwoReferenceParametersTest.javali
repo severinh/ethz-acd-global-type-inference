@@ -1,0 +1,25 @@
+// Assert that the types of formal parameters are correctly parsed
+// There was a bug in the parser that caused the formal parameter
+// 'B b' to be parsed as 'A b'.
+
+class A {
+}
+
+class B extends A {
+	void bar() {
+	}
+}
+
+class Main {
+	void main () {
+	    B b;
+	    b = new B();
+		foo(b, b);
+	}
+	
+	void foo(A a, B b) {
+		a = new A();
+		b = new B();
+		b.bar();
+	}
+}
