@@ -63,6 +63,11 @@ public abstract class ConstraintGeneratorContext {
 		return variableSymbolTypeSets.get(variable);
 	}
 
+	protected void addVariableTypeSet(VariableSymbol variable, String desc) {
+		TypeVariable typeSet = constraintSystem.addTypeVariable(desc);
+		variableSymbolTypeSets.put(variable, typeSet);
+	}
+
 	public abstract TypeSet getReturnTypeSet(MethodSymbol method);
 
 }

@@ -34,9 +34,7 @@ public final class GlobalConstraintGeneratorContext extends
 				for (VariableSymbol variable : methodSymbol
 						.getLocalsAndParameters()) {
 					String desc = prefix + variable.getName();
-					TypeVariable typeVariable = result.getConstraintSystem()
-							.addTypeVariable(desc);
-					result.variableSymbolTypeSets.put(variable, typeVariable);
+					result.addVariableTypeSet(variable, desc);
 				}
 
 				TypeVariable returnTypeVariable = result.getConstraintSystem()
@@ -46,9 +44,7 @@ public final class GlobalConstraintGeneratorContext extends
 
 			for (VariableSymbol field : classSymbol.getDeclaredFields()) {
 				String desc = prefix + field.getName();
-				TypeVariable fieldTypeVariable = result.getConstraintSystem()
-						.addTypeVariable(desc);
-				result.variableSymbolTypeSets.put(field, fieldTypeVariable);
+				result.addVariableTypeSet(field, desc);
 			}
 		}
 		return result;

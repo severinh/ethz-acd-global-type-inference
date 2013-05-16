@@ -5,7 +5,6 @@ import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.semantic.TypeSymbolTable;
 import cd.semantic.ti.constraintSolving.TypeSet;
-import cd.semantic.ti.constraintSolving.TypeVariable;
 
 public final class LocalConstraintGeneratorContext extends
 		ConstraintGeneratorContext {
@@ -18,15 +17,10 @@ public final class LocalConstraintGeneratorContext extends
 			TypeSymbolTable typeSymbols, MethodSymbol methodSymbol) {
 		LocalConstraintGeneratorContext result = new LocalConstraintGeneratorContext(
 				typeSymbols);
-
 		for (VariableSymbol variable : methodSymbol.getLocalsAndParameters()) {
 			String desc = variable.getName();
-			@SuppressWarnings("null")
-			TypeVariable typeVariable = result.getConstraintSystem()
-					.addTypeVariable(desc);
-			result.variableSymbolTypeSets.put(variable, typeVariable);
+			result.addVariableTypeSet(variable, desc);
 		}
-
 		return result;
 	}
 
