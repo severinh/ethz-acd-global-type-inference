@@ -10,13 +10,12 @@ class Main {
 	void main () {
 	    B b;
 	    b = new B();
-		foo(b, b);
+		foo(b);
 		bar(b);
 	}
 	
-	void foo(A a, B b) {
+	void foo(A a) {
 		a = new A();
-		b = new B();
 	}
 	
 	void bar(A a) {

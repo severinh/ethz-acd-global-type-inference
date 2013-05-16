@@ -123,7 +123,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 		// variables while
 		// these TypeVariables are constraint solver variables describing the
 		// type of such program variables
-		private final Map<VariableSymbol, TypeVariable> localSymbolVariables = new HashMap<>();
+		private final Map<VariableSymbol, TypeSet> localSymbolVariables = new HashMap<>();
 
 		public ConstraintGenerator(MethodDecl mdecl, TypeSymbolTable typeSymbols) {
 			this.typeSymbols = typeSymbols;
@@ -147,12 +147,15 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 			// variables and constraints for parameters (types given!)
 			MethodSymbol msym = mdecl.sym;
 			for (VariableSymbol varSym : msym.getParameters()) {
-				TypeVariable typeVar = constraintSystem
-						.addTypeVariable("param_" + varSym.name);
-				ConstantTypeSet typeConst = constantTypeSetFactory.make(varSym
-						.getType());
-				constraintSystem.addEquality(typeVar, typeConst);
-				localSymbolVariables.put(varSym, typeVar);
+				// Do not create a type variable for the parameter.
+				// There is nothing to infer since the parameter type is fixed.
+				// However, it is not correct to use a singleton type set
+				// with only the declared type, because otherwise, assigning
+				// a valid value of a subtype would not be possible.
+				// Thus, use the constant set of all declarable subtypes.
+				ConstantTypeSet typeConst = constantTypeSetFactory
+						.makeDeclarableSubtypes(varSym.getType());
+				localSymbolVariables.put(varSym, typeConst);
 			}
 
 			// type variables for local variables
