@@ -1,5 +1,11 @@
 class Main {
-  test(int x) {
-    return x;
-  }
+	test(int x) {
+		return x;
+	}
+
+	main() {
+		var i;
+		i = test(1);
+		write(i);
+	}
 }
