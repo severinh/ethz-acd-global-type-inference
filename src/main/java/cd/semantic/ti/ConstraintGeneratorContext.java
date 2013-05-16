@@ -27,33 +27,34 @@ import cd.semantic.ti.constraintSolving.TypeVariable;
 public abstract class ConstraintGeneratorContext {
 
 	private final TypeSymbolTable typeSymbols;
-	private final ConstantTypeSetFactory constantTypeSetFactory;
 	private final ConstraintSystem constraintSystem;
+	private final Map<VariableSymbol, TypeVariable> variableSymbolTypeSets;
+
+	// Caches
+	private final ConstantTypeSetFactory constantTypeSetFactory;
 	private final MethodSymbolCache methodSymbolCache;
 	private final ClassSymbolFieldCache classSymbolFieldCache;
 
-	protected final Map<VariableSymbol, TypeVariable> variableSymbolTypeSets;
-
 	public ConstraintGeneratorContext(TypeSymbolTable typeSymbols) {
 		this.typeSymbols = typeSymbols;
-		this.constantTypeSetFactory = new ConstantTypeSetFactory(typeSymbols);
 		this.constraintSystem = new ConstraintSystem();
+		this.variableSymbolTypeSets = new HashMap<>();
+
+		this.constantTypeSetFactory = new ConstantTypeSetFactory(typeSymbols);
 		this.methodSymbolCache = MethodSymbolCache.of(typeSymbols);
 		this.classSymbolFieldCache = ClassSymbolFieldCache.of(typeSymbols);
-
-		this.variableSymbolTypeSets = new HashMap<>();
 	}
 
 	public TypeSymbolTable getTypeSymbolTable() {
 		return typeSymbols;
 	}
 
-	public ConstantTypeSetFactory getConstantTypeSetFactory() {
-		return constantTypeSetFactory;
-	}
-
 	public ConstraintSystem getConstraintSystem() {
 		return constraintSystem;
+	}
+
+	public ConstantTypeSetFactory getConstantTypeSetFactory() {
+		return constantTypeSetFactory;
 	}
 
 	public Collection<MethodSymbol> getMatchingMethods(String name,
