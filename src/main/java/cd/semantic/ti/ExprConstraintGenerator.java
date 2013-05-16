@@ -148,10 +148,9 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 			possibleClassSymbols.addAll(getTypeSymbols()
 					.getClassSymbolSubtypes(classSym));
 			VariableSymbol fieldSymbol = classSym.getField(fieldName);
-			TypeSymbol fieldType = fieldSymbol.getType();
+			TypeSet fieldTypeSet = context.getFieldTypeSet(fieldSymbol);
 			ConstraintCondition condition = new ConstraintCondition(classSym,
 					receiverTypeSet);
-			ConstantTypeSet fieldTypeSet = getTypeSetFactory().make(fieldType);
 			getSystem().addEquality(resultType, fieldTypeSet, condition);
 		}
 
