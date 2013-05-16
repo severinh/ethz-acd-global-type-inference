@@ -1,0 +1,12 @@
+// Assert that the program compiles even though there is an unused method
+
+class Main {
+	void main() {
+		write(5);
+		writeln();
+	}
+	
+	void foo(int[] array) {
+		array[0] = 1;
+	}
+}

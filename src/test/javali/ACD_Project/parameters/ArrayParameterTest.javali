@@ -1,11 +1,15 @@
+// Assert that arrays can be passed to methods as a parameter
+
 class Main {
 	void main() {
 		int[] array;
 		array = new int[10];
 		foo(array);
+		write(array[0]);
+		writeln();
 	}
 	
 	void foo(int[] array) {
-		array[0] = 1;
+		array[0] = 42;
 	}
 }
