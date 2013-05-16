@@ -7,24 +7,24 @@ import cd.semantic.ti.constraintSolving.TypeSet;
 
 public class GlobalMethodConstraintGenerator extends MethodConstraintGenerator {
 
-	private final GlobalTypeVariableStore typeSetStore;
+	private final GlobalTypeVariableStore typeVariableStore;
 
 	public GlobalMethodConstraintGenerator(MethodDecl methodDecl,
 			MethodConstraintGeneratorContext context,
-			GlobalTypeVariableStore globalVariableTypeSets) {
+			GlobalTypeVariableStore variableTypeStore) {
 		super(methodDecl, context);
 
-		this.typeSetStore = globalVariableTypeSets;
+		this.typeVariableStore = variableTypeStore;
 	}
 
 	@Override
 	public TypeSet getVariableTypeSet(VariableSymbol localVariable) {
-		return typeSetStore.getVariableSymbolTypeSet(localVariable);
+		return typeVariableStore.getVariableSymbolTypeSet(localVariable);
 	}
 
 	@Override
 	public TypeSet getReturnTypeSet(MethodSymbol method) {
-		return typeSetStore.getReturnTypeSet(method);
+		return typeVariableStore.getReturnTypeSet(method);
 	}
 
 }

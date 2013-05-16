@@ -11,13 +11,13 @@ import cd.semantic.TypeSymbolTable;
 import cd.semantic.ti.constraintSolving.ConstraintSystem;
 import cd.semantic.ti.constraintSolving.TypeVariable;
 
-public final class GlobalTypeVariableStore {
+public final class GlobalTypeVariableStore extends TypeVariableStore {
 
-	private final Map<VariableSymbol, TypeVariable> variableSymbolTypeSets;
 	private final Map<MethodSymbol, TypeVariable> returnTypeSets;
 
 	private GlobalTypeVariableStore() {
-		this.variableSymbolTypeSets = new HashMap<>();
+		super();
+
 		this.returnTypeSets = new HashMap<>();
 	}
 
@@ -51,16 +51,8 @@ public final class GlobalTypeVariableStore {
 		return result;
 	}
 
-	public Map<VariableSymbol, TypeVariable> getVariableSymbolTypeSets() {
-		return Collections.unmodifiableMap(variableSymbolTypeSets);
-	}
-
 	public Map<MethodSymbol, TypeVariable> getReturnTypeSets() {
 		return Collections.unmodifiableMap(returnTypeSets);
-	}
-
-	public TypeVariable getVariableSymbolTypeSet(VariableSymbol variable) {
-		return variableSymbolTypeSets.get(variable);
 	}
 
 	public TypeVariable getReturnTypeSet(MethodSymbol method) {

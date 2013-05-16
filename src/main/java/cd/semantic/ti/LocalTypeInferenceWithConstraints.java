@@ -30,10 +30,12 @@ public class LocalTypeInferenceWithConstraints extends
 	public void inferTypes(MethodDecl mdecl, TypeSymbolTable typeSymbols) {
 		MethodConstraintGeneratorContext context = new MethodConstraintGeneratorContextImpl(
 				typeSymbols);
+		ConstraintSystem constraintSystem = context.getConstraintSystem();
+		LocalTypeVariableStore typeVariableStore = LocalTypeVariableStore.of(
+				mdecl.sym, constraintSystem);
 		LocalMethodConstraintGenerator generator = new LocalMethodConstraintGenerator(
-				mdecl, context);
+				mdecl, context, typeVariableStore);
 		generator.generate();
-		ConstraintSystem constraintSystem = generator.getConstraintSystem();
 		ConstraintSolver solver = new ConstraintSolver(constraintSystem);
 		solver.solve();
 		if (!solver.hasSolution()) {
@@ -49,5 +51,4 @@ public class LocalTypeInferenceWithConstraints extends
 		}
 
 	}
-
 }
