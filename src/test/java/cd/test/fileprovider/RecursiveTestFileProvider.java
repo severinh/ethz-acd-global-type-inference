@@ -8,6 +8,7 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.NameFileFilter;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 
 public class RecursiveTestFileProvider implements TestFileProvider {
 
@@ -18,6 +19,17 @@ public class RecursiveTestFileProvider implements TestFileProvider {
 		super();
 		this.rootFolder = rootFolder;
 		this.dirFilter = dirFilter;
+	}
+
+	/**
+	 * Constructs a new recursive test file provider that does not filter out
+	 * any files.
+	 * 
+	 * @param rootFolder
+	 *            the root folder to search from recursively
+	 */
+	public RecursiveTestFileProvider(File rootFolder) {
+		this(rootFolder, TrueFileFilter.INSTANCE);
 	}
 
 	/**
