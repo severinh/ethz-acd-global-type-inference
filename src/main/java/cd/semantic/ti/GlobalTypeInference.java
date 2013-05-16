@@ -12,7 +12,6 @@ import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.semantic.TypeSymbolTable;
 import cd.semantic.ti.constraintSolving.ConstraintSolver;
-import cd.semantic.ti.constraintSolving.ConstraintSystem;
 import cd.semantic.ti.constraintSolving.TypeVariable;
 import cd.util.NonnullByDefault;
 
@@ -22,28 +21,25 @@ public class GlobalTypeInference extends TypeInferenceWithConstraints {
 	@Override
 	public void inferTypes(CompilationContext compilationContext) {
 		TypeSymbolTable typeSymbols = compilationContext.getTypeSymbols();
-		MethodConstraintGeneratorContext generatorContext = new MethodConstraintGeneratorContextImpl(
-				typeSymbols);
-		ConstraintSystem constraintSystem = generatorContext
-				.getConstraintSystem();
-		GlobalTypeVariableStore typeVariableStore = GlobalTypeVariableStore.of(
-				typeSymbols, constraintSystem);
+		GlobalConstraintGeneratorContext generatorContext = GlobalConstraintGeneratorContext
+				.of(typeSymbols);
 
 		for (ClassDecl classDecl : compilationContext.getAstRoots()) {
 			for (MethodDecl methodDecl : classDecl.methods()) {
-				GlobalMethodConstraintGenerator generator = new GlobalMethodConstraintGenerator(
-						methodDecl, generatorContext, typeVariableStore);
+				MethodConstraintGenerator generator = new MethodConstraintGenerator(
+						methodDecl, generatorContext);
 				generator.generate();
 			}
 		}
 
-		ConstraintSolver solver = new ConstraintSolver(constraintSystem);
+		ConstraintSolver solver = new ConstraintSolver(
+				generatorContext.getConstraintSystem());
 		solver.solve();
 		if (!solver.hasSolution()) {
 			throw new SemanticFailure(Cause.TYPE_INFERENCE_ERROR,
 					"Type inference was unable to resolve type constraints");
 		} else {
-			for (Entry<VariableSymbol, TypeVariable> entry : typeVariableStore
+			for (Entry<VariableSymbol, TypeVariable> entry : generatorContext
 					.getVariableSymbolTypeSets().entrySet()) {
 				VariableSymbol variableSymbol = entry.getKey();
 				TypeVariable typeSet = entry.getValue();
@@ -52,7 +48,7 @@ public class GlobalTypeInference extends TypeInferenceWithConstraints {
 				variableSymbol.setType(type);
 			}
 
-			for (Entry<MethodSymbol, TypeVariable> entry : typeVariableStore
+			for (Entry<MethodSymbol, TypeVariable> entry : generatorContext
 					.getReturnTypeSets().entrySet()) {
 				MethodSymbol method = entry.getKey();
 				TypeVariable typeSet = entry.getValue();
@@ -66,5 +62,4 @@ public class GlobalTypeInference extends TypeInferenceWithConstraints {
 			}
 		}
 	}
-
 }

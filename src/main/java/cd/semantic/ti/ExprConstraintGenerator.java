@@ -44,9 +44,12 @@ import com.google.common.collect.ImmutableSet;
 
 public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
-	private final StmtConstraintGeneratorContext context;
+	private final MethodSymbol method;
+	private final ConstraintGeneratorContext context;
 
-	public ExprConstraintGenerator(StmtConstraintGeneratorContext context) {
+	public ExprConstraintGenerator(MethodSymbol method,
+			ConstraintGeneratorContext context) {
+		this.method = method;
 		this.context = context;
 	}
 
@@ -108,7 +111,7 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
 	@Override
 	public TypeSet thisRef(ThisRef ast) {
-		return getTypeSetFactory().make(context.getMethod().owner);
+		return getTypeSetFactory().make(method.owner);
 	}
 
 	@Override
