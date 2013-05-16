@@ -1,0 +1,10 @@
+class Main {
+	void main() {
+		int[] array;
+		array = new int[10];
+	}
+	
+	void foo(int[] array) {
+		array[0] = 1;
+	}
+}
