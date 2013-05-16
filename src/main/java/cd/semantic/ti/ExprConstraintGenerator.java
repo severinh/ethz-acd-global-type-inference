@@ -274,11 +274,9 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 			}
 
 			if (methodCallResultTypeVar.isPresent()) {
-				TypeSymbol resultSym = msym.returnType;
-				ConstantTypeSet expectedResultTypes = getTypeSetFactory().make(
-						resultSym);
-				getSystem().addLowerBound(methodCallResultTypeVar.get(),
-						expectedResultTypes, condition);
+				TypeSet resultTypeSet = context.getReturnTypeSet(msym);
+				TypeSet lhsTypeSet = methodCallResultTypeVar.get();
+				getSystem().addInequality(resultTypeSet, lhsTypeSet, condition);
 			}
 		}
 

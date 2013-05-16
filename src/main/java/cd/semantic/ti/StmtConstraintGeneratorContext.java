@@ -13,7 +13,7 @@ public interface StmtConstraintGeneratorContext extends
 
 	public TypeSet getFieldTypeSet(VariableSymbol field);
 
-	public TypeSet getReturnTypeSet();
+	public TypeSet getReturnTypeSet(MethodSymbol method);
 
 	public MethodSymbol getMethod();
 

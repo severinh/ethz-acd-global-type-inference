@@ -1,6 +1,7 @@
 package cd.semantic.ti;
 
 import cd.ir.ast.MethodDecl;
+import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.semantic.ti.constraintSolving.TypeSet;
@@ -17,8 +18,8 @@ public class LocalMethodConstraintGenerator extends MethodConstraintGenerator {
 	}
 
 	@Override
-	public TypeSet getReturnTypeSet() {
-		TypeSymbol type = getMethod().returnType;
+	public TypeSet getReturnTypeSet(MethodSymbol method) {
+		TypeSymbol type = method.returnType;
 		if (type == getTypeSymbolTable().getVoidType()) {
 			return getConstantTypeSetFactory().makeEmpty();
 		} else {

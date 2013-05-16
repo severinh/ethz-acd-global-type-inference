@@ -53,7 +53,7 @@ public class StmtConstraintGenerator extends AstVisitor<Void, Void> {
 		if (ast.arg() != null) {
 			TypeSet exprTypeSet = getExprTypeSet(ast.arg());
 			context.getConstraintSystem().addInequality(exprTypeSet,
-					context.getReturnTypeSet());
+					context.getReturnTypeSet(context.getMethod()));
 		}
 		return null;
 	}
