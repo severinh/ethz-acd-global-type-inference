@@ -266,10 +266,9 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 				Expr argument = arguments.get(argNum);
 				TypeSet argTypeSet = visit(argument);
 				VariableSymbol paramSym = msym.getParameter(argNum);
-				TypeSymbol paramType = paramSym.getType();
-				ConstantTypeSet expectedArgType = getTypeSetFactory()
-						.makeDeclarableSubtypes(paramType);
-				getSystem().addUpperBound(argTypeSet, expectedArgType,
+				TypeSet parameterTypeSet = context
+						.getParameterTypeSet(paramSym);
+				getSystem().addInequality(argTypeSet, parameterTypeSet,
 						condition);
 			}
 
