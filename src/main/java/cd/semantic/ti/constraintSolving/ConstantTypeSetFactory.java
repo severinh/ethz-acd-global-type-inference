@@ -132,6 +132,13 @@ public class ConstantTypeSetFactory {
 	}
 
 	/**
+	 * Returns a constant type set containing only the void type.
+	 */
+	public ConstantTypeSet makeVoid() {
+		return make(typeSymbols.getVoidType());
+	}
+
+	/**
 	 * Returns a constant type set containing all numerical types.
 	 */
 	public ConstantTypeSet makeNumericalTypeSet() {

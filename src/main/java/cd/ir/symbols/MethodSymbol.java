@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import cd.exceptions.SemanticFailure;
+import cd.ir.ast.Var;
 import cd.semantic.SymbolTable;
 
 public class MethodSymbol extends Symbol {
@@ -45,6 +46,13 @@ public class MethodSymbol extends Symbol {
 
 	public Collection<VariableSymbol> getLocals() {
 		return Collections.unmodifiableCollection(locals.values());
+	}
+
+	public Collection<VariableSymbol> getLocalsAndParameters() {
+		List<VariableSymbol> result = new ArrayList<>();
+		result.addAll(getLocals());
+		result.addAll(getParameters());
+		return result;
 	}
 
 	public VariableSymbol getLocal(String name) {
