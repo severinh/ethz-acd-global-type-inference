@@ -66,6 +66,18 @@ public class ConstantTypeSetFactory {
 		return result;
 	}
 
+	/**
+	 * Returns a constant type set for a single type, given by its name.
+	 * 
+	 * @param typeSymbolName
+	 *            the name of the type symbol to create the set for
+	 * @return the type set containing only the given type
+	 */
+	public ConstantTypeSet make(String typeSymbolName) {
+		TypeSymbol typeSymbol = typeSymbols.get(typeSymbolName);
+		return make(typeSymbol);
+	}
+
 	public ConstantTypeSet makeDeclarableSubtypes(TypeSymbol typeSymbol) {
 		checkNotNull(typeSymbol);
 
