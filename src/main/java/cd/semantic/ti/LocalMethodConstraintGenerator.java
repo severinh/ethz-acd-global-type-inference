@@ -36,8 +36,17 @@ public class LocalMethodConstraintGenerator extends MethodConstraintGenerator {
 	}
 
 	@Override
-	public TypeSet getLocalVariableTypeSet(VariableSymbol localVariable) {
-		return localVariableTypeSets.get(localVariable);
+	public TypeSet getVariableTypeSet(VariableSymbol symbol) {
+		switch (symbol.getKind()) {
+		case FIELD:
+		case PARAM:
+			TypeSymbol type = symbol.getType();
+			return getConstantTypeSetFactory().makeDeclarableSubtypes(type);
+		case LOCAL:
+			return localVariableTypeSets.get(symbol);
+		default:
+			throw new IllegalArgumentException("no such variable kind");
+		}
 	}
 
 	@Override
@@ -48,24 +57,6 @@ public class LocalMethodConstraintGenerator extends MethodConstraintGenerator {
 		} else {
 			return getConstantTypeSetFactory().makeDeclarableSubtypes(type);
 		}
-	}
-
-	@Override
-	public TypeSet getParameterTypeSet(VariableSymbol parameter) {
-		// Do not create a type variable for the parameter. There is nothing to
-		// infer since the parameter type is fixed. However, it is not correct
-		// to use a singleton type set with only the declared type, because
-		// otherwise, assigning a valid value of a subtype would not be
-		// possible. Thus, use the constant set of all declarable subtypes.
-
-		TypeSymbol type = parameter.getType();
-		return getConstantTypeSetFactory().makeDeclarableSubtypes(type);
-	}
-
-	@Override
-	public TypeSet getFieldTypeSet(VariableSymbol field) {
-		TypeSymbol type = field.getType();
-		return getConstantTypeSetFactory().makeDeclarableSubtypes(type);
 	}
 
 }

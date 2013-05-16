@@ -7,11 +7,7 @@ import cd.semantic.ti.constraintSolving.TypeSet;
 public interface StmtConstraintGeneratorContext extends
 		MethodConstraintGeneratorContext {
 
-	public TypeSet getLocalVariableTypeSet(VariableSymbol localVariable);
-
-	public TypeSet getParameterTypeSet(VariableSymbol parameter);
-
-	public TypeSet getFieldTypeSet(VariableSymbol field);
+	public TypeSet getVariableTypeSet(VariableSymbol localVariable);
 
 	public TypeSet getReturnTypeSet(MethodSymbol method);
 

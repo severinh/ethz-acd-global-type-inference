@@ -73,17 +73,7 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
 	@Override
 	public TypeSet var(Var ast) {
-		VariableSymbol varSym = ast.getSymbol();
-		switch (varSym.getKind()) {
-		case FIELD:
-			return context.getFieldTypeSet(varSym);
-		case LOCAL:
-			return context.getLocalVariableTypeSet(varSym);
-		case PARAM:
-			return context.getParameterTypeSet(varSym);
-		default:
-			throw new IllegalStateException("no such variable kind");
-		}
+		return context.getVariableTypeSet(ast.getSymbol());
 	}
 
 	@Override
@@ -148,7 +138,7 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 			possibleClassSymbols.addAll(getTypeSymbols()
 					.getClassSymbolSubtypes(classSym));
 			VariableSymbol fieldSymbol = classSym.getField(fieldName);
-			TypeSet fieldTypeSet = context.getFieldTypeSet(fieldSymbol);
+			TypeSet fieldTypeSet = context.getVariableTypeSet(fieldSymbol);
 			ConstraintCondition condition = new ConstraintCondition(classSym,
 					receiverTypeSet);
 			getSystem().addEquality(resultType, fieldTypeSet, condition);
@@ -266,8 +256,7 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 				Expr argument = arguments.get(argNum);
 				TypeSet argTypeSet = visit(argument);
 				VariableSymbol paramSym = msym.getParameter(argNum);
-				TypeSet parameterTypeSet = context
-						.getParameterTypeSet(paramSym);
+				TypeSet parameterTypeSet = context.getVariableTypeSet(paramSym);
 				getSystem().addInequality(argTypeSet, parameterTypeSet,
 						condition);
 			}

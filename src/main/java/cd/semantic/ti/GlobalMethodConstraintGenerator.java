@@ -18,18 +18,8 @@ public class GlobalMethodConstraintGenerator extends MethodConstraintGenerator {
 	}
 
 	@Override
-	public TypeSet getLocalVariableTypeSet(VariableSymbol localVariable) {
+	public TypeSet getVariableTypeSet(VariableSymbol localVariable) {
 		return typeSetStore.getVariableSymbolTypeSet(localVariable);
-	}
-
-	@Override
-	public TypeSet getParameterTypeSet(VariableSymbol parameter) {
-		return typeSetStore.getVariableSymbolTypeSet(parameter);
-	}
-
-	@Override
-	public TypeSet getFieldTypeSet(VariableSymbol field) {
-		return typeSetStore.getVariableSymbolTypeSet(field);
 	}
 
 	@Override

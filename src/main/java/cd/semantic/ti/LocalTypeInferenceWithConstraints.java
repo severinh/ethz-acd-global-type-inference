@@ -41,7 +41,7 @@ public class LocalTypeInferenceWithConstraints extends
 					"Type inference was unable to resolve type constraints");
 		} else {
 			for (VariableSymbol varSym : mdecl.sym.getLocals()) {
-				TypeSet typeSet = generator.getLocalVariableTypeSet(varSym);
+				TypeSet typeSet = generator.getVariableTypeSet(varSym);
 				TypeSymbol type = makeStaticType(typeSymbols, typeSet,
 						varSym.name);
 				varSym.setType(type);
