@@ -23,6 +23,8 @@ public interface ConstraintGenerationContext {
 
 	public TypeSet getLocalVariableTypeSet(VariableSymbol localVariable);
 
+	public TypeSet getReturnTypeSet();
+
 	public MethodSymbol getCurrentMethod();
 
 	public TypeSymbolTable getTypeSymbolTable();

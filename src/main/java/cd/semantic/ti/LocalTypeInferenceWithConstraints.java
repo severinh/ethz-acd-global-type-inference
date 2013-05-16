@@ -8,14 +8,7 @@ import java.util.Set;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.AstVisitor;
-import cd.ir.ast.Assign;
-import cd.ir.ast.BuiltInWrite;
-import cd.ir.ast.BuiltInWriteFloat;
-import cd.ir.ast.IfElse;
-import cd.ir.ast.MethodCall;
 import cd.ir.ast.MethodDecl;
-import cd.ir.ast.ReturnStmt;
-import cd.ir.ast.WhileLoop;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.TypeSymbol;
@@ -27,8 +20,6 @@ import cd.semantic.ti.constraintSolving.ConstraintSolver;
 import cd.semantic.ti.constraintSolving.ConstraintSystem;
 import cd.semantic.ti.constraintSolving.TypeSet;
 import cd.semantic.ti.constraintSolving.TypeVariable;
-
-import com.google.common.base.Optional;
 
 public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
@@ -100,9 +91,6 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 		// type of such program variables
 		private final Map<VariableSymbol, TypeSet> localSymbolVariables = new HashMap<>();
 
-		private final ExprConstraintGenerator exprVisitor = new ExprConstraintGenerator(
-				this);
-
 		public ConstraintGenerator(MethodDecl mdecl, TypeSymbolTable typeSymbols) {
 			this.typeSymbols = typeSymbols;
 			this.mdecl = mdecl;
@@ -137,6 +125,11 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 		@Override
 		public TypeSet getLocalVariableTypeSet(VariableSymbol localVariable) {
 			return localSymbolVariables.get(localVariable);
+		}
+
+		@Override
+		public TypeSet getReturnTypeSet() {
+			return allowedReturnTypeSet;
 		}
 
 		@Override
@@ -183,75 +176,9 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 						.makeDeclarableSubtypes(msym.returnType);
 			}
 
-			ConstraintStmtVisitor constraintVisitor = new ConstraintStmtVisitor();
+			StmtConstraintGenerator constraintVisitor = new StmtConstraintGenerator(
+					this);
 			mdecl.accept(constraintVisitor, null);
-		}
-
-		public class ConstraintStmtVisitor extends AstVisitor<Void, Void> {
-
-			@Override
-			public Void returnStmt(ReturnStmt ast, Void arg) {
-				if (ast.arg() != null) {
-					TypeSet exprTypeSet = exprVisitor.visit(ast.arg());
-					constraintSystem.addUpperBound(exprTypeSet,
-							allowedReturnTypeSet);
-				}
-				return null;
-			}
-
-			@Override
-			public Void assign(Assign assign, Void arg) {
-				TypeSet lhsTypeSet = exprVisitor.visit(assign.left());
-				TypeSet exprTypeSet = exprVisitor.visit(assign.right());
-				constraintSystem.addInequality(exprTypeSet, lhsTypeSet);
-				return null;
-			}
-
-			@Override
-			public Void builtInWrite(BuiltInWrite ast, Void arg) {
-				TypeSet argTypeSet = exprVisitor.visit(ast.arg());
-				ConstantTypeSet intTypeSet = constantTypeSetFactory.makeInt();
-				constraintSystem.addEquality(argTypeSet, intTypeSet);
-				return null;
-			}
-
-			@Override
-			public Void builtInWriteFloat(BuiltInWriteFloat ast, Void arg) {
-				TypeSet argTypeSet = exprVisitor.visit(ast.arg());
-				ConstantTypeSet floatTypeSet = constantTypeSetFactory
-						.makeFloat();
-				constraintSystem.addEquality(argTypeSet, floatTypeSet);
-				return null;
-			}
-
-			@Override
-			public Void methodCall(MethodCall call, Void arg) {
-				exprVisitor.createMethodCallConstraints(call.methodName,
-						call.receiver(), call.argumentsWithoutReceiver(),
-						Optional.<TypeVariable> absent());
-				return null;
-			}
-
-			@Override
-			public Void ifElse(IfElse ast, Void arg) {
-				visit(ast.then(), null);
-				visit(ast.otherwise(), null);
-				TypeSet ifExprTypeSet = exprVisitor.visit(ast.condition(), arg);
-				TypeSet booleanType = constantTypeSetFactory.makeBoolean();
-				constraintSystem.addEquality(ifExprTypeSet, booleanType);
-				return null;
-			}
-
-			@Override
-			public Void whileLoop(WhileLoop ast, Void arg) {
-				visit(ast.body(), null);
-				TypeSet whileConditionExprTypeSet = exprVisitor.visit(
-						ast.condition(), arg);
-				TypeSet booleanType = constantTypeSetFactory.makeBoolean();
-				constraintSystem.addEquality(whileConditionExprTypeSet,
-						booleanType);
-				return null;
-			}
 		}
 
 	}
