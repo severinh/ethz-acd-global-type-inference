@@ -14,6 +14,16 @@ import cd.semantic.ti.constraintSolving.ConstraintSystem;
 import cd.semantic.ti.constraintSolving.TypeSet;
 import cd.semantic.ti.constraintSolving.TypeVariable;
 
+/**
+ * Represents the context that the constraint generation for type inference
+ * types place in. It can be used for both global and local type inference.
+ * 
+ * It provides the constraint system, caches various values and also holds the
+ * mapping of type variables back to variable symbols.
+ * 
+ * The context is not associated with a fixed method symbol deliberately,
+ * because in global type inference, the same context is used for all methods.
+ */
 public abstract class ConstraintGeneratorContext {
 
 	private final TypeSymbolTable typeSymbols;
@@ -59,10 +69,35 @@ public abstract class ConstraintGeneratorContext {
 		return Collections.unmodifiableMap(variableSymbolTypeSets);
 	}
 
+	/**
+	 * Returns the type set associated with a given variable symbol.
+	 * 
+	 * By default, it looks up the type variable associated with the given
+	 * variable symbol in this context. However, subclasses may override this
+	 * behavior such that the method returns constant type sets or certain kinds
+	 * of variables such as fields or parameters.
+	 * 
+	 * @param variable
+	 *            can be any local variable, parameter and field
+	 * @return a variable or constant set of types
+	 */
 	public TypeSet getVariableTypeSet(VariableSymbol variable) {
 		return variableSymbolTypeSets.get(variable);
 	}
 
+	/**
+	 * Create a new type variable for the given variable symbol, annotate it
+	 * with a description and add it to the constraint system.
+	 * 
+	 * This method is only meant to be called during the construction process of
+	 * the constraint generator context.
+	 * 
+	 * @param variable
+	 *            the variable to create a type variable for
+	 * @param desc
+	 *            string that helps identify the variable symbol in the
+	 *            constraint system
+	 */
 	protected void addVariableTypeSet(VariableSymbol variable, String desc) {
 		TypeVariable typeSet = constraintSystem.addTypeVariable(desc);
 		variableSymbolTypeSets.put(variable, typeSet);

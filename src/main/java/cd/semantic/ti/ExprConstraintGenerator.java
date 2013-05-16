@@ -42,6 +42,13 @@ import cd.semantic.ti.constraintSolving.constraints.ConstraintCondition;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
+/**
+ * Recursively generates the type set for a expressions and potentially adds
+ * type constraints to the constraint system.
+ * 
+ * The type sets associated with fields, parameters, local variables and return
+ * values are looked up in the context.
+ */
 public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
 	private final MethodSymbol method;

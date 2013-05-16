@@ -18,6 +18,12 @@ import cd.semantic.ti.constraintSolving.TypeVariable;
 
 import com.google.common.base.Optional;
 
+/**
+ * Recursively generates the type constraints for an individual methods
+ * 
+ * The type sets associated with fields, parameters, local variables and return
+ * values are looked up in the context.
+ */
 public class MethodConstraintGenerator extends AstVisitor<Void, Void> {
 
 	private final MethodDecl methodDecl;

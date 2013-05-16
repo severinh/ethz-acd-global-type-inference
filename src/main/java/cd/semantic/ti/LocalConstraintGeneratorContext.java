@@ -6,6 +6,17 @@ import cd.ir.symbols.VariableSymbol;
 import cd.semantic.TypeSymbolTable;
 import cd.semantic.ti.constraintSolving.TypeSet;
 
+/**
+ * Context used for constraint generation in local type inference. The context
+ * is built for local type inference in a specific method.
+ * 
+ * Most importantly, it provides a static construction method
+ * {@code #of(TypeSymbolTable)} that initializes the context.
+ * 
+ * It implements the methods {@code #getVariableTypeSet(VariableSymbol)} and
+ * {@code #getReturnTypeSet(MethodSymbol)} such that the type sets for
+ * parameters, local variables and return values are constant.
+ */
 public final class LocalConstraintGeneratorContext extends
 		ConstraintGeneratorContext {
 
@@ -13,6 +24,13 @@ public final class LocalConstraintGeneratorContext extends
 		super(typeSymbols);
 	}
 
+	/**
+	 * Constructs a new constraint generation context containing all local
+	 * variable symbols of the method for which the context is constructed.
+	 * 
+	 * @param typeSymbols
+	 * @return the newly constructed context
+	 */
 	public static LocalConstraintGeneratorContext of(
 			TypeSymbolTable typeSymbols, MethodSymbol methodSymbol) {
 		LocalConstraintGeneratorContext result = new LocalConstraintGeneratorContext(
