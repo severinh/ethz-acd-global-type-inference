@@ -19,10 +19,10 @@ import com.google.common.base.Optional;
 
 public class StmtConstraintGenerator extends AstVisitor<Void, Void> {
 
-	private final ConstraintGenerationContext context;
+	private final StmtConstraintGeneratorContext context;
 	private final ExprConstraintGenerator exprConstraintGenerator;
 
-	public StmtConstraintGenerator(ConstraintGenerationContext context) {
+	public StmtConstraintGenerator(StmtConstraintGeneratorContext context) {
 		this.context = context;
 		this.exprConstraintGenerator = new ExprConstraintGenerator(context);
 	}

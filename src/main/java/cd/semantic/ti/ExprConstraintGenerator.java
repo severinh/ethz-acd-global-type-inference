@@ -44,9 +44,9 @@ import com.google.common.collect.ImmutableSet;
 
 public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
-	private final ConstraintGenerationContext context;
+	private final StmtConstraintGeneratorContext context;
 
-	public ExprConstraintGenerator(ConstraintGenerationContext context) {
+	public ExprConstraintGenerator(StmtConstraintGeneratorContext context) {
 		this.context = context;
 	}
 
@@ -76,11 +76,11 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 		VariableSymbol varSym = ast.getSymbol();
 		switch (varSym.getKind()) {
 		case FIELD:
-			TypeSymbol type = varSym.getType();
-			return getTypeSetFactory().makeDeclarableSubtypes(type);
+			return context.getFieldTypeSet(varSym);
 		case LOCAL:
-		case PARAM:
 			return context.getLocalVariableTypeSet(varSym);
+		case PARAM:
+			return context.getParameterTypeSet(varSym);
 		default:
 			throw new IllegalStateException("no such variable kind");
 		}
@@ -118,7 +118,7 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
 	@Override
 	public TypeSet thisRef(ThisRef ast) {
-		return getTypeSetFactory().make(context.getCurrentMethod().owner);
+		return getTypeSetFactory().make(context.getMethod().owner);
 	}
 
 	@Override

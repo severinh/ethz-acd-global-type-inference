@@ -15,8 +15,10 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 
 	@Override
 	public void inferTypes(MethodDecl mdecl, TypeSymbolTable typeSymbols) {
-		MethodConstraintGenerator generator = new MethodConstraintGenerator(
-				mdecl, typeSymbols);
+		MethodConstraintGeneratorContext context = new MethodConstraintGeneratorContextImpl(
+				typeSymbols);
+		LocalMethodConstraintGenerator generator = new LocalMethodConstraintGenerator(
+				mdecl, context);
 		generator.generate();
 		ConstraintSystem constraintSystem = generator.getConstraintSystem();
 		ConstraintSolver solver = new ConstraintSolver(constraintSystem);
@@ -27,7 +29,7 @@ public class LocalTypeInferenceWithConstraints extends LocalTypeInference {
 		} else {
 			for (VariableSymbol varSym : mdecl.sym.getLocals()) {
 				Set<TypeSymbol> possibleTypes = generator
-						.getPossibleTypes(varSym);
+						.getLocalVariableTypeSet(varSym).getTypes();
 				TypeSymbol type = null;
 				if (possibleTypes.isEmpty()) {
 					// Use the bottom type if there are no types in the type
