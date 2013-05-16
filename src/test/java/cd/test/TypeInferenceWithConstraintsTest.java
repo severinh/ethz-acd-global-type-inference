@@ -14,7 +14,7 @@ import cd.test.reference.RemoteReferenceDataFactory;
 
 import com.google.common.base.Optional;
 
-public class TypeInferenceWithConstraintsTest extends TestSamplePrograms {
+public abstract class TypeInferenceWithConstraintsTest extends TestSamplePrograms {
 
 	public TypeInferenceWithConstraintsTest(String testName,
 			@Nonnull File file, @Nonnull CompilerOptions options,
