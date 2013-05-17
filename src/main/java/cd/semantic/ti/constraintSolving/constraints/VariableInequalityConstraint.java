@@ -21,27 +21,19 @@ public class VariableInequalityConstraint extends TypeConstraint {
 		this.right = right;
 	}
 
-	public TypeVariable getLeft() {
+	@Override
+	public TypeVariable getSubTypeSet() {
 		return left;
 	}
 
-	public TypeVariable getRight() {
-		return right;
-	}
-
 	@Override
-	public boolean isSatisfied() {
-		return !isActive() || left.isSubsetOf(right);
+	public TypeVariable getSuperTypeSet() {
+		return right;
 	}
 
 	@Override
 	public <R, A> R accept(TypeConstraintVisitor<R, A> visitor, @Nullable A arg) {
 		return visitor.visit(this, arg);
-	}
-
-	@Override
-	public String toString() {
-		return buildString(left + " \u2286 " + right);
 	}
 
 }

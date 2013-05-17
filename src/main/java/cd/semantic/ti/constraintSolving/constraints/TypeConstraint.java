@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang.StringUtils;
 
+import cd.semantic.ti.constraintSolving.TypeSet;
+
 import com.google.common.collect.ImmutableList;
 
 public abstract class TypeConstraint {
@@ -32,21 +34,29 @@ public abstract class TypeConstraint {
 		return active;
 	}
 
-	public abstract boolean isSatisfied();
+	public boolean isSatisfied() {
+		return !isActive() || getSubTypeSet().isSubsetOf(getSuperTypeSet());
+	}
 
 	public abstract <R, A> R accept(TypeConstraintVisitor<R, A> visitor,
 			@Nullable A arg);
 
-	protected String buildString(String inequalityString) {
+	public abstract TypeSet getSubTypeSet();
+
+	public abstract TypeSet getSuperTypeSet();
+
+	@Override
+	public String toString() {
+		String inequality = getSubTypeSet() + " \u2286 " + getSuperTypeSet();
 		if (conditions.isEmpty()) {
-			return inequalityString;
+			return inequality;
 		} else {
 			List<String> conditionStrings = new ArrayList<>(conditions.size());
 			for (ConstraintCondition condition : conditions) {
 				conditionStrings.add("(" + condition + ")");
 			}
-			return StringUtils.join(conditionStrings, "\u2227") + "\u21D2("
-					+ inequalityString + ")";
+			return StringUtils.join(conditionStrings, " \u2227 ") + " \u21D2 ("
+					+ inequality + ")";
 		}
 	}
 

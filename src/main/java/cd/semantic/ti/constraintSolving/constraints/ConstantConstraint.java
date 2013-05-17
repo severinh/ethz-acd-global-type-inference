@@ -20,6 +20,16 @@ public class ConstantConstraint extends TypeConstraint {
 	}
 
 	@Override
+	public ConstantTypeSet getSubTypeSet() {
+		return subTypeSet;
+	}
+
+	@Override
+	public ConstantTypeSet getSuperTypeSet() {
+		return superTypeSet;
+	}
+
+	@Override
 	public boolean isSatisfied() {
 		return !isActive() || isSatisfiedIfActive;
 	}
@@ -27,11 +37,6 @@ public class ConstantConstraint extends TypeConstraint {
 	@Override
 	public <R, A> R accept(TypeConstraintVisitor<R, A> visitor, A arg) {
 		return visitor.visit(this, arg);
-	}
-
-	@Override
-	public String toString() {
-		return buildString(subTypeSet + " \u2286 " + superTypeSet);
 	}
 
 }

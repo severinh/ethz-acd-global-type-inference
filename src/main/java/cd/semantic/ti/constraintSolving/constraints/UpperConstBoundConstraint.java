@@ -31,18 +31,18 @@ public class UpperConstBoundConstraint extends TypeConstraint {
 	}
 
 	@Override
-	public boolean isSatisfied() {
-		return !isActive() || typeVariable.isSubsetOf(upperBound);
+	public TypeVariable getSubTypeSet() {
+		return typeVariable;
+	}
+
+	@Override
+	public ConstantTypeSet getSuperTypeSet() {
+		return upperBound;
 	}
 
 	@Override
 	public <R, A> R accept(TypeConstraintVisitor<R, A> visitor, A arg) {
 		return visitor.visit(this, arg);
-	}
-
-	@Override
-	public String toString() {
-		return buildString(typeVariable + " \u2286 " + upperBound);
 	}
 
 }

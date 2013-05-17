@@ -55,7 +55,7 @@ public class ConstraintSolver {
 
 		@Override
 		public Void visit(VariableInequalityConstraint constraint, Void arg) {
-			constraint.getRight().extend(constraint.getLeft());
+			constraint.getSuperTypeSet().extend(constraint.getSubTypeSet());
 			return null;
 		}
 
