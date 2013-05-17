@@ -31,7 +31,7 @@ public class ConstantConstraint extends TypeConstraint {
 
 	@Override
 	public String toString() {
-		return buildString(subTypeSet + "\u2286" + superTypeSet);
+		return buildString(subTypeSet + " \u2286 " + superTypeSet);
 	}
 
 }

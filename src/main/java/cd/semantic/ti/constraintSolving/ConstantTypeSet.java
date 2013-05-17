@@ -11,7 +11,7 @@ import cd.util.NonnullByDefault;
 import com.google.common.collect.ImmutableSet;
 
 @NonnullByDefault
-public class ConstantTypeSet implements TypeSet {
+public class ConstantTypeSet extends TypeSet {
 
 	private final ImmutableSet<TypeSymbol> types;
 
@@ -49,11 +49,7 @@ public class ConstantTypeSet implements TypeSet {
 
 	@Override
 	public String toString() {
-		if (types.isEmpty()) {
-			return "\u2205";
-		} else {
-			return "{" + StringUtils.join(types, ",") + "}";
-		}
+		return getTypeSetString();
 	}
 
 	@Override

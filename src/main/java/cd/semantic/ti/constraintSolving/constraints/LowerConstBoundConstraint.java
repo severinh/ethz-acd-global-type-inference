@@ -42,7 +42,7 @@ public class LowerConstBoundConstraint extends TypeConstraint {
 
 	@Override
 	public String toString() {
-		return buildString(lowerBound + "\u2286" + typeVariable);
+		return buildString(lowerBound + " \u2286 " + typeVariable);
 	}
 
 }

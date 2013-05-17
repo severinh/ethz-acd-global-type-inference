@@ -41,7 +41,7 @@ public class VariableInequalityConstraint extends TypeConstraint {
 
 	@Override
 	public String toString() {
-		return buildString(left + "\u2286" + right);
+		return buildString(left + " \u2286 " + right);
 	}
 
 }
