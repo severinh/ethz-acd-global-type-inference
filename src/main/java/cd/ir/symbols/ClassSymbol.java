@@ -5,15 +5,18 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
+import com.google.common.base.Optional;
+
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.semantic.SymbolTable;
-
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class ClassSymbol extends TypeSymbol {
 
-	private final ClassSymbol superClass;
+	private final Optional<ClassSymbol> superClass;
 	private final VariableSymbol thisSymbol;
 
 	private final SymbolTable<VariableSymbol> scope;
@@ -24,12 +27,12 @@ public class ClassSymbol extends TypeSymbol {
 	public int totalFields = -1;
 	public int sizeof = -1;
 
-	public ClassSymbol(String name, ClassSymbol superClass) {
+	private ClassSymbol(String name, Optional<ClassSymbol> superClass) {
 		super(name);
 
 		SymbolTable<VariableSymbol> superScope = null;
-		if (superClass != null) {
-			superScope = superClass.getScope();
+		if (superClass.isPresent()) {
+			superScope = superClass.get().getScope();
 		}
 
 		this.superClass = superClass;
@@ -39,11 +42,21 @@ public class ClassSymbol extends TypeSymbol {
 		this.methods = new LinkedHashMap<>();
 	}
 
-	public ClassSymbol(String name) {
-		this(name, null);
+	// Third-party library is missing non-null annotations
+	@SuppressWarnings("null")
+	public ClassSymbol(String name, ClassSymbol superClass) {
+		this(name, Optional.of(superClass));
 	}
 
-	public ClassSymbol getSuperClass() {
+	public static ClassSymbol makeObjectClass() {
+		// Third-party library is missing non-null annotations
+		@SuppressWarnings("null")
+		ClassSymbol result = new ClassSymbol("Object",
+				Optional.<ClassSymbol> absent());
+		return result;
+	}
+
+	public Optional<ClassSymbol> getSuperClass() {
 		return superClass;
 	}
 
@@ -60,18 +73,20 @@ public class ClassSymbol extends TypeSymbol {
 		return thisSymbol;
 	}
 
+	@Nullable
 	public VariableSymbol getField(String name) {
 		VariableSymbol fieldSymbol = fields.get(name);
-		if (fieldSymbol == null && superClass != null) {
-			return superClass.getField(name);
+		if (fieldSymbol == null && superClass.isPresent()) {
+			return superClass.get().getField(name);
 		}
 		return fieldSymbol;
 	}
 
+	@Nullable
 	public MethodSymbol getMethod(String name) {
 		MethodSymbol methodSymbol = methods.get(name);
-		if (methodSymbol == null && superClass != null) {
-			return superClass.getMethod(name);
+		if (methodSymbol == null && superClass.isPresent()) {
+			return superClass.get().getMethod(name);
 		}
 		return methodSymbol;
 	}
@@ -81,6 +96,8 @@ public class ClassSymbol extends TypeSymbol {
 	 * 
 	 * @return the list of fields, not including the ones of super-classes
 	 */
+	// Third-party library is missing non-null annotations
+	@SuppressWarnings("null")
 	public Collection<VariableSymbol> getDeclaredFields() {
 		return Collections.unmodifiableCollection(fields.values());
 	}
@@ -90,6 +107,8 @@ public class ClassSymbol extends TypeSymbol {
 	 * 
 	 * @return the list of methods, not including the ones of super-classes
 	 */
+	// Third-party library is missing non-null annotations
+	@SuppressWarnings("null")
 	public Collection<MethodSymbol> getDeclaredMethods() {
 		return Collections.unmodifiableCollection(methods.values());
 	}
@@ -103,7 +122,7 @@ public class ClassSymbol extends TypeSymbol {
 	 *             if there is already a method with the same name in this class
 	 */
 	public void addMethod(MethodSymbol method) {
-		checkArgument(method.owner.equals(this));
+		checkArgument(method.getOwner().equals(this));
 
 		if (methods.containsKey(method.name)) {
 			throw new SemanticFailure(Cause.DOUBLE_DECLARATION,

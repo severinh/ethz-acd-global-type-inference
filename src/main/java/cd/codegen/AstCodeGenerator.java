@@ -206,10 +206,11 @@ public class AstCodeGenerator {
 		newMain.setType(context.getMainType());
 		MethodCall callMain = new MethodCall(newMain, "main",
 				Collections.<Expr> emptyList());
-		
+
 		ClassSymbol mainType = context.getMainType();
 		if (mainType == null) {
-			throw new IllegalStateException("the main type must be set before code generation");
+			throw new IllegalStateException(
+					"the main type must be set before code generation");
 		} else {
 			callMain.sym = mainType.getMethod("main");
 		}
@@ -231,18 +232,17 @@ public class AstCodeGenerator {
 	 * {@code sym}.
 	 */
 	private int computeVtableOffsets(ClassSymbol sym) {
-
-		if (sym == null)
-			return 0;
-
 		if (sym.totalMethods != -1)
 			return sym.totalMethods;
 
-		int index = computeVtableOffsets(sym.getSuperClass());
+		int index = 0;
+		if (sym.getSuperClass().isPresent()) {
+			index = computeVtableOffsets(sym.getSuperClass().get());
+		}
 		for (MethodSymbol ms : sym.getDeclaredMethods()) {
 			assert ms.vtableIndex == -1;
-			if (ms.overrides != null)
-				ms.vtableIndex = ms.overrides.vtableIndex;
+			if (ms.getOverriddenMethod().isPresent())
+				ms.vtableIndex = ms.getOverriddenMethod().get().vtableIndex;
 			else
 				ms.vtableIndex = index++;
 		}
@@ -254,13 +254,13 @@ public class AstCodeGenerator {
 	 * Computes the offset for each field.
 	 */
 	private int computeFieldOffsets(ClassSymbol sym) {
-		if (sym == null)
-			return 0;
-
 		if (sym.totalFields != -1)
 			return sym.totalFields;
 
-		int index = computeFieldOffsets(sym.getSuperClass());
+		int index = 0;
+		if (sym.getSuperClass().isPresent()) {
+			index = computeFieldOffsets(sym.getSuperClass().get());
+		}
 		for (VariableSymbol fs : sym.getDeclaredFields()) {
 			assert fs.offset == -1;
 			// compute offset in bytes; note that 0 is the vtable
@@ -273,8 +273,8 @@ public class AstCodeGenerator {
 	}
 
 	private void collectVtable(MethodSymbol[] vtable, ClassSymbol sym) {
-		if (sym.getSuperClass() != null)
-			collectVtable(vtable, sym.getSuperClass());
+		if (sym.getSuperClass().isPresent())
+			collectVtable(vtable, sym.getSuperClass().get());
 		for (MethodSymbol ms : sym.getDeclaredMethods())
 			vtable[ms.vtableIndex] = ms;
 	}
@@ -289,8 +289,8 @@ public class AstCodeGenerator {
 
 			// Emit vtable for this class:
 			emitLabel(vtable(cs));
-			if (cs.getSuperClass() != null)
-				emitConstantData(vtable(cs.getSuperClass()));
+			if (cs.getSuperClass().isPresent())
+				emitConstantData(vtable(cs.getSuperClass().get()));
 			else
 				emitConstantData("0");
 			for (int i = 0; i < cs.totalMethods; i++)
@@ -1266,14 +1266,14 @@ public class AstCodeGenerator {
 	}
 
 	protected String mthdlbl(MethodSymbol msym) {
-		return msym.owner.name + "_" + msym.name;
+		return msym.getOwner().name + "_" + msym.name;
 	}
 
 	protected void emitMethodPrefix(MethodDecl ast) {
 		// Emit the label for the method:
 		emit(Config.TEXT_SECTION);
-		emitCommentSection(String.format("Method %s.%s", ast.sym.owner.name,
-				ast.name));
+		emitCommentSection(String.format("Method %s.%s",
+				ast.sym.getOwner().name, ast.name));
 		emit(".globl " + mthdlbl(ast.sym));
 		emitLabel(mthdlbl(ast.sym));
 

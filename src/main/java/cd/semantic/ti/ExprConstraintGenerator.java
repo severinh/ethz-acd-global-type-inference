@@ -118,7 +118,7 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
 	@Override
 	public TypeSet thisRef(ThisRef ast) {
-		return getTypeSetFactory().make(method.owner);
+		return getTypeSetFactory().make(method.getOwner());
 	}
 
 	@Override
@@ -261,7 +261,7 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
 		for (MethodSymbol msym : methodSymbols) {
 			ImmutableSet<ClassSymbol> msymClassSubtypes = getTypeSymbols()
-					.getClassSymbolSubtypes(msym.owner);
+					.getClassSymbolSubtypes(msym.getOwner());
 			possibleReceiverTypes.addAll(msymClassSubtypes);
 
 			for (ClassSymbol msymClassSubtype : msymClassSubtypes) {

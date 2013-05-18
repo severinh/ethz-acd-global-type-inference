@@ -42,7 +42,7 @@ public final class MethodSymbolCache {
 		for (ClassSymbol classSymbol : typeSymbols.getClassSymbols()) {
 			for (MethodSymbol methodSymbol : classSymbol.getDeclaredMethods()) {
 				// Ignore overriding methods
-				if (methodSymbol.overrides == null) {
+				if (!methodSymbol.getOverriddenMethod().isPresent()) {
 					String name = methodSymbol.name;
 					int parameterCount = methodSymbol.getParameters().size();
 					Key key = new Key(name, parameterCount);

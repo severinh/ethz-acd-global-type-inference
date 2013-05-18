@@ -49,7 +49,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		floatType = new PrimitiveTypeSymbol("float");
 		booleanType = new PrimitiveTypeSymbol("boolean");
 		voidType = new PrimitiveTypeSymbol("void");
-		objectType = new ClassSymbol("Object");
+		objectType = ClassSymbol.makeObjectClass();
 
 		add(intType);
 		add(booleanType);
@@ -230,8 +230,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	 * @return the super type of the given type, or <code>null</code> if there
 	 *         is none
 	 * 
-	 * @todo This method was copied from {@link TypeChecker}. Eventually, it
-	 *       should be turned into a method of {@link TypeSymbol}.
+	 * @todo incomplete and it should better use {@link Optional}.
 	 */
 	public TypeSymbol getSuperType(TypeSymbol sym) {
 		if (sym instanceof PrimitiveTypeSymbol) {
@@ -240,7 +239,11 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		if (sym instanceof ArrayTypeSymbol) {
 			return getObjectType();
 		}
-		return ((ClassSymbol) sym).getSuperClass();
+		if (sym instanceof ClassSymbol) {
+			ClassSymbol classSym = (ClassSymbol) sym;
+			return classSym.getSuperClass().orNull();
+		}
+		return null;
 	}
 
 	/**

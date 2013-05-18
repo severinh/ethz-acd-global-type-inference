@@ -46,8 +46,8 @@ public class MethodConstraintGenerator extends AstVisitor<Void, Void> {
 		// parameter and return type variables. In the case of local type
 		// inference, the resulting constraints are trivially satisfied.
 		MethodSymbol method = methodDecl.sym;
-		if (method.overrides != null) {
-			MethodSymbol overriddenMethod = method.overrides;
+		if (method.getOverriddenMethod().isPresent()) {
+			MethodSymbol overriddenMethod = method.getOverriddenMethod().get();
 			for (Pair<VariableSymbol> pair : Pair.zip(method.getParameters(),
 					overriddenMethod.getParameters())) {
 				TypeSet typeSet = context.getVariableTypeSet(pair.a);

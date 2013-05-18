@@ -4,7 +4,6 @@ import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.ast.ClassDecl;
 import cd.ir.ast.MethodDecl;
-import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.ir.AstVisitor;
@@ -20,11 +19,8 @@ import cd.util.Pair;
  */
 public class TypedInheritanceChecker extends AstVisitor<Void, Void> {
 
-	private ClassSymbol classSym;
-
 	@Override
 	public Void classDecl(ClassDecl ast, Void arg) {
-		classSym = ast.sym;
 		return this.visitChildren(ast, null);
 	}
 
@@ -33,8 +29,8 @@ public class TypedInheritanceChecker extends AstVisitor<Void, Void> {
 		// check that methods overridden from a parent class agree
 		// on number/type of parameters
 		MethodSymbol sym = ast.sym;
-		MethodSymbol superSym = classSym.getSuperClass().getMethod(ast.name);
-		if (superSym != null) {
+		if (sym.getOverriddenMethod().isPresent()) {
+			MethodSymbol superSym = sym.getOverriddenMethod().get();
 			for (Pair<VariableSymbol> pair : Pair.zip(sym.getParameters(),
 					superSym.getParameters()))
 				if (pair.a.getType() != pair.b.getType())

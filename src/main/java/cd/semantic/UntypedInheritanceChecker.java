@@ -4,7 +4,6 @@ import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.ast.ClassDecl;
 import cd.ir.ast.MethodDecl;
-import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.AstVisitor;
 
@@ -21,27 +20,23 @@ import cd.ir.AstVisitor;
  */
 public class UntypedInheritanceChecker extends AstVisitor<Void, Void> {
 
-	private ClassSymbol classSym;
-
 	public void check(ClassDecl classDecl) {
 		visit(classDecl, null);
 	}
 
 	@Override
 	public Void classDecl(ClassDecl ast, Void arg) {
-		classSym = ast.sym;
 		visitChildren(ast, null);
 		return null;
 	}
 
 	@Override
 	public Void methodDecl(MethodDecl ast, Void arg) {
-		// check that methods overridden from a parent class agree
+		// Check that methods overridden from a parent class agree
 		// on number/type of parameters
 		MethodSymbol sym = ast.sym;
-		MethodSymbol superSym = classSym.getSuperClass().getMethod(ast.name);
-		sym.overrides = superSym;
-		if (superSym != null) {
+		if (sym.getOverriddenMethod().isPresent()) {
+			MethodSymbol superSym = sym.getOverriddenMethod().get();
 			if (superSym.getParameters().size() != sym.getParameters().size()) {
 				throw new SemanticFailure(Cause.INVALID_OVERRIDE,
 						"Overridden method %s has %d parameters, "
