@@ -41,7 +41,7 @@ public class MethodSymbol extends Symbol {
 		Optional<MethodSymbol> overrides = Optional.absent();
 		if (owner.getSuperClass().isPresent()) {
 			ClassSymbol superClass = owner.getSuperClass().get();
-			MethodSymbol nullOverrides = superClass.getMethod(name);
+			MethodSymbol nullOverrides = superClass.tryGetMethod(name);
 			if (nullOverrides != null) {
 				overrides = Optional.of(nullOverrides);
 			}

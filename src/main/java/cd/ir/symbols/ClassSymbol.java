@@ -84,7 +84,7 @@ public class ClassSymbol extends TypeSymbol {
 	 *             if there is no field of that name in any superclass
 	 */
 	public VariableSymbol getField(String name) {
-		VariableSymbol fieldSymbol = getFieldImpl(name);
+		VariableSymbol fieldSymbol = tryGetField(name);
 		if (fieldSymbol == null) {
 			throw new SemanticFailure(Cause.NO_SUCH_FIELD,
 					"Type %s has no field %s", this, name);
@@ -93,19 +93,38 @@ public class ClassSymbol extends TypeSymbol {
 	}
 
 	@Nullable
-	private VariableSymbol getFieldImpl(String name) {
+	VariableSymbol tryGetField(String name) {
 		VariableSymbol fieldSymbol = fields.get(name);
 		if (fieldSymbol == null && superClass.isPresent()) {
-			return superClass.get().getFieldImpl(name);
+			return superClass.get().tryGetField(name);
 		}
 		return fieldSymbol;
 	}
 
-	@Nullable
+	/**
+	 * Returns the method symbol for the method with the given name in this
+	 * class or any superclass.
+	 * 
+	 * @param name
+	 *            the name of the method
+	 * @return the method symbol
+	 * @throws SemanticFailure
+	 *             if there is no method of that name in any superclass
+	 */
 	public MethodSymbol getMethod(String name) {
+		MethodSymbol methodSymbol = tryGetMethod(name);
+		if (methodSymbol == null) {
+			throw new SemanticFailure(Cause.NO_SUCH_FIELD,
+					"Type %s has no method %s", this, name);
+		}
+		return methodSymbol;
+	}
+
+	@Nullable
+	MethodSymbol tryGetMethod(String name) {
 		MethodSymbol methodSymbol = methods.get(name);
 		if (methodSymbol == null && superClass.isPresent()) {
-			return superClass.get().getMethod(name);
+			return superClass.get().tryGetMethod(name);
 		}
 		return methodSymbol;
 	}

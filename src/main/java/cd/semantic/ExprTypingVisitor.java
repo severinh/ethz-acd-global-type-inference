@@ -290,11 +290,6 @@ public class ExprTypingVisitor extends
 		ClassSymbol rcvrType = TypeChecker.asClass(type(methodCall.receiver(),
 				scope));
 		MethodSymbol mthd = rcvrType.getMethod(methodCall.methodName);
-		if (mthd == null) {
-			throw new SemanticFailure(Cause.NO_SUCH_METHOD,
-					"Class %s has no method %s()", rcvrType.name,
-					methodCall.methodName);
-		}
 
 		methodCall.sym = mthd;
 

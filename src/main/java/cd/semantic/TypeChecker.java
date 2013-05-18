@@ -113,10 +113,6 @@ public class TypeChecker {
 
 			ClassSymbol rcvrType = asClass(type(ast.receiver(), locals));
 			MethodSymbol mthd = rcvrType.getMethod(ast.methodName);
-			if (mthd == null)
-				throw new SemanticFailure(Cause.NO_SUCH_METHOD,
-						"Class %s has no method %s()", rcvrType.name,
-						ast.methodName);
 
 			ast.sym = mthd;
 
