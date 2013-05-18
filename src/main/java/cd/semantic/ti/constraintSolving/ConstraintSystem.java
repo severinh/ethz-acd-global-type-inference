@@ -2,15 +2,10 @@ package cd.semantic.ti.constraintSolving;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.apache.commons.lang.StringUtils;
-
-import cd.ir.symbols.TypeSymbol;
 import cd.semantic.ti.constraintSolving.constraints.ConstraintCondition;
 import cd.semantic.ti.constraintSolving.constraints.TypeConstraint;
 import static com.google.common.base.Preconditions.checkNotNull;
