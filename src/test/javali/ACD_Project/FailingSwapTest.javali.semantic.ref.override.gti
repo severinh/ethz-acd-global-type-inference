@@ -1,0 +1,2 @@
+TYPE_INFERENCE_ERROR
+// the type of field Foo.i cannot be determined since swap could work with any type.
