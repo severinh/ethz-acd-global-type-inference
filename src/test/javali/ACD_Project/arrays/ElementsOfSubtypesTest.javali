@@ -1,0 +1,21 @@
+// Assert that it is possible to store an object in an array
+// that is a subtype of the array's element type
+
+class A {
+}
+
+class B extends A {
+	void foo() {
+	}
+}
+
+class Main {
+	void main() {
+		A[] array;
+		B b;
+		b = new B();
+		b.foo();
+		array = new A[1];
+		array[0] = b;
+	}
+}
