@@ -22,12 +22,12 @@ public abstract class TypeInferenceWithConstraints implements TypeInference {
 			// set. Since the constraint system has been solved
 			// successfully, this usually (always?) means that the
 			// variable symbol is not used at all.
-			
-			// TODO: The above is no true. if e.g. a field of an object is only assigned to 
-			// 	     to the same field of another object of the same class we do not have any
-			//		 constraints and therefore get bottom. This is not ok, since it's relevant for
-			//	   	 the code generator!
-			
+
+			// TODO: The above is no true. if e.g. a field of an object is only
+			// assigned to to the same field of another object of the same class
+			// we do not have any constraints and therefore get bottom. This is
+			// not ok, since it's relevant for the code generator!
+
 			type = typeSymbols.getBottomType();
 		} else if (possibleTypes.size() == 1) {
 			type = possibleTypes.iterator().next();
@@ -37,7 +37,9 @@ public abstract class TypeInferenceWithConstraints implements TypeInference {
 			TypeSymbol[] typesArray = possibleTypes
 					.toArray(new TypeSymbol[possibleTypes.size()]);
 			TypeSymbol lca = typeSymbols.getLCA(typesArray);
-			if (lca != typeSymbols.getTopType()) {
+			// The LCA must itself be among the possible types. Otherwise, the
+			// type may not be specific enough to satisfy all constraints.
+			if (possibleTypes.contains(lca)) {
 				type = lca;
 			} else {
 				throw new SemanticFailure(Cause.TYPE_INFERENCE_ERROR,
