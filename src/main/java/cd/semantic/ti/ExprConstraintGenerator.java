@@ -176,8 +176,10 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 		for (ArrayTypeSymbol arrayType : getTypeSymbols().getArrayTypeSymbols()) {
 			ConstraintCondition condition = new ConstraintCondition(arrayType,
 					arrayExprTypeSet);
-			ConstantTypeSet arrayElementTypeSet = getTypeSetFactory().make(
-					arrayType.elementType);
+			// Also allow objects in the array whose type is a subtype of the
+			// declared array element type
+			ConstantTypeSet arrayElementTypeSet = getTypeSetFactory()
+					.makeDeclarableSubtypes(arrayType.elementType);
 			getSystem().addEquality(resultVar, arrayElementTypeSet, condition);
 		}
 		return resultVar;
