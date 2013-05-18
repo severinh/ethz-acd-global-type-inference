@@ -276,7 +276,6 @@ public class ExprTypingVisitorTest {
 	@Test
 	public void testField() {
 		assertIntType(new Field(makeXVar(), xClassField.name));
-		assertBottomType(new Field(makeBottomVar(), "something"));
 	}
 
 	@Test(expected = SemanticFailure.class)
