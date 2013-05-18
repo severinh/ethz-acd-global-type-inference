@@ -34,7 +34,6 @@ import cd.ir.symbols.VariableSymbol;
 
 /**
  * Tests {@link ExprTypingVisitor}.
- * 
  */
 public class ExprTypingVisitorTest {
 
