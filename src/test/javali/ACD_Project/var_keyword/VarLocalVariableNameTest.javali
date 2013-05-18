@@ -1,0 +1,7 @@
+// Assert that the keyword 'var' cannot be used as a local variable name
+
+class Main {
+	void main() {
+		int var;
+	}
+}
