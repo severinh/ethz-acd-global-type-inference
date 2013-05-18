@@ -73,11 +73,30 @@ public class ClassSymbol extends TypeSymbol {
 		return thisSymbol;
 	}
 
-	@Nullable
+	/**
+	 * Returns the variable symbol for the field with the given name in this
+	 * class or any superclass.
+	 * 
+	 * @param name
+	 *            the name of the field
+	 * @return the variable symbol representing the field
+	 * @throws SemanticFailure
+	 *             if there is no field of that name in any superclass
+	 */
 	public VariableSymbol getField(String name) {
+		VariableSymbol fieldSymbol = getFieldImpl(name);
+		if (fieldSymbol == null) {
+			throw new SemanticFailure(Cause.NO_SUCH_FIELD,
+					"Type %s has no field %s", this, name);
+		}
+		return fieldSymbol;
+	}
+
+	@Nullable
+	private VariableSymbol getFieldImpl(String name) {
 		VariableSymbol fieldSymbol = fields.get(name);
 		if (fieldSymbol == null && superClass.isPresent()) {
-			return superClass.get().getField(name);
+			return superClass.get().getFieldImpl(name);
 		}
 		return fieldSymbol;
 	}

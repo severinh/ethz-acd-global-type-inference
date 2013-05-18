@@ -135,8 +135,8 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 	@Override
 	public TypeSet field(Field ast) {
 		String fieldName = ast.fieldName;
-		Expr receiver = ast.arg();
-		TypeSet receiverTypeSet = visit(receiver);
+		VariableSymbol fieldSymbol = ast.sym;
+		TypeSet receiverTypeSet = visit(ast.arg());
 
 		Collection<ClassSymbol> declaringClassSymbols = context
 				.getClassesDeclaringField(fieldName);
@@ -147,7 +147,6 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 		for (ClassSymbol classSym : declaringClassSymbols) {
 			possibleClassSymbols.addAll(getTypeSymbols()
 					.getClassSymbolSubtypes(classSym));
-			VariableSymbol fieldSymbol = classSym.getField(fieldName);
 			TypeSet fieldTypeSet = context.getVariableTypeSet(fieldSymbol);
 			ConstraintCondition condition = new ConstraintCondition(classSym,
 					receiverTypeSet);
