@@ -14,7 +14,7 @@ class Main {
 		A[] array;
 		B b;
 		b = new B();
-		b.foo();
+		b.foo(); // Force the static type of variable b to be 'B'
 		array = new A[1];
 		array[0] = b;
 	}
