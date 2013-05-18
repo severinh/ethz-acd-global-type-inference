@@ -48,7 +48,7 @@ public final class GlobalConstraintGeneratorContext extends
 
 				for (VariableSymbol variable : methodSymbol
 						.getLocalsAndParameters()) {
-					String desc = prefix + variable.getName();
+					String desc = methodPrefix + variable.getName();
 					result.addVariableTypeSet(variable, desc);
 				}
 
