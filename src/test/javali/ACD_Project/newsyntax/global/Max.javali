@@ -1,0 +1,16 @@
+class Main {
+  max(x,y) {
+    if (x < y) {
+      return y;
+    } else {
+      return x;
+    }
+  }
+  
+  void main() {
+    var a,b;
+    a = 5;
+    b = 2;
+    write(max(a,b));
+  }
+}
