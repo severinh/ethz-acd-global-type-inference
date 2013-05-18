@@ -19,6 +19,12 @@ public abstract class TypeInferenceWithConstraints implements TypeInference {
 			// set. Since the constraint system has been solved
 			// successfully, this usually (always?) means that the
 			// variable symbol is not used at all.
+			
+			// TODO: The above is no true. if e.g. a field of an object is only assigned to 
+			// 	     to the same field of another object of the same class we do not have any
+			//		 constraints and therefore get bottom. This is not ok, since it's relevant for
+			//	   	 the code generator!
+			
 			type = typeSymbols.getBottomType();
 		} else if (possibleTypes.size() == 1) {
 			type = possibleTypes.iterator().next();
