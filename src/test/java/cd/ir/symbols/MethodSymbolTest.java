@@ -1,6 +1,5 @@
 package cd.ir.symbols;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import cd.exceptions.SemanticFailure;

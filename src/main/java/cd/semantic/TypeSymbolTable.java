@@ -32,14 +32,22 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	/**
 	 * Symbols for the built-in primitive types.
 	 */
+	@Nonnull
 	private final PrimitiveTypeSymbol intType;
+
+	@Nonnull
 	private final PrimitiveTypeSymbol floatType;
+
+	@Nonnull
 	private final PrimitiveTypeSymbol voidType;
+
+	@Nonnull
 	private final PrimitiveTypeSymbol booleanType;
 
 	/**
-	 * Symbols for the built-in Object and null types.
+	 * Symbols for the built-in Object type.
 	 */
+	@Nonnull
 	private final ClassSymbol objectType;
 
 	public TypeSymbolTable() {
@@ -61,34 +69,42 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		add(BottomTypeSymbol.INSTANCE);
 	}
 
+	@Nonnull
 	public PrimitiveTypeSymbol getIntType() {
 		return intType;
 	}
 
+	@Nonnull
 	public PrimitiveTypeSymbol getFloatType() {
 		return floatType;
 	}
 
+	@Nonnull
 	public PrimitiveTypeSymbol getVoidType() {
 		return voidType;
 	}
 
+	@Nonnull
 	public PrimitiveTypeSymbol getBooleanType() {
 		return booleanType;
 	}
 
+	@Nonnull
 	public ClassSymbol getObjectType() {
 		return objectType;
 	}
 
+	@Nonnull
 	public TypeSymbol getNullType() {
 		return NullTypeSymbol.INSTANCE;
 	}
 
+	@Nonnull
 	public TypeSymbol getTopType() {
 		return TopTypeSymbol.INSTANCE;
 	}
 
+	@Nonnull
 	public TypeSymbol getBottomType() {
 		return BottomTypeSymbol.INSTANCE;
 	}
