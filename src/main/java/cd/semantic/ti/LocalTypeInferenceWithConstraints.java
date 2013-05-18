@@ -11,7 +11,6 @@ import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.semantic.TypeSymbolTable;
 import cd.semantic.ti.constraintSolving.ConstraintSolver;
-import cd.semantic.ti.constraintSolving.ConstraintSystem;
 import cd.semantic.ti.constraintSolving.TypeSet;
 
 public class LocalTypeInferenceWithConstraints extends
@@ -28,20 +27,20 @@ public class LocalTypeInferenceWithConstraints extends
 	}
 
 	public void inferTypes(MethodDecl mdecl, TypeSymbolTable typeSymbols) {
-		MethodConstraintGeneratorContext context = new MethodConstraintGeneratorContextImpl(
-				typeSymbols);
-		LocalMethodConstraintGenerator generator = new LocalMethodConstraintGenerator(
+		LocalConstraintGeneratorContext context = LocalConstraintGeneratorContext
+				.of(typeSymbols, mdecl.sym);
+		MethodConstraintGenerator generator = new MethodConstraintGenerator(
 				mdecl, context);
 		generator.generate();
-		ConstraintSystem constraintSystem = generator.getConstraintSystem();
-		ConstraintSolver solver = new ConstraintSolver(constraintSystem);
+		ConstraintSolver solver = new ConstraintSolver(
+				context.getConstraintSystem());
 		solver.solve();
 		if (!solver.hasSolution()) {
 			throw new SemanticFailure(Cause.TYPE_INFERENCE_ERROR,
 					"Type inference was unable to resolve type constraints");
 		} else {
 			for (VariableSymbol varSym : mdecl.sym.getLocals()) {
-				TypeSet typeSet = generator.getLocalVariableTypeSet(varSym);
+				TypeSet typeSet = context.getVariableTypeSet(varSym);
 				TypeSymbol type = makeStaticType(typeSymbols, typeSet,
 						varSym.name);
 				varSym.setType(type);
@@ -49,5 +48,4 @@ public class LocalTypeInferenceWithConstraints extends
 		}
 
 	}
-
 }

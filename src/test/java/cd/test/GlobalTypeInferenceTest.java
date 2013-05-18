@@ -25,7 +25,7 @@ import cd.test.reference.ReferenceDataFactory;
  * global type inference.
  */
 @RunWith(Parameterized.class)
-public class GlobalTypeInferenceTest extends TestSamplePrograms {
+public class GlobalTypeInferenceTest extends TypeInferenceWithConstraintsTest {
 
 	@Parameters(name = "{index}: {0}")
 	public static Collection<Object[]> getParameters() {
@@ -36,7 +36,7 @@ public class GlobalTypeInferenceTest extends TestSamplePrograms {
 		ImmutableList<String> suffixOrder = ImmutableList.of("override.gti",
 				"override");
 		ReferenceDataFactory factory = new LocalOverridingReferenceDataFactory(
-				suffixOrder);
+				suffixOrder, new CustomRemoteReferenceDataFactory());
 		return buildParameters(testFileProvider, options, factory);
 	}
 

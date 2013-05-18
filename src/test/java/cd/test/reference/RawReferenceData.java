@@ -34,7 +34,12 @@ public abstract class RawReferenceData implements ReferenceData {
 		// If there are multiple lines, only use the first one to determine
 		// the semantic failure cause
 		String[] lines = StringUtils.split(getSemanticFailureString(), "\n");
-		String causeString = lines[0];
+		String causeString;
+		if (lines.length > 0) {
+			causeString = lines[0].trim();
+		} else {
+			causeString = "";
+		}
 		Optional<Cause> cause = Enums.getIfPresent(Cause.class, causeString);
 		if (cause.isPresent()) {
 			return Optional.of(new SemanticFailure(cause.get()));

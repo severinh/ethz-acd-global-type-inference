@@ -2,15 +2,10 @@ package cd.semantic.ti.constraintSolving;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.apache.commons.lang.StringUtils;
-
-import cd.ir.symbols.TypeSymbol;
 import cd.semantic.ti.constraintSolving.constraints.ConstraintCondition;
 import cd.semantic.ti.constraintSolving.constraints.TypeConstraint;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -82,26 +77,22 @@ public class ConstraintSystem {
 
 	@Override
 	public String toString() {
-		List<String> typeVarContents = new LinkedList<>();
+		StringBuilder builder = new StringBuilder();
+
+		builder.append("Type variables:");
 		for (TypeVariable typeVar : typeVariables) {
-			String content;
-			Set<TypeSymbol> typeVarTypes = typeVar.getTypes();
-			if (typeVarTypes.isEmpty()) {
-				content = "\u2205";
-			} else {
-				content = "{" + StringUtils.join(typeVarTypes, ",") + "}";
-			}
-			typeVarContents.add(typeVar + " = " + content);
+			builder.append("\n\t");
+			builder.append(typeVar);
+			builder.append(" = ");
+			builder.append(typeVar.getTypeSetString());
 		}
 
-		StringBuilder builder = new StringBuilder();
-		builder.append("Type variables: \n");
-		builder.append(StringUtils.join(typeVarContents, ", "));
-		builder.append("\n");
-		builder.append("Type constraints: \n");
-		builder.append(typeConstraints.toString());
-		builder.append("\n");
+		builder.append("\n\nType constraints:");
+		for (TypeConstraint typeConstraint : typeConstraints) {
+			builder.append("\n\t");
+			builder.append(typeConstraint);
+		}
+
 		return builder.toString();
 	}
-
 }

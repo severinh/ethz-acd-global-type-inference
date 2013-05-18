@@ -8,6 +8,9 @@ import cd.ir.symbols.TypeSymbol;
 import cd.semantic.TypeSymbolTable;
 import cd.semantic.ti.constraintSolving.TypeSet;
 
+/**
+ * Base class for type inference implementations based on constraint solving.
+ */
 public abstract class TypeInferenceWithConstraints implements TypeInference {
 
 	public TypeSymbol makeStaticType(TypeSymbolTable typeSymbols,

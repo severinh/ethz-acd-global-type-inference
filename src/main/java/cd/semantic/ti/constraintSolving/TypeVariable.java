@@ -13,7 +13,8 @@ import com.google.common.collect.ImmutableSet;
  * manipulated when solving.
  */
 @NonnullByDefault
-public class TypeVariable implements TypeSet {
+public class TypeVariable extends TypeSet {
+	
 	private final Set<TypeSymbol> types;
 	private final String description;
 

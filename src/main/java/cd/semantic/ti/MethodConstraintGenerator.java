@@ -1,65 +1,151 @@
 package cd.semantic.ti;
 
-import java.util.Collection;
+import cd.ir.AstVisitor;
+import cd.ir.ast.Assign;
+import cd.ir.ast.BuiltInWrite;
+import cd.ir.ast.BuiltInWriteFloat;
+import cd.ir.ast.Expr;
+import cd.ir.ast.IfElse;
+import cd.ir.ast.MethodCall;
 import cd.ir.ast.MethodDecl;
-import cd.ir.symbols.ClassSymbol;
+import cd.ir.ast.ReturnStmt;
+import cd.ir.ast.WhileLoop;
 import cd.ir.symbols.MethodSymbol;
-import cd.semantic.TypeSymbolTable;
+import cd.ir.symbols.VariableSymbol;
+import cd.semantic.ti.constraintSolving.ConstantTypeSet;
 import cd.semantic.ti.constraintSolving.ConstantTypeSetFactory;
 import cd.semantic.ti.constraintSolving.ConstraintSystem;
+import cd.semantic.ti.constraintSolving.TypeSet;
+import cd.semantic.ti.constraintSolving.TypeVariable;
+import cd.util.Pair;
 
-public abstract class MethodConstraintGenerator implements
-		StmtConstraintGeneratorContext {
+import com.google.common.base.Optional;
+
+/**
+ * Recursively generates the type constraints for an individual methods
+ * 
+ * The type sets associated with fields, parameters, local variables and return
+ * values are looked up in the context.
+ */
+public class MethodConstraintGenerator extends AstVisitor<Void, Void> {
 
 	private final MethodDecl methodDecl;
-	private final MethodConstraintGeneratorContext context;
+	private final ConstraintGeneratorContext context;
+	private final ExprConstraintGenerator exprConstraintGenerator;
 
 	public MethodConstraintGenerator(MethodDecl methodDecl,
-			MethodConstraintGeneratorContext context) {
-		super();
-
+			ConstraintGeneratorContext context) {
 		this.methodDecl = methodDecl;
 		this.context = context;
+		this.exprConstraintGenerator = new ExprConstraintGenerator(
+				methodDecl.sym, context);
 	}
 
-	public MethodDecl getMethodDecl() {
-		return methodDecl;
+	public void generate() {
+		// For overriding methods, generate equality constraints on the
+		// parameter and return type variables. In the case of local type
+		// inference, the resulting constraints are trivially satisfied.
+		MethodSymbol method = methodDecl.sym;
+		if (method.overrides != null) {
+			MethodSymbol overriddenMethod = method.overrides;
+			for (Pair<VariableSymbol> pair : Pair.zip(method.getParameters(),
+					overriddenMethod.getParameters())) {
+				TypeSet typeSet = context.getVariableTypeSet(pair.a);
+				TypeSet overriddenTypeSet = context.getVariableTypeSet(pair.b);
+				getSystem().addEquality(typeSet, overriddenTypeSet);
+			}
+
+			TypeSet returnTypeSet = context.getReturnTypeSet(method);
+			TypeSet overriddenReturnTypeSet = context
+					.getReturnTypeSet(overriddenMethod);
+			getSystem().addEquality(returnTypeSet, overriddenReturnTypeSet);
+		}
+
+		methodDecl.accept(this, null);
 	}
 
-	@Override
-	public TypeSymbolTable getTypeSymbolTable() {
-		return context.getTypeSymbolTable();
+	/**
+	 * Convenience shortcut for {@code exprConstraintGenerator.visit(expr)}.
+	 */
+	private TypeSet getExprTypeSet(Expr expr) {
+		return exprConstraintGenerator.visit(expr);
 	}
 
-	@Override
-	public ConstantTypeSetFactory getConstantTypeSetFactory() {
+	/**
+	 * Convenience shortcut for {@code context.getConstantTypeSetFactory()}.
+	 */
+	private ConstantTypeSetFactory getTypeSetFactory() {
 		return context.getConstantTypeSetFactory();
 	}
 
-	@Override
-	public ConstraintSystem getConstraintSystem() {
+	/**
+	 * Convenience shortcut for {@code context.getConstraintSystem()}.
+	 */
+	private ConstraintSystem getSystem() {
 		return context.getConstraintSystem();
 	}
 
 	@Override
-	public Collection<MethodSymbol> getMatchingMethods(String name,
-			int paramCount) {
-		return context.getMatchingMethods(name, paramCount);
+	public Void returnStmt(ReturnStmt ast, Void arg) {
+		if (ast.arg() != null) {
+			TypeSet exprTypeSet = getExprTypeSet(ast.arg());
+			context.getConstraintSystem().addInequality(exprTypeSet,
+					context.getReturnTypeSet(methodDecl.sym));
+		}
+		return null;
 	}
 
 	@Override
-	public Collection<ClassSymbol> getClassesDeclaringField(String fieldName) {
-		return context.getClassesDeclaringField(fieldName);
+	public Void assign(Assign assign, Void arg) {
+		TypeSet lhsTypeSet = getExprTypeSet(assign.left());
+		TypeSet exprTypeSet = getExprTypeSet(assign.right());
+		getSystem().addInequality(exprTypeSet, lhsTypeSet);
+		return null;
 	}
 
 	@Override
-	public MethodSymbol getMethod() {
-		return methodDecl.sym;
+	public Void builtInWrite(BuiltInWrite ast, Void arg) {
+		TypeSet argTypeSet = getExprTypeSet(ast.arg());
+		ConstantTypeSet intTypeSet = getTypeSetFactory().makeInt();
+		getSystem().addEquality(argTypeSet, intTypeSet);
+		return null;
 	}
 
-	public final void generate() {
-		StmtConstraintGenerator generator = new StmtConstraintGenerator(this);
-		getMethodDecl().accept(generator, null);
+	@Override
+	public Void builtInWriteFloat(BuiltInWriteFloat ast, Void arg) {
+		TypeSet argTypeSet = getExprTypeSet(ast.arg());
+		ConstantTypeSet floatTypeSet = getTypeSetFactory().makeFloat();
+		getSystem().addEquality(argTypeSet, floatTypeSet);
+		return null;
+	}
+
+	@Override
+	public Void methodCall(MethodCall call, Void arg) {
+		exprConstraintGenerator.createMethodCallConstraints(call.methodName,
+				call.receiver(), call.argumentsWithoutReceiver(),
+				Optional.<TypeVariable> absent());
+		return null;
+	}
+
+	@Override
+	public Void ifElse(IfElse ast, Void arg) {
+		visit(ast.then(), null);
+		visit(ast.otherwise(), null);
+
+		TypeSet ifExprTypeSet = getExprTypeSet(ast.condition());
+		TypeSet booleanType = getTypeSetFactory().makeBoolean();
+		getSystem().addEquality(ifExprTypeSet, booleanType);
+		return null;
+	}
+
+	@Override
+	public Void whileLoop(WhileLoop ast, Void arg) {
+		visit(ast.body(), null);
+
+		TypeSet whileConditionExprTypeSet = getExprTypeSet(ast.condition());
+		TypeSet booleanType = getTypeSetFactory().makeBoolean();
+		getSystem().addEquality(whileConditionExprTypeSet, booleanType);
+		return null;
 	}
 
 }

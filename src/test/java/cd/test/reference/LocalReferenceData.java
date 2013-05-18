@@ -27,7 +27,11 @@ public class LocalReferenceData extends FileBasedReferenceData {
 		// The second line is usually a comment why the override exists
 		String result = FileUtils.readFileToString(getSemanticRefFile());
 		String[] lines = result.split("\n");
-		return lines[0].trim();
+		if (lines.length > 0) {
+			return lines[0].trim();
+		} else {
+			return "";
+		}
 	}
 
 	@Override

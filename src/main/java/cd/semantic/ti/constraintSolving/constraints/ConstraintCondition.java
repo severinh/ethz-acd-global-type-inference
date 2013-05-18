@@ -31,6 +31,6 @@ public class ConstraintCondition {
 
 	@Override
 	public String toString() {
-		return typeAtom + "\u2208" + typeSet;
+		return typeAtom + " \u2208 " + typeSet;
 	}
 }

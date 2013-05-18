@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import cd.exceptions.SemanticFailure;
-import cd.ir.ast.Var;
 import cd.semantic.SymbolTable;
 
 public class MethodSymbol extends Symbol {

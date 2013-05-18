@@ -42,11 +42,21 @@ import cd.semantic.ti.constraintSolving.constraints.ConstraintCondition;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
+/**
+ * Recursively generates the type set for a expressions and potentially adds
+ * type constraints to the constraint system.
+ * 
+ * The type sets associated with fields, parameters, local variables and return
+ * values are looked up in the context.
+ */
 public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
-	private final StmtConstraintGeneratorContext context;
+	private final MethodSymbol method;
+	private final ConstraintGeneratorContext context;
 
-	public ExprConstraintGenerator(StmtConstraintGeneratorContext context) {
+	public ExprConstraintGenerator(MethodSymbol method,
+			ConstraintGeneratorContext context) {
+		this.method = method;
 		this.context = context;
 	}
 
@@ -73,17 +83,7 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
 	@Override
 	public TypeSet var(Var ast) {
-		VariableSymbol varSym = ast.getSymbol();
-		switch (varSym.getKind()) {
-		case FIELD:
-			return context.getFieldTypeSet(varSym);
-		case LOCAL:
-			return context.getLocalVariableTypeSet(varSym);
-		case PARAM:
-			return context.getParameterTypeSet(varSym);
-		default:
-			throw new IllegalStateException("no such variable kind");
-		}
+		return context.getVariableTypeSet(ast.getSymbol());
 	}
 
 	@Override
@@ -118,7 +118,7 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
 	@Override
 	public TypeSet thisRef(ThisRef ast) {
-		return getTypeSetFactory().make(context.getMethod().owner);
+		return getTypeSetFactory().make(method.owner);
 	}
 
 	@Override
@@ -148,7 +148,7 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 			possibleClassSymbols.addAll(getTypeSymbols()
 					.getClassSymbolSubtypes(classSym));
 			VariableSymbol fieldSymbol = classSym.getField(fieldName);
-			TypeSet fieldTypeSet = context.getFieldTypeSet(fieldSymbol);
+			TypeSet fieldTypeSet = context.getVariableTypeSet(fieldSymbol);
 			ConstraintCondition condition = new ConstraintCondition(classSym,
 					receiverTypeSet);
 			getSystem().addEquality(resultType, fieldTypeSet, condition);
@@ -251,8 +251,11 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
 	public void createMethodCallConstraints(String methodName, Expr receiver,
 			List<Expr> arguments, Optional<TypeVariable> methodCallResultTypeVar) {
+		// The canonical (non-overriding) method symbols with that name and
+		// number of parameters
 		Collection<MethodSymbol> methodSymbols = context.getMatchingMethods(
 				methodName, arguments.size());
+
 		TypeSet receiverTypeSet = visit(receiver);
 		Set<ClassSymbol> possibleReceiverTypes = new HashSet<>();
 
@@ -260,22 +263,32 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 			ImmutableSet<ClassSymbol> msymClassSubtypes = getTypeSymbols()
 					.getClassSymbolSubtypes(msym.owner);
 			possibleReceiverTypes.addAll(msymClassSubtypes);
-			ConstraintCondition condition = new ConstraintCondition(msym.owner,
-					receiverTypeSet);
-			for (int argNum = 0; argNum < arguments.size(); argNum++) {
-				Expr argument = arguments.get(argNum);
-				TypeSet argTypeSet = visit(argument);
-				VariableSymbol paramSym = msym.getParameter(argNum);
-				TypeSet parameterTypeSet = context
-						.getParameterTypeSet(paramSym);
-				getSystem().addInequality(argTypeSet, parameterTypeSet,
-						condition);
-			}
 
-			if (methodCallResultTypeVar.isPresent()) {
-				TypeSet resultTypeSet = context.getReturnTypeSet(msym);
-				TypeSet lhsTypeSet = methodCallResultTypeVar.get();
-				getSystem().addInequality(resultTypeSet, lhsTypeSet, condition);
+			for (ClassSymbol msymClassSubtype : msymClassSubtypes) {
+				// Generate a conditional constraint for each of the subtypes of
+				// the method's owner. The receiver type set may only contain a
+				// subtype of the method's owner that does NOT override the
+				// method. Thus, if we only created a constraint whose condition
+				// only checks if the method's owner is in the receiver type
+				// set, the condition would never be satisfied.
+				ConstraintCondition condition = new ConstraintCondition(
+						msymClassSubtype, receiverTypeSet);
+				for (int argNum = 0; argNum < arguments.size(); argNum++) {
+					Expr argument = arguments.get(argNum);
+					TypeSet argTypeSet = visit(argument);
+					VariableSymbol paramSym = msym.getParameter(argNum);
+					TypeSet parameterTypeSet = context
+							.getVariableTypeSet(paramSym);
+					getSystem().addInequality(argTypeSet, parameterTypeSet,
+							condition);
+				}
+
+				if (methodCallResultTypeVar.isPresent()) {
+					TypeSet resultTypeSet = context.getReturnTypeSet(msym);
+					TypeSet lhsTypeSet = methodCallResultTypeVar.get();
+					getSystem().addInequality(resultTypeSet, lhsTypeSet,
+							condition);
+				}
 			}
 		}
 

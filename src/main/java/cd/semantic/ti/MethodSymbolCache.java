@@ -17,12 +17,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * Cache that makes it possible to efficiently look up all method symbols with a
- * certain name and a certain number of parameters.
- * 
- * Note that some of the method symbol that share the same name and number of
- * parameters may override each other, because there may be a subtype relation
- * between the class symbols that own the method symbols.
+ * Cache that allows an efficient lookup of all non-overriding method symbols
+ * with a certain name and a certain number of parameters.
+ * <p>
+ * Note that the cache does <em>not</em> provide overriding method symbols. In
+ * Javali, the parameter and return types are invariant. This allows us to treat
+ * the method symbol closest to the top of the type hierarchy as the canonical
+ * method symbol and ignore the ones overriding it in subclasses. For them, one
+ * can simply copy the parameter and return types.
  */
 public final class MethodSymbolCache {
 
@@ -39,10 +41,13 @@ public final class MethodSymbolCache {
 		Multimap<Key, MethodSymbol> map = LinkedHashMultimap.create();
 		for (ClassSymbol classSymbol : typeSymbols.getClassSymbols()) {
 			for (MethodSymbol methodSymbol : classSymbol.getDeclaredMethods()) {
-				String name = methodSymbol.name;
-				int parameterCount = methodSymbol.getParameters().size();
-				Key key = new Key(name, parameterCount);
-				map.put(key, methodSymbol);
+				// Ignore overriding methods
+				if (methodSymbol.overrides == null) {
+					String name = methodSymbol.name;
+					int parameterCount = methodSymbol.getParameters().size();
+					Key key = new Key(name, parameterCount);
+					map.put(key, methodSymbol);
+				}
 			}
 		}
 		return new MethodSymbolCache(ImmutableMultimap.copyOf(map));

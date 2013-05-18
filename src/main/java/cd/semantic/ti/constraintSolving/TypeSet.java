@@ -2,16 +2,32 @@ package cd.semantic.ti.constraintSolving;
 
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import cd.ir.symbols.TypeSymbol;
 import cd.util.NonnullByDefault;
 
 @NonnullByDefault
-public interface TypeSet {
+public abstract class TypeSet {
 
-	public Set<TypeSymbol> getTypes();
+	public abstract Set<TypeSymbol> getTypes();
 
-	public boolean isSubsetOf(TypeSet other);
+	public abstract boolean isSubsetOf(TypeSet other);
 
-	public <R, A> R accept(TypeSetVisitor<R, A> visitor, A arg);
+	public abstract <R, A> R accept(TypeSetVisitor<R, A> visitor, A arg);
+
+	/**
+	 * Returns a string showing the actual types contained in the set.
+	 * 
+	 * @return the empty set symbol if the type set is empty
+	 */
+	public String getTypeSetString() {
+		Set<TypeSymbol> types = getTypes();
+		if (types.isEmpty()) {
+			return "\u2205";
+		} else {
+			return "{" + StringUtils.join(types, ",") + "}";
+		}
+	}
 
 }
