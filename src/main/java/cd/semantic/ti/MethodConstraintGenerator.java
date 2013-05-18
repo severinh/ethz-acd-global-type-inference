@@ -10,11 +10,14 @@ import cd.ir.ast.MethodCall;
 import cd.ir.ast.MethodDecl;
 import cd.ir.ast.ReturnStmt;
 import cd.ir.ast.WhileLoop;
+import cd.ir.symbols.MethodSymbol;
+import cd.ir.symbols.VariableSymbol;
 import cd.semantic.ti.constraintSolving.ConstantTypeSet;
 import cd.semantic.ti.constraintSolving.ConstantTypeSetFactory;
 import cd.semantic.ti.constraintSolving.ConstraintSystem;
 import cd.semantic.ti.constraintSolving.TypeSet;
 import cd.semantic.ti.constraintSolving.TypeVariable;
+import cd.util.Pair;
 
 import com.google.common.base.Optional;
 
@@ -39,6 +42,25 @@ public class MethodConstraintGenerator extends AstVisitor<Void, Void> {
 	}
 
 	public void generate() {
+		// For overriding methods, generate equality constraints on the
+		// parameter and return type variables. In the case of local type
+		// inference, the resulting constraints are trivially satisfied.
+		MethodSymbol method = methodDecl.sym;
+		if (method.overrides != null) {
+			MethodSymbol overriddenMethod = method.overrides;
+			for (Pair<VariableSymbol> pair : Pair.zip(method.getParameters(),
+					overriddenMethod.getParameters())) {
+				TypeSet typeSet = context.getVariableTypeSet(pair.a);
+				TypeSet overriddenTypeSet = context.getVariableTypeSet(pair.b);
+				getSystem().addEquality(typeSet, overriddenTypeSet);
+			}
+
+			TypeSet returnTypeSet = context.getReturnTypeSet(method);
+			TypeSet overriddenReturnTypeSet = context
+					.getReturnTypeSet(overriddenMethod);
+			getSystem().addEquality(returnTypeSet, overriddenReturnTypeSet);
+		}
+
 		methodDecl.accept(this, null);
 	}
 
