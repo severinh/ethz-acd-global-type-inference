@@ -1,0 +1,8 @@
+// Assert that the keyword 'var' cannot be used as a field name
+
+class Main {
+	int var;
+
+	void main() {
+	}
+}

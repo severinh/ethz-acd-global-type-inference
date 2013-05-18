@@ -1,0 +1,9 @@
+// Assert that the keyword 'var' cannot be used as a method name
+
+class Main {
+	void main() {
+	}
+	
+	void var() {
+	}
+}
