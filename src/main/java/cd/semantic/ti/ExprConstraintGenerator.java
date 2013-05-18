@@ -164,15 +164,16 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 	}
 
 	@Override
-	public TypeSet index(Index idx) {
-		Expr arrayExpr = idx.left();
-		TypeSet indexTypeSet = visit(idx.right());
+	public TypeSet index(Index index) {
+		TypeSet arrayExprTypeSet = visit(index.left());
+		TypeSet indexTypeSet = visit(index.right());
+		TypeVariable resultVar = getSystem().addTypeVariable();
+
 		getSystem().addEquality(indexTypeSet, getTypeSetFactory().makeInt());
 
-		TypeVariable resultVar = getSystem().addTypeVariable();
-		TypeSet arrayExprTypeSet = visit(arrayExpr);
 		ConstantTypeSet arrayTypesSet = getTypeSetFactory().makeArrayTypeSet();
 		getSystem().addUpperBound(arrayExprTypeSet, arrayTypesSet);
+
 		for (ArrayTypeSymbol arrayType : getTypeSymbols().getArrayTypeSymbols()) {
 			ConstraintCondition condition = new ConstraintCondition(arrayType,
 					arrayExprTypeSet);
