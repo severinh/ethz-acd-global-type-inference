@@ -251,8 +251,11 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
 	public void createMethodCallConstraints(String methodName, Expr receiver,
 			List<Expr> arguments, Optional<TypeVariable> methodCallResultTypeVar) {
+		// The canonical (non-overriding) method symbols with that name and
+		// number of parameters
 		Collection<MethodSymbol> methodSymbols = context.getMatchingMethods(
 				methodName, arguments.size());
+
 		TypeSet receiverTypeSet = visit(receiver);
 		Set<ClassSymbol> possibleReceiverTypes = new HashSet<>();
 
@@ -260,21 +263,32 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 			ImmutableSet<ClassSymbol> msymClassSubtypes = getTypeSymbols()
 					.getClassSymbolSubtypes(msym.owner);
 			possibleReceiverTypes.addAll(msymClassSubtypes);
-			ConstraintCondition condition = new ConstraintCondition(msym.owner,
-					receiverTypeSet);
-			for (int argNum = 0; argNum < arguments.size(); argNum++) {
-				Expr argument = arguments.get(argNum);
-				TypeSet argTypeSet = visit(argument);
-				VariableSymbol paramSym = msym.getParameter(argNum);
-				TypeSet parameterTypeSet = context.getVariableTypeSet(paramSym);
-				getSystem().addInequality(argTypeSet, parameterTypeSet,
-						condition);
-			}
 
-			if (methodCallResultTypeVar.isPresent()) {
-				TypeSet resultTypeSet = context.getReturnTypeSet(msym);
-				TypeSet lhsTypeSet = methodCallResultTypeVar.get();
-				getSystem().addInequality(resultTypeSet, lhsTypeSet, condition);
+			for (ClassSymbol msymClassSubtype : msymClassSubtypes) {
+				// Generate a conditional constraint for each of the subtypes of
+				// the method's owner. The receiver type set may only contain a
+				// subtype of the method's owner that does NOT override the
+				// method. Thus, if we only created a constraint whose condition
+				// only checks if the method's owner is in the receiver type
+				// set, the condition would never be satisfied.
+				ConstraintCondition condition = new ConstraintCondition(
+						msymClassSubtype, receiverTypeSet);
+				for (int argNum = 0; argNum < arguments.size(); argNum++) {
+					Expr argument = arguments.get(argNum);
+					TypeSet argTypeSet = visit(argument);
+					VariableSymbol paramSym = msym.getParameter(argNum);
+					TypeSet parameterTypeSet = context
+							.getVariableTypeSet(paramSym);
+					getSystem().addInequality(argTypeSet, parameterTypeSet,
+							condition);
+				}
+
+				if (methodCallResultTypeVar.isPresent()) {
+					TypeSet resultTypeSet = context.getReturnTypeSet(msym);
+					TypeSet lhsTypeSet = methodCallResultTypeVar.get();
+					getSystem().addInequality(resultTypeSet, lhsTypeSet,
+							condition);
+				}
 			}
 		}
 
