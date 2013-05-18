@@ -1,0 +1,15 @@
+// Assert that arrays are invariant
+
+class A {
+}
+
+class B extends A {
+}
+
+class Main {
+	void main() {
+		A[] array;
+		array = new A[10];
+		array = new B[10];
+	}
+}
