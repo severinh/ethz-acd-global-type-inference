@@ -1,0 +1,4 @@
+TYPE_ERROR
+// It is impossible to catch this during type inference,
+// Thus, revert the override and again expect an old-school TYPE_ERROR
+// rather than a TYPE_INFERENCE_ERROR,
