@@ -103,7 +103,7 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
 	@Override
 	public TypeSet nullConst(NullConst ast) {
-		return getTypeSetFactory().makeNull();
+		return getTypeSetFactory().makeReferenceTypeSet();
 	}
 
 	@Override
