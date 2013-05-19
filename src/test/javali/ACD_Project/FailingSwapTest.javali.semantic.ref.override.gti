@@ -1,2 +1,4 @@
-TYPE_INFERENCE_ERROR
-// the type of field Foo.i cannot be determined since swap could work with any type.
+TYPE_ERROR
+// The type of field Foo.i cannot be determined since swap could work with any type.
+// For now this can only be detected in the type checker, since the inference
+// results in bottom type.
