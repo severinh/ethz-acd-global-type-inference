@@ -326,15 +326,19 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	}
 
 	/**
-	 * Finds the symbol with the given name, or fails with a NO_SUCH_TYPE error.
+	 * Returns the type symbol with the given name.
+	 * 
+	 * @throws SemanticFailure
+	 *             if there is no type with the given name
 	 */
+	@Nonnull
 	public TypeSymbol getType(String name) {
-		TypeSymbol res = get(name);
-		if (res == null) {
+		TypeSymbol result = get(name);
+		if (result == null) {
 			throw new SemanticFailure(Cause.NO_SUCH_TYPE,
 					"No type '%s' was found", name);
 		}
-		return res;
+		return result;
 	}
 
 }

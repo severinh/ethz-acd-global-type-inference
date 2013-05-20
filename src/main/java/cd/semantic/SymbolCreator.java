@@ -44,16 +44,19 @@ public class SymbolCreator extends Object {
 
 		@Override
 		public Void varDecl(VarDecl varDecl, ClassSymbol classSymbol) {
-			varDecl.sym = new VariableSymbol(varDecl.name,
+			VariableSymbol variableSymbol = new VariableSymbol(varDecl.name,
 					typeSymbols.getType(varDecl.type), Kind.FIELD);
-			classSymbol.addField(varDecl.sym);
+			varDecl.sym = variableSymbol;
+			classSymbol.addField(variableSymbol);
 			return null;
 		}
 
 		@Override
 		public Void methodDecl(MethodDecl methodDecl, ClassSymbol classSymbol) {
-			methodDecl.sym = new MethodSymbol(methodDecl.name, classSymbol);
-			classSymbol.addMethod(methodDecl.sym);
+			MethodSymbol methodSymbol = new MethodSymbol(methodDecl.name,
+					classSymbol);
+			methodDecl.sym = methodSymbol;
+			classSymbol.addMethod(methodSymbol);
 
 			// create return type symbol
 			if (methodDecl.returnType.equals("void")) {
