@@ -1,11 +1,14 @@
 package cd.debug;
 
+import cd.ir.AstVisitor;
 import cd.ir.ast.Assign;
 import cd.ir.ast.Ast;
 import cd.ir.ast.BinaryOp;
 import cd.ir.ast.BooleanConst;
 import cd.ir.ast.BuiltInRead;
 import cd.ir.ast.BuiltInReadFloat;
+import cd.ir.ast.BuiltInTick;
+import cd.ir.ast.BuiltInTock;
 import cd.ir.ast.BuiltInWrite;
 import cd.ir.ast.BuiltInWriteFloat;
 import cd.ir.ast.BuiltInWriteln;
@@ -30,7 +33,6 @@ import cd.ir.ast.UnaryOp;
 import cd.ir.ast.Var;
 import cd.ir.ast.VarDecl;
 import cd.ir.ast.WhileLoop;
-import cd.ir.AstVisitor;
 
 public class AstOneLine {
 
@@ -83,6 +85,16 @@ public class AstOneLine {
 		@Override
 		public String builtInWriteln(BuiltInWriteln ast, Void arg) {
 			return String.format("writeln()");
+		}
+		
+		@Override
+		public String builtInTick(BuiltInTick ast, Void arg) {
+			return String.format("tick()");
+		}
+		
+		@Override
+		public String builtInTock(BuiltInTock ast, Void arg) {
+			return String.format("tock()");
 		}
 
 		@Override

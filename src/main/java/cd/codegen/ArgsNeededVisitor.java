@@ -1,9 +1,12 @@
 package cd.codegen;
 
 import cd.Config;
+import cd.ir.AstVisitor;
 import cd.ir.ast.Ast;
 import cd.ir.ast.BuiltInRead;
 import cd.ir.ast.BuiltInReadFloat;
+import cd.ir.ast.BuiltInTick;
+import cd.ir.ast.BuiltInTock;
 import cd.ir.ast.BuiltInWrite;
 import cd.ir.ast.BuiltInWriteFloat;
 import cd.ir.ast.BuiltInWriteln;
@@ -13,7 +16,6 @@ import cd.ir.ast.MethodCall;
 import cd.ir.ast.MethodCallExpr;
 import cd.ir.ast.NewArray;
 import cd.ir.ast.NewObject;
-import cd.ir.AstVisitor;
 
 /**
  * This visitor computes, for a given method body, the maximum number of bytes
@@ -58,6 +60,16 @@ public class ArgsNeededVisitor extends AstVisitor<Integer, Void> {
 	@Override
 	public Integer builtInWriteln(BuiltInWriteln ast, Void arg) {
 		return Config.SIZEOF_PTR; // calls printf("\n")
+	}
+	
+	@Override
+	public Integer builtInTick(BuiltInTick ast, Void arg) {
+		return Config.SIZEOF_PTR; 
+	}
+	
+	@Override
+	public Integer builtInTock(BuiltInTock ast, Void arg) {
+		return Config.SIZEOF_PTR; 
 	}
 
 	@Override

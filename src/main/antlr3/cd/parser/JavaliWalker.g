@@ -161,6 +161,10 @@ stmt returns [Stmt stmt]
       { $stmt = new BuiltInWriteFloat($e.expr); }	
 	|	BuiltInWriteln
 		{ $stmt = new BuiltInWriteln(); }
+	|	BuiltInTick
+		{ $stmt = new BuiltInTick(); }
+	|	BuiltInTock
+		{ $stmt = new BuiltInTock(); }
 	|	^( IfElse cond=expr thenB=stmtBlock elseB=ifStmtTail )
 		{ $stmt = new IfElse($cond.expr, $thenB.stmtSeq, $elseB.elseBlock); }
 	|	^( WhileLoop cond=expr body=stmtBlock )

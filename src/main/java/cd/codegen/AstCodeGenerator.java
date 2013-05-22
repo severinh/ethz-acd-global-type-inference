@@ -25,6 +25,8 @@ import cd.ir.ast.BinaryOp.BOp;
 import cd.ir.ast.BooleanConst;
 import cd.ir.ast.BuiltInRead;
 import cd.ir.ast.BuiltInReadFloat;
+import cd.ir.ast.BuiltInTick;
+import cd.ir.ast.BuiltInTock;
 import cd.ir.ast.BuiltInWrite;
 import cd.ir.ast.BuiltInWriteFloat;
 import cd.ir.ast.BuiltInWriteln;
@@ -90,6 +92,12 @@ public class AstCodeGenerator {
 	private static final String CHECK_NON_ZERO = "checkNonZero";
 
 	private static final String CHECK_ARRAY_SIZE = "checkArraySize";
+	
+	private static final String TICK = "tick_tsc";
+	
+	private static final String TOCK = "tock_tsc";
+
+
 
 	/**
 	 * Main method. Causes us to emit x86 assembly corresponding to {@code ast}
@@ -137,7 +145,14 @@ public class AstCodeGenerator {
 		emit(Config.DOT_STRING + " \"%.10f\"");
 		emitLabel("SCANF_STR_F");
 		emit(Config.DOT_STRING + " \"%f\"");
+		emitLabel("STR_UL");
+		emit(Config.DOT_STRING + " \"Ticks: %llu\\n\"");
 		emit(Config.DATA_INT_SECTION);
+		
+		// variables to save TSC start value
+		emit(".section .bss");
+		emit(".lcomm cycle_low,4");
+		emit(".lcomm cycle_high,4");
 
 		emit(Config.TEXT_SECTION);
 
@@ -146,6 +161,31 @@ public class AstCodeGenerator {
 		String looplbl = uniqueLabel();
 		String donelbl = uniqueLabel();
 		String faillbl = uniqueLabel();
+		
+		emitCommentSection("tick_tsc() function");
+		emitLabel(TICK);
+		emitStackframeSetup(0);
+		emit("cpuid");
+		emit("rdtsc");
+		emit("movl %eax, cycle_low");
+		emit("movl %edx, cycle_high");
+		emit("leave");
+		emit("ret");
+		
+		emitCommentSection("tock_tsc() function");
+		emitLabel(TOCK);
+		emitStackframeSetup(0);
+		emit("cpuid");
+		emit("rdtsc");
+		emit("subl cycle_low, %eax");
+		emit("sbb cycle_high, %edx");
+		emit("pushl %edx");
+		emit("pushl %eax");
+		emit("pushl $STR_UL");
+		emit("call " + Config.PRINTF);
+		emit("leave");
+		emit("ret");
+		
 		emitCommentSection("checkCast() function");
 		emitLabel(CHECK_CAST);
 		emitStackframeSetup(8);
@@ -1099,6 +1139,18 @@ public class AstCodeGenerator {
 			call(PRINTF, null);
 			return null;
 
+		}
+		
+		@Override
+		public String builtInTick(BuiltInTick ast, Void arg) {
+			call(TICK, null);
+			return null;
+		}
+		
+		@Override
+		public String builtInTock(BuiltInTock ast, Void arg) {
+			call(TOCK, null);
+			return null;
 		}
 
 		@Override

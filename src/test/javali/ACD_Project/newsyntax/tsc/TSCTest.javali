@@ -1,0 +1,15 @@
+class Main {
+	void main() {
+		int[] a;
+		int i;
+		
+		tick();
+		a = new int[1000];
+		i = 0;
+		while (i < 1000) {
+		  a[i] = i;
+		  i = i + 1;
+		}
+		tock();
+	}
+}

@@ -176,6 +176,8 @@ tokens {
 	BuiltInWrite;
 	BuiltInWriteFloat;
 	BuiltInWriteln;
+	BuiltInTick;
+	BuiltInTock;
 	Assign;
 	MethodCall;
 	ReturnStmt;
@@ -392,6 +394,10 @@ ioStmt
       -> ^( BuiltInWriteFloat[$mth, "BuiltInWriteFloat"] expr )
    |	mth='writeln' '(' ')' ';'
 	   -> ^( BuiltInWriteln[$mth, "BuiltInWriteln"] )
+   |	mth='tick' '(' ')' ';'
+	   -> ^( BuiltInTick[$mth, "BuiltInTick"] )
+   |	mth='tock' '(' ')' ';'
+	   -> ^( BuiltInTock[$mth, "BuiltInTock"] )
    ;
    
 ifStmt
