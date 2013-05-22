@@ -3,8 +3,12 @@ package cd.semantic;
 import cd.debug.AstOneLine;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
+import cd.ir.AstVisitor;
+import cd.ir.ExprVisitor;
 import cd.ir.ast.Assign;
 import cd.ir.ast.Ast;
+import cd.ir.ast.BuiltInTick;
+import cd.ir.ast.BuiltInTock;
 import cd.ir.ast.BuiltInWrite;
 import cd.ir.ast.BuiltInWriteFloat;
 import cd.ir.ast.BuiltInWriteln;
@@ -21,8 +25,6 @@ import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
-import cd.ir.AstVisitor;
-import cd.ir.ExprVisitor;
 
 public class TypeChecker {
 
@@ -94,6 +96,18 @@ public class TypeChecker {
 
 		@Override
 		public Void builtInWriteln(BuiltInWriteln ast,
+				SymbolTable<VariableSymbol> locals) {
+			return null;
+		}
+		
+		@Override
+		public Void builtInTick(BuiltInTick ast,
+				SymbolTable<VariableSymbol> locals) {
+			return null;
+		}
+		
+		@Override
+		public Void builtInTock(BuiltInTock ast,
 				SymbolTable<VariableSymbol> locals) {
 			return null;
 		}

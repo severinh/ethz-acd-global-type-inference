@@ -2,6 +2,8 @@ package cd.ir;
 
 import cd.ir.ast.Assign;
 import cd.ir.ast.Ast;
+import cd.ir.ast.BuiltInTick;
+import cd.ir.ast.BuiltInTock;
 import cd.ir.ast.BuiltInWrite;
 import cd.ir.ast.BuiltInWriteFloat;
 import cd.ir.ast.BuiltInWriteln;
@@ -86,6 +88,14 @@ public class AstVisitor<R, A> extends ExprVisitor<R, A> {
 	}
 
 	public R builtInWriteln(BuiltInWriteln ast, A arg) {
+		return dfltStmt(ast, arg);
+	}
+	
+	public R builtInTick(BuiltInTick ast, A arg) {
+		return dfltStmt(ast, arg);
+	}
+	
+	public R builtInTock(BuiltInTock ast, A arg) {
 		return dfltStmt(ast, arg);
 	}
 
