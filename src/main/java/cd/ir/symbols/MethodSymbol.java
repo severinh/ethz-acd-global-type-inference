@@ -22,7 +22,7 @@ public class MethodSymbol extends Symbol {
 
 	private final ClassSymbol owner;
 	private final Optional<MethodSymbol> overrides;
-
+	private boolean overridden = false;
 	public TypeSymbol returnType;
 	public int vtableIndex = -1;
 
@@ -44,6 +44,7 @@ public class MethodSymbol extends Symbol {
 			MethodSymbol nullOverrides = superClass.tryGetMethod(name);
 			if (nullOverrides != null) {
 				overrides = Optional.of(nullOverrides);
+				nullOverrides.setOverridden(true);
 			}
 		}
 		this.overrides = overrides;
@@ -95,6 +96,14 @@ public class MethodSymbol extends Symbol {
 			}
 		}
 		return null;
+	}
+
+	public boolean isOverridden() {
+		return overridden;
+	}
+
+	public void setOverridden(boolean overridden) {
+		this.overridden = overridden;
 	}
 
 	/**

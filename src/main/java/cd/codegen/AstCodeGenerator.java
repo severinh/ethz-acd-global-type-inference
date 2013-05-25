@@ -987,13 +987,21 @@ public class AstCodeGenerator {
 			emitStore(reg, 0, SP); // check for null ptr
 			call(CHECK_NULL, null);
 
-			// Load the address of the method to call into "reg"
-			// and call it indirectly.
-			emitLoad(0, reg, reg);
-			int mthdoffset = 4 + mthSymbol.vtableIndex * Config.SIZEOF_PTR;
-			emitLoad(mthdoffset, reg, reg);
+			if (mthSymbol.isOverridden()) {
+				// load address of vtable from object
+				emitLoad(0, reg, reg);
 
-			call("*" + reg, reg);
+				// Load the address of the method to call into "reg"
+				// and call it indirectly.
+				int mthdoffset = 4 + mthSymbol.vtableIndex * Config.SIZEOF_PTR;
+				emitLoad(mthdoffset, reg, reg);
+				call("*" + reg, reg);
+			} else {
+				// Optimization: we don't need to do a v-table lookup since the
+				// call target is clear, the static type ensures there can't be any
+				// method overriding this method symbol!
+				call(mthdlbl(mthSymbol), reg);
+			}
 
 			if (mthSymbol.returnType == context.getTypeSymbols().getVoidType()) {
 				releaseRegister(reg);
