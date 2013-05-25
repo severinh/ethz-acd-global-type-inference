@@ -97,8 +97,6 @@ public class AstCodeGenerator {
 	
 	private static final String TOCK = "tock_tsc";
 
-
-
 	/**
 	 * Main method. Causes us to emit x86 assembly corresponding to {@code ast}
 	 * into {@code file}. Throws a {@link RuntimeException} should any I/O error
@@ -146,7 +144,7 @@ public class AstCodeGenerator {
 		emitLabel("SCANF_STR_F");
 		emit(Config.DOT_STRING + " \"%f\"");
 		emitLabel("STR_UL");
-		emit(Config.DOT_STRING + " \"Ticks: %llu\\n\"");
+		emit(Config.DOT_STRING + " \"%llu\\n\"");
 		emit(Config.DATA_INT_SECTION);
 		
 		// variables to save TSC start value
@@ -987,7 +985,8 @@ public class AstCodeGenerator {
 			emitStore(reg, 0, SP); // check for null ptr
 			call(CHECK_NULL, null);
 
-			if (mthSymbol.isOverridden()) {
+			boolean optimize = context.getOptions().isEnableDevirtualizationOptimization();
+			if (mthSymbol.isOverridden() || !optimize) {
 				// load address of vtable from object
 				emitLoad(0, reg, reg);
 

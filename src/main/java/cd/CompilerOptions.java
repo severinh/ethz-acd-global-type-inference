@@ -4,9 +4,11 @@ public class CompilerOptions {
 
 	private final TypeErasureMode typeErasureMode;
 	private final TypeInferenceMode typeInferenceMode;
+	private boolean enableDevirtualizationOptimization;
 
 	public CompilerOptions() {
 		this(TypeErasureMode.NONE, TypeInferenceMode.NONE);
+		setEnableDevirtualizationOptimization(false);
 	}
 
 	public CompilerOptions(TypeErasureMode erasure, TypeInferenceMode inference) {
@@ -20,6 +22,15 @@ public class CompilerOptions {
 
 	public TypeInferenceMode getTypeInferenceMode() {
 		return typeInferenceMode;
+	}
+
+	public boolean isEnableDevirtualizationOptimization() {
+		return enableDevirtualizationOptimization;
+	}
+
+	public void setEnableDevirtualizationOptimization(
+			boolean enableDevirtualizationOptimization) {
+		this.enableDevirtualizationOptimization = enableDevirtualizationOptimization;
 	}
 
 }

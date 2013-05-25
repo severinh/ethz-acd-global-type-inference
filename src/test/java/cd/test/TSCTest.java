@@ -67,6 +67,7 @@ public class TSCTest {
 			String binaryFilePath = compiler.getContext().getBinaryFile()
 					.getAbsolutePath();
 
+			LOG.info("Running compiled program");
 			String execOut = FileUtil.runCommand(new File("."),
 					new String[] { binaryFilePath }, new String[] {}, null,
 					true);
@@ -74,12 +75,15 @@ public class TSCTest {
 			
 			LOG.info("Output of " + context.getSourceFile().getName() + " was: " + execOut);
 
-			String[] valgrindCommand = new String[] { "valgrind",
-					"--error-exitcode=" + VALGRIND_ERROR_CODE, binaryFilePath };
-			String valgrindOut = FileUtil.runCommand(new File("."),
-					valgrindCommand, new String[] {}, null, true);
-			Assert.assertFalse(valgrindOut.contains("Error: "
-					+ VALGRIND_ERROR_CODE));
+			TestConfig tc= new TestConfig();
+			if (tc.isValgrindEnabled()) {
+				String[] valgrindCommand = new String[] { "valgrind",
+						"--error-exitcode=" + VALGRIND_ERROR_CODE, binaryFilePath };
+				String valgrindOut = FileUtil.runCommand(new File("."),
+						valgrindCommand, new String[] {}, null, true);
+				Assert.assertFalse(valgrindOut.contains("Error: "
+						+ VALGRIND_ERROR_CODE));
+			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
