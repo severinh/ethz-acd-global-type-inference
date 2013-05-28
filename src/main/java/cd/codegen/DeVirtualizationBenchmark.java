@@ -16,8 +16,8 @@ public class DeVirtualizationBenchmark {
 	private static final String JAVALI_FILE = "Benchmark.javali";
 	private static final int REPEAT_MEASUREMENT = 100;
 	
-	private static final int CLASSES = 5;
-	private static final int METHODS_PER_CLASS = 8192;
+	private static final int CLASSES = 2000;
+	private static final int METHODS_PER_CLASS = 10;
 	private static final int ITERATIONS = 100;
 
 	public void generateBenchmarkFile(File javaliOutputFile) throws IOException {
