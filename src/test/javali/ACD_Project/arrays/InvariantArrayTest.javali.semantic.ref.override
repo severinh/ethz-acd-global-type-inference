@@ -1,0 +1,3 @@
+
+// Should type-check with type inference because Object can be used as the static type
+// for the local variable 'array'.

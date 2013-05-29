@@ -1,4 +1,6 @@
-// Assert that arrays are invariant
+// Assert that arrays are invariant. With type inference however,
+// the code should type-check with type inference because Object
+// can be used as the static type for the local variable 'array'.
 
 class A {
 }
