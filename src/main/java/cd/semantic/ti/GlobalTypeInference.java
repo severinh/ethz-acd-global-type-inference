@@ -32,7 +32,7 @@ public class GlobalTypeInference extends TypeInferenceWithConstraints {
 			}
 		}
 
-		ConstraintSolver solver = new ConstraintSolver(
+		ConstraintSolver solver = new ConstraintSolver(typeSymbols,
 				generatorContext.getConstraintSystem());
 		solver.solve();
 		if (!solver.hasSolution()) {

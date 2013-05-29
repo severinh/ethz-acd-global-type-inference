@@ -2,6 +2,8 @@ package cd.semantic.ti.constraintSolving;
 
 import java.util.Set;
 
+import cd.ir.symbols.TypeSymbol;
+import cd.semantic.TypeSymbolTable;
 import cd.semantic.ti.constraintSolving.constraints.ConstantConstraint;
 import cd.semantic.ti.constraintSolving.constraints.LowerConstBoundConstraint;
 import cd.semantic.ti.constraintSolving.constraints.TypeConstraint;
@@ -11,10 +13,14 @@ import cd.semantic.ti.constraintSolving.constraints.VariableInequalityConstraint
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ConstraintSolver {
+
+	private final TypeSymbolTable typeSymbols;
 	private final ConstraintSystem constraintSystem;
 	private boolean hasSolution;
 
-	public ConstraintSolver(ConstraintSystem constraints) {
+	public ConstraintSolver(TypeSymbolTable typeSymbols,
+			ConstraintSystem constraints) {
+		this.typeSymbols = checkNotNull(typeSymbols);
 		this.constraintSystem = checkNotNull(constraints);
 	}
 
@@ -44,6 +50,15 @@ public class ConstraintSolver {
 		@Override
 		public Void visit(LowerConstBoundConstraint constraint, Void arg) {
 			constraint.getTypeVariable().extend(constraint.getLowerBound());
+			// Add the LCA of the resulting set. We need to decide on a single
+			// static type at the end of type inference anyway. Since the update
+			// is monotonic, i.e., types are only added but not removed from the
+			// type variable, it is safe to add the LCA.
+			// TODO: Does not add "intermediate" types between the types in the
+			// set and the LCA.
+			TypeSymbol lca = typeSymbols.getLCA(constraint.getTypeVariable()
+					.getTypes());
+			constraint.getTypeVariable().extend(lca);
 			return null;
 		}
 
@@ -56,6 +71,15 @@ public class ConstraintSolver {
 		@Override
 		public Void visit(VariableInequalityConstraint constraint, Void arg) {
 			constraint.getSuperTypeSet().extend(constraint.getSubTypeSet());
+			// Add the LCA of the resulting set. We need to decide on a single
+			// static type at the end of type inference anyway. Since the update
+			// is monotonic, i.e., types are only added but not removed from the
+			// type variable, it is safe to add the LCA.
+			// TODO: Does not add "intermediate" types between the types in the
+			// set and the LCA.
+			TypeSymbol lca = typeSymbols.getLCA(constraint.getSuperTypeSet()
+					.getTypes());
+			constraint.getSuperTypeSet().extend(lca);
 			return null;
 		}
 

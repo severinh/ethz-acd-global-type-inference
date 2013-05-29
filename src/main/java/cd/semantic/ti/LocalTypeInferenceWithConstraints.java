@@ -32,7 +32,7 @@ public class LocalTypeInferenceWithConstraints extends
 		MethodConstraintGenerator generator = new MethodConstraintGenerator(
 				mdecl, context);
 		generator.generate();
-		ConstraintSolver solver = new ConstraintSolver(
+		ConstraintSolver solver = new ConstraintSolver(typeSymbols,
 				context.getConstraintSystem());
 		solver.solve();
 		if (!solver.hasSolution()) {

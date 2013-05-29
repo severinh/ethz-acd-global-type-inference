@@ -32,18 +32,11 @@ public abstract class TypeInferenceWithConstraints implements TypeInference {
 		} else if (possibleTypes.size() == 1) {
 			type = possibleTypes.iterator().next();
 		} else if (possibleTypes.size() > 1) {
-			// NOTE: we may still try to take the join (lca). This is
-			// sometimes necessary.
-			TypeSymbol[] typesArray = possibleTypes
-					.toArray(new TypeSymbol[possibleTypes.size()]);
-			TypeSymbol lca = typeSymbols.getLCA(typesArray);
-			// The LCA must itself be among the possible types. Otherwise, the
-			// type may not be specific enough to satisfy all constraints.
-			if (possibleTypes.contains(lca)) {
-				type = lca;
-			} else {
+			if (possibleTypes.contains(typeSymbols.getTopType())) {
 				throw new SemanticFailure(Cause.TYPE_INFERENCE_ERROR,
 						"Type inference resulted in ambiguous type for " + name);
+			} else {
+				type = typeSymbols.getLCA(possibleTypes);
 			}
 		}
 		return type;

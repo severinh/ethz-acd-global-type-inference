@@ -14,7 +14,7 @@ import com.google.common.collect.ImmutableSet;
  */
 @NonnullByDefault
 public class TypeVariable extends TypeSet {
-	
+
 	private final Set<TypeSymbol> types;
 	private final String description;
 
@@ -40,6 +40,10 @@ public class TypeVariable extends TypeSet {
 	 */
 	public void extend(TypeSet other) {
 		types.addAll(other.getTypes());
+	}
+
+	public void extend(TypeSymbol typeSymbol) {
+		types.add(typeSymbol);
 	}
 
 	@Override

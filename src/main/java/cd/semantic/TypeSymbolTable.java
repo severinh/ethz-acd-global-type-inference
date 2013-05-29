@@ -1,6 +1,7 @@
 package cd.semantic;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -317,7 +318,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 		}
 	}
 
-	public TypeSymbol getLCA(TypeSymbol... symbols) {
+	public TypeSymbol getLCA(Collection<? extends TypeSymbol> symbols) {
 		TypeSymbol result = getBottomType();
 		for (TypeSymbol sym : symbols) {
 			result = getLCA(result, sym);
