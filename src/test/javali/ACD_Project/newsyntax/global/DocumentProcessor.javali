@@ -1,0 +1,20 @@
+class Document {
+    var length;
+    isEmpty() { return length == 0; }
+}
+
+class DocumentProcessor {
+    void process(document) {
+        write(document.length);
+    }
+}
+
+class Main {
+    void main() {
+        var documentProc, document;
+        document = new Document();
+        document.length = 156;
+        documentProc = new DocumentProcessor();
+        documentProc.process(document);
+    }
+}
