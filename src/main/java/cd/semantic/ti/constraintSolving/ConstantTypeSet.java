@@ -1,6 +1,5 @@
 package cd.semantic.ti.constraintSolving;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import cd.ir.symbols.TypeSymbol;
@@ -32,12 +31,6 @@ public class ConstantTypeSet extends TypeSet {
 	@Override
 	public ImmutableSet<TypeSymbol> getTypes() {
 		return types;
-	}
-
-	public ConstantTypeSet intersect(ConstantTypeSet typeSet) {
-		Set<TypeSymbol> typeSyms = new HashSet<>(types);
-		typeSyms.retainAll(typeSet.getTypes());
-		return new ConstantTypeSet(typeSyms);
 	}
 
 	@Override
