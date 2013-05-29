@@ -113,6 +113,9 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
 	@Override
 	public TypeSet newArray(NewArray ast) {
+		TypeSet sizeTypeSet = visit(ast.arg());
+		getSystem().addEquality(sizeTypeSet, getTypeSetFactory().makeInt());
+
 		return getTypeSetFactory().make(ast.typeName);
 	}
 

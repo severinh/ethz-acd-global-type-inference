@@ -1,0 +1,9 @@
+// Assert that the compiler only accepts an integer expression as the size
+// for a new array.
+
+class Main {
+	void main() {
+		int[] array;
+		array = new int[true];
+	}
+}
