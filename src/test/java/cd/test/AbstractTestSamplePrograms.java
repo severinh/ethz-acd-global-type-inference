@@ -156,7 +156,9 @@ abstract public class AbstractTestSamplePrograms {
 					+ VALGRIND_ERROR_CODE));
 		}
 
-		Assert.assertEquals(execRef, execOut);
+		if (!execRef.contains("NONDETERMINISTIC")) {
+			Assert.assertEquals(execRef, execOut);
+		}
 	}
 
 	private String getInput() throws IOException {
