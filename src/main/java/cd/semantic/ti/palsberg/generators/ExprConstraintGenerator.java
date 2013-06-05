@@ -134,7 +134,7 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 		getSystem().addUpperBound(exprTypeSet, allRefTypes);
 
 		TypeSymbol castResultType = getTypeSymbols().getType(ast.typeName);
-		return getTypeSetFactory().makeDeclarableSubtypes(castResultType);
+		return getTypeSetFactory().makeSubtypes(castResultType);
 	}
 
 	@Override

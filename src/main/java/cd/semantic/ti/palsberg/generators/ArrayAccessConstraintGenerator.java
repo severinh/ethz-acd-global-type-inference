@@ -43,7 +43,7 @@ public class ArrayAccessConstraintGenerator extends
 	protected TypeSet getResultTypeSet(ArrayTypeSymbol receiverType) {
 		// Also allow objects in the array whose type is a subtype of the
 		// declared array element type
-		return generator.getTypeSetFactory().makeDeclarableSubtypes(
+		return generator.getTypeSetFactory().makeSubtypes(
 				receiverType.elementType);
 	}
 

@@ -26,7 +26,6 @@ public class ConstantTypeSetFactory {
 	private final TypeSymbolTable typeSymbols;
 	private final Map<TypeSymbol, ConstantTypeSet> singletonTypeSets;
 	private final Map<TypeSymbol, ConstantTypeSet> subtypeSets;
-	private final Map<TypeSymbol, ConstantTypeSet> declarableSubtypeSets;
 
 	private ConstantTypeSet numericalTypeSet;
 	private ConstantTypeSet referenceTypeSet;
@@ -44,7 +43,6 @@ public class ConstantTypeSetFactory {
 		this.typeSymbols = checkNotNull(typeSymbols);
 		this.singletonTypeSets = new HashMap<>();
 		this.subtypeSets = new HashMap<>();
-		this.declarableSubtypeSets = new HashMap<>();
 	}
 
 	/**
@@ -97,31 +95,6 @@ public class ConstantTypeSetFactory {
 				result = make(typeSymbol);
 			}
 			subtypeSets.put(typeSymbol, result);
-		}
-
-		return result;
-	}
-
-	public ConstantTypeSet makeDeclarableSubtypes(TypeSymbol typeSymbol) {
-		checkNotNull(typeSymbol);
-
-		if (!typeSymbol.isDeclarableType()) {
-			return makeEmpty();
-		}
-
-		ConstantTypeSet result = declarableSubtypeSets.get(typeSymbol);
-		if (result == null) {
-			if (typeSymbol instanceof ClassSymbol) {
-				ClassSymbol classSym = (ClassSymbol) typeSymbol;
-				Set<ClassSymbol> classSymbolSubtypes = typeSymbols
-						.getClassSymbolSubtypes(classSym);
-				result = new ConstantTypeSet(classSymbolSubtypes);
-			} else {
-				// All other types do not have any strict subtypes (that may be
-				// used in a program)
-				result = make(typeSymbol);
-			}
-			declarableSubtypeSets.put(typeSymbol, result);
 		}
 
 		return result;
