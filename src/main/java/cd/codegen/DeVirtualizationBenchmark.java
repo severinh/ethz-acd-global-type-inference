@@ -96,12 +96,12 @@ public class DeVirtualizationBenchmark {
 			generateBenchmarkFile(benchmarkJavaliSource);
 			
 			CompilerOptions options1 = new CompilerOptions();
-			options1.setEnableDevirtualizationOptimization(false);
+			options1.setDevirtualizing(false);
 			CompilationContext context1 = new CompilationContext(benchmarkJavaliSource, options1);
 			CompilerToolchain compiler1 = CompilerToolchain.forContext(context1);
 			
 			CompilerOptions options2 = new CompilerOptions();
-			options2.setEnableDevirtualizationOptimization(true);
+			options2.setDevirtualizing(true);
 			CompilationContext context2 = new CompilationContext(benchmarkJavaliSource, options2);
 			CompilerToolchain compiler2 = CompilerToolchain.forContext(context2);
 			
