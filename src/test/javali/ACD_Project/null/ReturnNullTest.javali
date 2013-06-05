@@ -1,0 +1,14 @@
+// Assert that it is possible to return null.
+
+class A {
+}
+
+class Main {
+	void main() {
+		foo();
+	}
+	
+	A foo() {
+		return null;
+	}
+}
