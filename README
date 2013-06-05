@@ -1,0 +1,52 @@
+Javali Compiler with Global Type Inference
+==========================================
+
+Prerequisites
+-------------
+
+Make sure that you have installed JDK for Java 7.
+The project uses the build system Maven. On Ubuntu, install it using
+
+$ sudo apt-get install maven
+
+Maven will take care of fetching all dependencies, generating the parser,
+compiling the code and building the resulting JAR file.
+The dependencies include:
+
+- ANTLR 3 (for generating the parser)
+- JUnit 4 (for unit testing)
+- SLF4J and Logback (for logging)
+- Apache Commons Lang
+- Apache Commons IO
+- Apache Commons Math
+- Apache Commons CLI
+- Google Guava (various data structures, Optional, preconditions)
+
+
+Building
+--------
+
+Run the following to build the whole compiler:
+
+$ mvn install
+
+
+Running
+-------
+
+To compile a single Javali source file 'foo.javali', run
+
+$ ./javalic foo.javali
+
+To get the list of available options (type inference mode, optimization), run
+
+$ ./javalic --help
+
+
+Eclipse Project
+---------------
+
+After opening the Eclipse project, it may be necessary to install
+some software to make Maven play nicely with Eclipse.
+
+TODO

@@ -7,7 +7,7 @@ public class CompilerOptions {
 	private boolean enableDevirtualizationOptimization;
 
 	public CompilerOptions() {
-		this(TypeErasureMode.NONE, TypeInferenceMode.NONE);
+		this(TypeErasureMode.NONE, TypeInferenceMode.GLOBAL);
 		setEnableDevirtualizationOptimization(false);
 	}
 
