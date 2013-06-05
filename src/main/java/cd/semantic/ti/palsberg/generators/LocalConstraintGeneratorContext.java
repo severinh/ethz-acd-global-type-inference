@@ -62,7 +62,7 @@ public final class LocalConstraintGeneratorContext extends
 		if (type == getTypeSymbolTable().getVoidType()) {
 			return getConstantTypeSetFactory().makeEmpty();
 		} else {
-			return getConstantTypeSetFactory().makeDeclarableSubtypes(type);
+			return getConstantTypeSetFactory().makeSubtypes(type);
 		}
 	}
 
