@@ -11,6 +11,7 @@ import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.TypeSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.semantic.TypeSymbolTable;
+import cd.semantic.ti.palsberg.generators.MethodSymbolCache;
 
 /**
  * Tests {@link MethodSymbolCache}.

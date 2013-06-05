@@ -1,9 +1,9 @@
 package cd;
 
-import cd.semantic.ti.GlobalTypeInference;
 import cd.semantic.ti.LocalTypeInferenceLightweight;
-import cd.semantic.ti.LocalTypeInferenceWithConstraints;
 import cd.semantic.ti.TypeInference;
+import cd.semantic.ti.palsberg.GlobalTypeInference;
+import cd.semantic.ti.palsberg.LocalTypeInferenceWithConstraints;
 
 /**
  * Specifies the scope of type inference, if any, and provides clients with the
