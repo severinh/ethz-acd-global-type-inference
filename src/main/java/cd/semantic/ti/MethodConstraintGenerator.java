@@ -16,10 +16,7 @@ import cd.semantic.ti.constraintSolving.ConstantTypeSet;
 import cd.semantic.ti.constraintSolving.ConstantTypeSetFactory;
 import cd.semantic.ti.constraintSolving.ConstraintSystem;
 import cd.semantic.ti.constraintSolving.TypeSet;
-import cd.semantic.ti.constraintSolving.TypeVariable;
 import cd.util.Pair;
-
-import com.google.common.base.Optional;
 
 /**
  * Recursively generates the type constraints for an individual methods
@@ -121,9 +118,8 @@ public class MethodConstraintGenerator extends AstVisitor<Void, Void> {
 
 	@Override
 	public Void methodCall(MethodCall call, Void arg) {
-		exprConstraintGenerator.createMethodCallConstraints(call.methodName,
-				call.receiver(), call.argumentsWithoutReceiver(),
-				Optional.<TypeVariable> absent());
+		new MethodCallConstraintGenerator(exprConstraintGenerator, call)
+				.generate();
 		return null;
 	}
 
