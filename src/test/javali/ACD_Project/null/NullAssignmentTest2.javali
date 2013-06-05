@@ -1,0 +1,10 @@
+// Assert that it is not possible to assign null to a variable whose
+// static type must be a primitive type.
+
+class Main {
+	void main() {
+		int a;
+		a = 1;
+		a = null;
+	}
+}
