@@ -48,7 +48,7 @@ public final class LocalConstraintGeneratorContext extends
 		case FIELD:
 		case PARAM:
 			TypeSymbol type = symbol.getType();
-			return getConstantTypeSetFactory().makeDeclarableSubtypes(type);
+			return getConstantTypeSetFactory().makeSubtypes(type);
 		case LOCAL:
 			return super.getVariableTypeSet(symbol);
 		default:

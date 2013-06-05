@@ -3,6 +3,7 @@ package cd.semantic.ti.palsberg.solving;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,6 +25,7 @@ public class ConstantTypeSetFactory {
 
 	private final TypeSymbolTable typeSymbols;
 	private final Map<TypeSymbol, ConstantTypeSet> singletonTypeSets;
+	private final Map<TypeSymbol, ConstantTypeSet> subtypeSets;
 	private final Map<TypeSymbol, ConstantTypeSet> declarableSubtypeSets;
 
 	private ConstantTypeSet numericalTypeSet;
@@ -41,6 +43,7 @@ public class ConstantTypeSetFactory {
 		super();
 		this.typeSymbols = checkNotNull(typeSymbols);
 		this.singletonTypeSets = new HashMap<>();
+		this.subtypeSets = new HashMap<>();
 		this.declarableSubtypeSets = new HashMap<>();
 	}
 
@@ -75,6 +78,28 @@ public class ConstantTypeSetFactory {
 	public ConstantTypeSet make(String typeSymbolName) {
 		TypeSymbol typeSymbol = typeSymbols.get(typeSymbolName);
 		return make(typeSymbol);
+	}
+
+	public ConstantTypeSet makeSubtypes(TypeSymbol typeSymbol) {
+		checkNotNull(typeSymbol);
+
+		ConstantTypeSet result = subtypeSets.get(typeSymbol);
+		if (result == null) {
+			if (typeSymbol instanceof ClassSymbol) {
+				ClassSymbol classSym = (ClassSymbol) typeSymbol;
+				Set<TypeSymbol> subtypes = new HashSet<>();
+				subtypes.addAll(typeSymbols.getClassSymbolSubtypes(classSym));
+				subtypes.add(typeSymbols.getNullType());
+				result = new ConstantTypeSet(subtypes);
+			} else {
+				// All other types do not have any strict subtypes (that may be
+				// used in a program)
+				result = make(typeSymbol);
+			}
+			subtypeSets.put(typeSymbol, result);
+		}
+
+		return result;
 	}
 
 	public ConstantTypeSet makeDeclarableSubtypes(TypeSymbol typeSymbol) {

@@ -1,6 +1,7 @@
 package cd.semantic.ti.palsberg.generators;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +30,6 @@ public abstract class ReceiverConstraintGenerator<A extends Ast, RT extends Type
 		List<TypeSet> argumentTypeSets = getArgumentTypeSets();
 
 		Set<? extends RT> possibleReceiverTypes = getPossibleReceiverTypes();
-
 		for (RT possibleReceiverType : possibleReceiverTypes) {
 			ConstraintCondition condition = new ConstraintCondition(
 					possibleReceiverType, receiverTypeSet);
@@ -47,10 +47,20 @@ public abstract class ReceiverConstraintGenerator<A extends Ast, RT extends Type
 					possibleResultTypeSet, condition);
 		}
 
-		ConstantTypeSet possibleReceiverTypeSet = new ConstantTypeSet(
-				possibleReceiverTypes);
+		// We do not need to generate any constraints for the case that null
+		// is in the receiver type set, because null is a subtype of all
+		// reference types. Thus, null is not part of the possibleReceiverTypes
+		// set. However, we must not disallow null as a receiver. Thus,
+		// include it in the upper bound.
+		Set<TypeSymbol> possibleReceiverTypesWithNull = new HashSet<>();
+		possibleReceiverTypesWithNull.addAll(possibleReceiverTypes);
+		possibleReceiverTypesWithNull.add(generator.getTypeSymbols()
+				.getNullType());
+
+		ConstantTypeSet possibleReceiverTypeSetWithNull = new ConstantTypeSet(
+				possibleReceiverTypesWithNull);
 		generator.getSystem().addUpperBound(receiverTypeSet,
-				possibleReceiverTypeSet);
+				possibleReceiverTypeSetWithNull);
 
 		return resultTypeSet;
 	}

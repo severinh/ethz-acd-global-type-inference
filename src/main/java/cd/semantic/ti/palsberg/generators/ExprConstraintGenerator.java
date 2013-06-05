@@ -129,7 +129,8 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 	public TypeSet cast(Cast ast) {
 		TypeSet exprTypeSet = visit(ast.arg());
 		// Only reference types can be cast
-		ConstantTypeSet allRefTypes = getTypeSetFactory().makeReferenceTypeSet();
+		ConstantTypeSet allRefTypes = getTypeSetFactory()
+				.makeReferenceTypeSet();
 		getSystem().addUpperBound(exprTypeSet, allRefTypes);
 
 		TypeSymbol castResultType = getTypeSymbols().getType(ast.typeName);
