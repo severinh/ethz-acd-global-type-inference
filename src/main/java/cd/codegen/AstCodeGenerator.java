@@ -985,7 +985,7 @@ public class AstCodeGenerator {
 			emitStore(reg, 0, SP); // check for null ptr
 			call(CHECK_NULL, null);
 
-			boolean optimize = context.getOptions().isEnableDevirtualizationOptimization();
+			boolean optimize = context.getOptions().isDevirtualizing();
 			if (mthSymbol.isOverridden() || !optimize) {
 				// load address of vtable from object
 				emitLoad(0, reg, reg);

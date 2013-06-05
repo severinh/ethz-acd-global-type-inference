@@ -9,9 +9,8 @@ The project uses the build system Maven. On Ubuntu, install it using
 
 $ sudo apt-get install maven
 
-Maven will take care of fetching all dependencies, generating the parser,
-compiling the code and building the resulting JAR file.
-The dependencies include:
+Maven will fetch all dependencies, generate the parser, compile the code
+and build the resulting JAR file. The dependencies include:
 
 - ANTLR 3 (for generating the parser)
 - JUnit 4 (for unit testing)

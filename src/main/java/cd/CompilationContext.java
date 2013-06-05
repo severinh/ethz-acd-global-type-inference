@@ -18,6 +18,8 @@ public class CompilationContext {
 	private final File sourceFile;
 	private final File assemblyFile;
 	private final File binaryFile;
+
+	@Nullable
 	private final File cfgDumpBase;
 
 	private final CompilerOptions options;
@@ -39,16 +41,18 @@ public class CompilationContext {
 		this.sourceFile = file;
 		this.assemblyFile = new File(file.getPath() + Config.ASMEXT);
 		this.binaryFile = new File(file.getPath() + Config.BINARYEXT);
-		this.cfgDumpBase = file;
+		this.cfgDumpBase = (options.isDebugging()) ? file : null;
 		this.options = options;
 		this.typeSymbols = new TypeSymbolTable();
 		this.classDecls = new ArrayList<>();
+
 	}
 
 	public TypeSymbolTable getTypeSymbols() {
 		return typeSymbols;
 	}
 
+	@Nullable
 	public File getCfgDumpBase() {
 		return cfgDumpBase;
 	}
@@ -61,10 +65,13 @@ public class CompilationContext {
 	 * Delete intermediate files from previous runs.
 	 */
 	public void deleteIntermediateFiles() {
-		if (assemblyFile.exists())
+		if (assemblyFile.exists()) {
 			assemblyFile.delete();
-		if (binaryFile.exists())
+		}
+
+		if (binaryFile.exists()) {
 			binaryFile.delete();
+		}
 	}
 
 	public File getAssemblyFile() {

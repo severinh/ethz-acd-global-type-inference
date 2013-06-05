@@ -43,21 +43,15 @@ public class Main {
 			formatter.printHelp("javalic", options);
 		}
 
-		TypeInferenceMode typeInferenceMode = TypeInferenceMode.NONE;
+		CompilerOptions compilerOptions = new CompilerOptions();
 		if (line.hasOption("i")) {
-			typeInferenceMode = TypeInferenceMode.GLOBAL;
+			compilerOptions.setTypeInferenceMode(TypeInferenceMode.GLOBAL);
 		}
-
-		TypeErasureMode typeErasureMode = TypeErasureMode.NONE;
 		if (line.hasOption("e")) {
-			typeErasureMode = TypeErasureMode.GLOBAL;
+			compilerOptions.setTypeErasureMode(TypeErasureMode.GLOBAL);
 		}
-
-		CompilerOptions compilerOptions = new CompilerOptions(typeErasureMode,
-				typeInferenceMode);
-
-		compilerOptions.setEnableDevirtualizationOptimization(options
-				.hasOption("O"));
+		compilerOptions.setDevirtualizing(line.hasOption("o"));
+		compilerOptions.setDebugging(line.hasOption("d"));
 
 		for (String file : line.getArgs()) {
 			CompilationContext context = new CompilationContext(new File(file),
