@@ -1,5 +1,6 @@
 package cd.semantic.ti.palsberg.generators;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -15,19 +16,18 @@ public abstract class ReceiverConstraintGenerator<A extends Ast, RT extends Type
 
 	protected final ExprConstraintGenerator generator;
 	protected final A ast;
+	protected final TypeSet resultTypeSet;
 
 	public ReceiverConstraintGenerator(
 			ExprConstraintGenerator exprConstraintGenerator, A ast) {
 		this.generator = exprConstraintGenerator;
 		this.ast = ast;
+		this.resultTypeSet = generator.getSystem().addTypeVariable();
 	}
 
-	public TypeVariable generate() {
-		Expr receiver = getReceiver();
-		List<? extends Expr> arguments = getArguments();
-
-		TypeSet receiverTypeSet = generator.visit(receiver);
-		TypeVariable resultTypeSet = generator.getSystem().addTypeVariable();
+	public TypeSet generate() {
+		TypeSet receiverTypeSet = getReceiverTypeSet();
+		List<TypeSet> argumentTypeSets = getArgumentTypeSets();
 
 		Set<? extends RT> possibleReceiverTypes = getPossibleReceiverTypes();
 
@@ -36,9 +36,8 @@ public abstract class ReceiverConstraintGenerator<A extends Ast, RT extends Type
 					possibleReceiverType, receiverTypeSet);
 			List<? extends TypeSet> parameterTypeSets = getParameterTypeSets(possibleReceiverType);
 
-			for (int i = 0; i < arguments.size(); i++) {
-				Expr argument = arguments.get(i);
-				TypeSet argumentTypeSet = generator.visit(argument);
+			for (int i = 0; i < argumentTypeSets.size(); i++) {
+				TypeSet argumentTypeSet = argumentTypeSets.get(i);
 				TypeSet parameterTypeSet = parameterTypeSets.get(i);
 				generator.getSystem().addInequality(argumentTypeSet,
 						parameterTypeSet, condition);
@@ -59,7 +58,19 @@ public abstract class ReceiverConstraintGenerator<A extends Ast, RT extends Type
 
 	protected abstract Expr getReceiver();
 
+	protected TypeSet getReceiverTypeSet() {
+		return generator.visit(getReceiver());
+	}
+
 	protected abstract List<? extends Expr> getArguments();
+
+	protected List<TypeSet> getArgumentTypeSets() {
+		List<TypeSet> result = new ArrayList<>();
+		for (Expr argument : getArguments()) {
+			result.add(generator.visit(argument));
+		}
+		return result;
+	}
 
 	protected abstract Set<? extends RT> getPossibleReceiverTypes();
 
