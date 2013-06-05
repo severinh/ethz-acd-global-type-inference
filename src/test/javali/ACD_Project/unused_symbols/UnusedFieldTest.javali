@@ -1,0 +1,7 @@
+// Assert that the program compiles even though there is an unused field
+
+class Main {
+	int f;
+	void main() {
+	}
+}
