@@ -10,7 +10,6 @@ import cd.ir.symbols.TypeSymbol;
 import cd.semantic.ti.palsberg.constraints.ConstraintCondition;
 import cd.semantic.ti.palsberg.solving.ConstantTypeSet;
 import cd.semantic.ti.palsberg.solving.TypeSet;
-import cd.semantic.ti.palsberg.solving.TypeVariable;
 
 public abstract class ReceiverConstraintGenerator<A extends Ast, RT extends TypeSymbol> {
 

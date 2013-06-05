@@ -3,7 +3,6 @@ package cd.semantic.ti.palsberg.solving;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -150,14 +149,12 @@ public class ConstantTypeSetFactory {
 	}
 
 	/**
-	 * Returns a constant type set containing all declarable reference types.
+	 * Returns a constant type set containing all reference types.
 	 */
 	public ConstantTypeSet makeReferenceTypeSet() {
 		if (referenceTypeSet == null) {
-			Set<TypeSymbol> referenceTypes = new HashSet<>();
-			referenceTypes.addAll(typeSymbols.getClassSymbols());
-			referenceTypes.addAll(typeSymbols.getArrayTypeSymbols());
-			referenceTypeSet = new ConstantTypeSet(referenceTypes);
+			referenceTypeSet = new ConstantTypeSet(
+					typeSymbols.getReferenceTypeSymbols());
 		}
 		return referenceTypeSet;
 	}

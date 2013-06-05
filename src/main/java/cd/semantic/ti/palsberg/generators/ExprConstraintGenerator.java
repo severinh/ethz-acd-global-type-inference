@@ -94,7 +94,17 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 
 	@Override
 	public TypeSet nullConst(NullConst ast) {
-		return getTypeSetFactory().makeReferenceTypeSet();
+		// It is neither possible to use the empty set or the set of all
+		// reference types here:
+		//
+		// The empty set is not possible because otherwise, null could be
+		// assigned to a non-reference variable, because the assignment
+		// constraint would be (trivially) satisfied.
+		//
+		// The set of all reference types is not possible because otherwise, the
+		// static type of the variable that null is assigned to can only be
+		// Object.
+		return getTypeSetFactory().makeNull();
 	}
 
 	@Override
@@ -118,9 +128,9 @@ public class ExprConstraintGenerator extends ExprVisitorWithoutArg<TypeSet> {
 	@Override
 	public TypeSet cast(Cast ast) {
 		TypeSet exprTypeSet = visit(ast.arg());
-		// only reference types can be cast
-		ConstantTypeSet allRefTyes = getTypeSetFactory().makeReferenceTypeSet();
-		getSystem().addUpperBound(exprTypeSet, allRefTyes);
+		// Only reference types can be cast
+		ConstantTypeSet allRefTypes = getTypeSetFactory().makeReferenceTypeSet();
+		getSystem().addUpperBound(exprTypeSet, allRefTypes);
 
 		TypeSymbol castResultType = getTypeSymbols().getType(ast.typeName);
 		return getTypeSetFactory().makeDeclarableSubtypes(castResultType);
