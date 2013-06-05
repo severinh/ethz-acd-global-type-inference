@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import cd.CompilationContext;
 import cd.CompilerOptions;
-import cd.CompilerToolchain;
+import cd.Compiler;
 import cd.test.fileprovider.RecursiveTestFileProvider;
 import cd.test.fileprovider.TestFileProvider;
 import cd.util.FileUtil;
@@ -51,12 +51,12 @@ public class TSCTest {
 	}
 
 	private CompilationContext context;
-	private CompilerToolchain compiler;
+	private Compiler compiler;
 
 	public TSCTest(String testName, @Nonnull File sourceFile,
 			@Nonnull CompilerOptions options) {
 		context = new CompilationContext(sourceFile, options);
-		compiler = CompilerToolchain.forContext(context);
+		compiler = Compiler.forContext(context);
 	}
 
 	@Test

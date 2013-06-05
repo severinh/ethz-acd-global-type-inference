@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Optional;
 
 import cd.CompilationContext;
-import cd.CompilerToolchain;
+import cd.Compiler;
 import cd.CompilerOptions;
 import cd.exceptions.ParseFailure;
 import cd.exceptions.SemanticFailure;
@@ -33,7 +33,7 @@ abstract public class AbstractTestSamplePrograms {
 	// Otherwise valgrind returns the exit code of the simulated program.
 	private static final int VALGRIND_ERROR_CODE = 77;
 
-	private final CompilerToolchain compiler;
+	private final Compiler compiler;
 
 	private final ReferenceData referenceData;
 	private final File inputFile;
@@ -42,13 +42,13 @@ abstract public class AbstractTestSamplePrograms {
 	public AbstractTestSamplePrograms(@Nonnull File sourceFile,
 			@Nonnull CompilerOptions options, ReferenceData referenceData) {
 		CompilationContext context = new CompilationContext(sourceFile, options);
-		this.compiler = CompilerToolchain.forContext(context);
+		this.compiler = Compiler.forContext(context);
 		this.referenceData = referenceData;
 		this.inputFile = new File(context.getSourceFile().getPath() + ".in");
 		this.testConfig = new TestConfig(); // Could be passed as parameter
 	}
 
-	protected CompilerToolchain getCompiler() {
+	protected Compiler getCompiler() {
 		return compiler;
 	}
 

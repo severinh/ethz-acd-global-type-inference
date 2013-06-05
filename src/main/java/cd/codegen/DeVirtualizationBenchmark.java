@@ -8,7 +8,7 @@ import org.apache.commons.math3.stat.StatUtils;
 
 import cd.CompilationContext;
 import cd.CompilerOptions;
-import cd.CompilerToolchain;
+import cd.Compiler;
 import cd.util.FileUtil;
 
 public class DeVirtualizationBenchmark {
@@ -98,12 +98,12 @@ public class DeVirtualizationBenchmark {
 			CompilerOptions options1 = new CompilerOptions();
 			options1.setDevirtualizing(false);
 			CompilationContext context1 = new CompilationContext(benchmarkJavaliSource, options1);
-			CompilerToolchain compiler1 = CompilerToolchain.forContext(context1);
+			Compiler compiler1 = Compiler.forContext(context1);
 			
 			CompilerOptions options2 = new CompilerOptions();
 			options2.setDevirtualizing(true);
 			CompilationContext context2 = new CompilationContext(benchmarkJavaliSource, options2);
-			CompilerToolchain compiler2 = CompilerToolchain.forContext(context2);
+			Compiler compiler2 = Compiler.forContext(context2);
 			
 			compiler1.compile();
 			double unoptimizedRuntimeAvg = measureAvgExecutionTime(context1.getBinaryFile());

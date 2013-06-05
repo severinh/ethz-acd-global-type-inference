@@ -35,20 +35,20 @@ import cd.semantic.ti.TypeEraser;
 import cd.semantic.ti.TypeInference;
 import cd.util.FileUtil;
 
-public class CompilerToolchain {
+public class Compiler {
 
 	@SuppressWarnings("null")
 	public static final Logger LOG = LoggerFactory
-			.getLogger(CompilerToolchain.class);
+			.getLogger(Compiler.class);
 
 	private final CompilationContext context;
 
-	protected CompilerToolchain(CompilationContext context) {
+	protected Compiler(CompilationContext context) {
 		this.context = context;
 	}
 
-	public static CompilerToolchain forContext(CompilationContext context) {
-		return new CompilerToolchain(context);
+	public static Compiler forContext(CompilationContext context) {
+		return new Compiler(context);
 	}
 
 	public CompilationContext getContext() {

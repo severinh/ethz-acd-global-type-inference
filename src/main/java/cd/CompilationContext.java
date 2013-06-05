@@ -99,7 +99,7 @@ public class CompilationContext {
 	 * Add a class declaration to the context.
 	 * 
 	 * The method is package-private because it is meant to be called by the
-	 * {@link CompilerToolchain}.
+	 * {@link Compiler}.
 	 */
 	void addClassDecl(ClassDecl classDecl) {
 		this.classDecls.add(classDecl);
@@ -109,7 +109,7 @@ public class CompilationContext {
 	 * Add a list of class declarations to the context.
 	 * 
 	 * The method is package-private because it is meant to be called by the
-	 * {@link CompilerToolchain}.
+	 * {@link Compiler}.
 	 */
 	void addClassDecls(List<ClassDecl> classDecls) {
 		this.classDecls.addAll(classDecls);
