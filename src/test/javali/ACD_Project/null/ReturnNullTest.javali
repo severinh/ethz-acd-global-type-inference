@@ -1,14 +1,29 @@
 // Assert that it is possible to return null.
 
 class A {
+	void m() {
+	}
 }
 
 class Main {
 	void main() {
-		foo();
+		A a;
+		Object obj;
+		a = foo();
+		a.m();
+		bar();
+		obj = baz();
 	}
 	
 	A foo() {
+		return null;
+	}
+	
+	A bar() {
+		return null;
+	}
+	
+	Object baz() {
 		return null;
 	}
 }
