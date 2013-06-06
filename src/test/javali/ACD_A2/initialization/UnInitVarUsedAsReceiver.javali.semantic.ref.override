@@ -1,2 +1,0 @@
-TYPE_ERROR
-# With type inference, the uninitialized variable access leads to a type error
