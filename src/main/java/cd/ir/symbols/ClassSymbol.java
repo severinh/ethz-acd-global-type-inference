@@ -170,6 +170,12 @@ public class ClassSymbol extends TypeSymbol {
 
 		methods.put(method.name, method);
 	}
+	
+	public void removeMethod(MethodSymbol method) {
+		checkArgument(method.getOwner().equals(this));
+		checkArgument(methods.containsValue(method));
+		methods.remove(method.name);
+	}
 
 	/**
 	 * Registers a new field as being declared in this class.

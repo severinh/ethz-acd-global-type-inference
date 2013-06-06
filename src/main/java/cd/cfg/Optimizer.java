@@ -59,10 +59,6 @@ public class Optimizer {
 	}
 
 	public void compute(MethodDecl md) {
-		if (!md.sym.used) {
-			return;
-		}
-		
 		int oldChanges, outer = 0;
 		do {
 

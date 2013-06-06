@@ -1027,9 +1027,7 @@ public class AstCodeGenerator {
 		@Override
 		public String methodDecl(MethodDecl ast, Void arg) {
 			emitMethodPrefix(ast);
-			if (ast.sym.used) { 
-				gen(ast.body());
-			}
+			gen(ast.body());
 			emitMethodSuffix(false);
 			return null;
 		}

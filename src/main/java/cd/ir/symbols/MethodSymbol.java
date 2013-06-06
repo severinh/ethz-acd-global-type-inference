@@ -25,7 +25,6 @@ public class MethodSymbol extends Symbol {
 	private final List<MethodSymbol> overriddenBy;
 	public TypeSymbol returnType;
 	public int vtableIndex = -1;
-	public boolean used = false;
 
 	// Third-party library is missing non-null annotations
 	@SuppressWarnings("null")

@@ -40,62 +40,26 @@ public class TypedSemanticAnalyzer {
 		checkInheritance(classDecls);
 		checkStartPoint(context.getTypeSymbols());
 		checkUsedMethodBodies(classDecls);
-		//checkMethodBodies(context.getTypeSymbols(), classDecls);
 		rewriteMethodBodies(classDecls);
 	}
 
+	/**
+	 * Transitively check which methods are used (i.e. reachable) from main,
+	 * and perform semantic checks on them.
+	 */
 	private void checkUsedMethodBodies(List<ClassDecl> classDecls) {
-		final Set<MethodSymbol> usedMethods = new HashSet<>();
 		@SuppressWarnings("null")
 		MethodSymbol main = context.getMainType().getMethod("main");
-		
-		AstVisitor<Void,Void> methodUseCollector = new AstVisitor<Void,Void>() {
-			
-			@Override
-			public Void methodDecl(MethodDecl ast, Void arg) {
-				checkMethodBody(ast);
-				ast.sym.used = true;
-				usedMethods.add(ast.sym);
-				return super.methodDecl(ast, null);
-			}
-			
-			@Override
-			public Void methodCall(MethodCall ast, Void arg) {
-				handleCallSite(ast.sym);
-				return null;
-			}
-			
-			@Override
-			public Void methodCall(MethodCallExpr ast, Void arg) {
-				handleCallSite(ast.sym);
-				return null;
-			}
-			
-			private void handleCallSite(MethodSymbol msym) {
-				// When a method symbol is used, check its method declaration 
-				// and all the overriding methods as well. This is an approximation but necessary.
-				List<MethodSymbol> toVisit = new ArrayList<>();
-				toVisit.add(msym);
-				toVisit.addAll(msym.getOverriddenBy());
-				for (MethodSymbol m : toVisit) {
-					if (!usedMethods.contains(m)) {
-						visit(getMethodDecl(m), null);
-					}
-				}
-			}
-		};
-		methodUseCollector.visit(getMethodDecl(main), null);
-		Set<MethodSymbol> allMethodSyms = new HashSet<>();
-		for (ClassSymbol csym : context.getTypeSymbols().getClassSymbols()) {
-			allMethodSyms.addAll(csym.getDeclaredMethods());
-		}
-		Set<MethodSymbol> unusedMethods = new HashSet<>(allMethodSyms);
-		unusedMethods.removeAll(usedMethods);
-		for (MethodSymbol msym : unusedMethods) {
-			System.out.println("MethodSymbol unused: " + msym.getOwner().getName() + "." + msym.getName());
-		}
+		ReachableMethodChecker reachableMethodChecker = new ReachableMethodChecker();
+		reachableMethodChecker.checkReachableFrom(getMethodDecl(main));
+		reachableMethodChecker.removeUnusedMethods();
 	}
 	
+	/**
+	 * Finds the MethodDecl of a MethodSymbol
+	 * @param msym
+	 * @return
+	 */
 	private MethodDecl getMethodDecl(MethodSymbol msym) {
 		for (ClassDecl cdecl : context.getAstRoots()) {
 			for (MethodDecl mdecl : cdecl.methods()) {
@@ -138,20 +102,6 @@ public class TypedSemanticAnalyzer {
 		throw new SemanticFailure(Cause.INVALID_START_POINT);
 	}
 
-	/**
-	 * Check the bodies of methods for errors, particularly type errors but also
-	 * undefined identifiers and the like.
-	 * 
-	 * @see TypeChecker
-	 */
-	private void checkMethodBodies(TypeSymbolTable typeSymbols,
-			List<ClassDecl> classDecls) {
-		for (ClassDecl classd : classDecls) {
-			for (MethodDecl md : classd.methods()) {
-				checkMethodBody(md);
-			}
-		}
-	}
 
 	private void checkMethodBody(MethodDecl md) {
 		TypeSymbolTable typeSyms = context.getTypeSymbols();
@@ -173,6 +123,73 @@ public class TypedSemanticAnalyzer {
 	private void rewriteMethodBodies(List<ClassDecl> classDecls) {
 		for (ClassDecl cd : classDecls)
 			new ExprRewriter().visit(cd, null);
+	}
+	
+	
+	/**
+	 * Check all method bodies reachable from a given method.
+	 * A method is reachable if there is a call from another reachable method to it.
+	 *
+	 */
+	private final class ReachableMethodChecker extends AstVisitor<Void, Void> {
+		private final Set<MethodSymbol> usedMethods;
+	
+		private ReachableMethodChecker() {
+			this.usedMethods = new HashSet<>();
+		}
+		
+		public void checkReachableFrom(MethodDecl ast) {
+			visit(ast, null);
+		}
+	
+		@Override
+		public Void methodDecl(MethodDecl ast, Void arg) {
+			checkMethodBody(ast);
+			usedMethods.add(ast.sym);
+			return super.methodDecl(ast, null);
+		}
+	
+		@Override
+		public Void methodCall(MethodCall ast, Void arg) {
+			handleCallSite(ast.sym);
+			return null;
+		}
+	
+		@Override
+		public Void methodCall(MethodCallExpr ast, Void arg) {
+			handleCallSite(ast.sym);
+			return null;
+		}
+	
+		private void handleCallSite(MethodSymbol msym) {
+			// When a method symbol is used, check its method declaration 
+			// and all the overriding methods as well. This is an approximation but necessary.
+			List<MethodSymbol> toVisit = new ArrayList<>();
+			toVisit.add(msym);
+			toVisit.addAll(msym.getOverriddenBy());
+			for (MethodSymbol m : toVisit) {
+				if (!usedMethods.contains(m)) {
+					visit(getMethodDecl(m), null);
+				}
+			}
+		}
+		
+		/**
+		 * Removes all the unused methods. This prevents the code generator
+		 * from processing methods we could not correctly type but that are never used.
+		 * The reason we cannot type them is often exactly because they are never called.
+		 */
+		public void removeUnusedMethods() {
+			for (ClassDecl cdecl : context.getAstRoots()) {
+				ClassSymbol csym = cdecl.sym;
+				Set<MethodSymbol> unusedMethods = new HashSet<>(csym.getDeclaredMethods());
+				unusedMethods.removeAll(usedMethods);
+				for (MethodSymbol unusedMethodSym : unusedMethods) {
+					csym.removeMethod(unusedMethodSym);
+					cdecl.removeChild(getMethodDecl(unusedMethodSym));
+				}
+			}
+		}
 	}
 
 }

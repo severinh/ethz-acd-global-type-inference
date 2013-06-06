@@ -38,6 +38,10 @@ public abstract class Ast {
 		}
 		return result;
 	}
+	
+	public void removeChild(Ast child) {
+		rwChildren.remove(child);
+	}
 
 	/**
 	 * Returns a new list containing all children AST nodes that are of the
