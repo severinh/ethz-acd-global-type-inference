@@ -8,6 +8,8 @@ import java.util.Set;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
+import cd.exceptions.SemanticFailure;
+import cd.exceptions.SemanticFailure.Cause;
 import cd.ir.AstVisitor;
 import cd.ir.ast.Assign;
 import cd.ir.ast.Expr;
@@ -42,6 +44,10 @@ public class LocalTypeInferenceLightweight extends LocalTypeInference {
 			VariableSymbol variable = ((Var) assign.left()).getSymbol();
 			TypeSymbol exprType = exprTypingVisitor.type(assign.right(), scope);
 			TypeSymbol lca = typeSymbols.getLCA(variable.getType(), exprType);
+			if (lca.equals(typeSymbols.getTopType())) {
+				throw new SemanticFailure(Cause.TYPE_ERROR,
+						"Variable %s cannot have top type.", variable);
+			}
 			if (lca != variable.getType()) {
 				variable.setType(lca);
 				workList.addAll(dependencies.getVariableUses(variable));
