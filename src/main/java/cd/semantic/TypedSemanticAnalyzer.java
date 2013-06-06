@@ -1,11 +1,17 @@
 package cd.semantic;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import cd.CompilationContext;
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
+import cd.ir.AstVisitor;
 import cd.ir.ast.ClassDecl;
+import cd.ir.ast.MethodCall;
+import cd.ir.ast.MethodCallExpr;
 import cd.ir.ast.MethodDecl;
 import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.MethodSymbol;
@@ -33,8 +39,72 @@ public class TypedSemanticAnalyzer {
 	public void check(List<ClassDecl> classDecls) throws SemanticFailure {
 		checkInheritance(classDecls);
 		checkStartPoint(context.getTypeSymbols());
-		checkMethodBodies(context.getTypeSymbols(), classDecls);
+		checkUsedMethodBodies(classDecls);
+		//checkMethodBodies(context.getTypeSymbols(), classDecls);
 		rewriteMethodBodies(classDecls);
+	}
+
+	private void checkUsedMethodBodies(List<ClassDecl> classDecls) {
+		final Set<MethodSymbol> usedMethods = new HashSet<>();
+		@SuppressWarnings("null")
+		MethodSymbol main = context.getMainType().getMethod("main");
+		
+		AstVisitor<Void,Void> methodUseCollector = new AstVisitor<Void,Void>() {
+			
+			@Override
+			public Void methodDecl(MethodDecl ast, Void arg) {
+				checkMethodBody(ast);
+				ast.sym.used = true;
+				usedMethods.add(ast.sym);
+				return super.methodDecl(ast, null);
+			}
+			
+			@Override
+			public Void methodCall(MethodCall ast, Void arg) {
+				handleCallSite(ast.sym);
+				return null;
+			}
+			
+			@Override
+			public Void methodCall(MethodCallExpr ast, Void arg) {
+				handleCallSite(ast.sym);
+				return null;
+			}
+			
+			private void handleCallSite(MethodSymbol msym) {
+				// When a method symbol is used, check its method declaration 
+				// and all the overriding methods as well. This is an approximation but necessary.
+				List<MethodSymbol> toVisit = new ArrayList<>();
+				toVisit.add(msym);
+				toVisit.addAll(msym.getOverriddenBy());
+				for (MethodSymbol m : toVisit) {
+					if (!usedMethods.contains(m)) {
+						visit(getMethodDecl(m), null);
+					}
+				}
+			}
+		};
+		methodUseCollector.visit(getMethodDecl(main), null);
+		Set<MethodSymbol> allMethodSyms = new HashSet<>();
+		for (ClassSymbol csym : context.getTypeSymbols().getClassSymbols()) {
+			allMethodSyms.addAll(csym.getDeclaredMethods());
+		}
+		Set<MethodSymbol> unusedMethods = new HashSet<>(allMethodSyms);
+		unusedMethods.removeAll(usedMethods);
+		for (MethodSymbol msym : unusedMethods) {
+			System.out.println("MethodSymbol unused: " + msym.getOwner().getName() + "." + msym.getName());
+		}
+	}
+	
+	private MethodDecl getMethodDecl(MethodSymbol msym) {
+		for (ClassDecl cdecl : context.getAstRoots()) {
+			for (MethodDecl mdecl : cdecl.methods()) {
+				if (msym.equals(mdecl.sym)) {
+					return mdecl;
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -76,23 +146,28 @@ public class TypedSemanticAnalyzer {
 	 */
 	private void checkMethodBodies(TypeSymbolTable typeSymbols,
 			List<ClassDecl> classDecls) {
-		TypeChecker tc = new TypeChecker(typeSymbols);
-
 		for (ClassDecl classd : classDecls) {
 			for (MethodDecl md : classd.methods()) {
-				boolean hasReturn = new ReturnCheckerVisitor().visit(md.body(),
-						null);
-
-				if (md.sym.returnType != typeSymbols.getVoidType()
-						&& !hasReturn) {
-					throw new SemanticFailure(Cause.MISSING_RETURN,
-							"Method %s.%s is missing a return statement",
-							classd.name, md.name);
-				}
-
-				tc.checkStmt(md, md.sym.getScope());
+				checkMethodBody(md);
 			}
 		}
+	}
+
+	private void checkMethodBody(MethodDecl md) {
+		TypeSymbolTable typeSyms = context.getTypeSymbols();
+		TypeChecker tc = new TypeChecker(typeSyms);
+
+		boolean hasReturn = new ReturnCheckerVisitor().visit(md.body(),
+				null);
+
+		if (md.sym.returnType != typeSyms.getVoidType()
+				&& !hasReturn) {
+			throw new SemanticFailure(Cause.MISSING_RETURN,
+					"Method %s.%s is missing a return statement",
+					md.sym.getOwner().name, md.name);
+		}
+
+		tc.checkStmt(md, md.sym.getScope());
 	}
 
 	private void rewriteMethodBodies(List<ClassDecl> classDecls) {

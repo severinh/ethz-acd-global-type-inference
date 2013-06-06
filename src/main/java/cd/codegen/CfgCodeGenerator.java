@@ -43,47 +43,49 @@ public class CfgCodeGenerator {
 		@Override
 		public Void methodDecl(MethodDecl ast, Void arg) {
 			cg.emitMethodPrefix(ast);
-
-			ControlFlowGraph cfg = ast.cfg;
-			assert cfg != null;
-
-			Map<BasicBlock, String> labels = new HashMap<>();
-			for (BasicBlock blk : cfg.allBlocks)
-				labels.put(blk, cg.uniqueLabel());
-			String exitLabel = cg.uniqueLabel();
-
-			cg.emit("jmp", labels.get(cfg.start));
-
-			for (BasicBlock blk : cfg.allBlocks) {
-
-				cg.emitCommentSection("Basic block " + blk.index);
-				cg.emitLabel(labels.get(blk));
-
-				for (Ast instr : blk.instructions)
-					cg.sdg.gen(instr);
-
-				if (blk == cfg.end) {
-					cg.emitComment(String.format("Return"));
-					assert blk.successors.size() == 0;
-					cg.emit("jmp", exitLabel);
-				} else if (blk.condition != null) {
-					assert blk.successors.size() == 2;
-					cg.emitComment(String.format(
-							"Exit to block %d if true, block %d if false",
-							blk.trueSuccessor().index,
-							blk.falseSuccessor().index));
-					cg.genJumpIfFalse(blk.condition,
-							labels.get(blk.falseSuccessor()));
-					cg.emit("jmp", labels.get(blk.trueSuccessor()));
-				} else {
-					cg.emitComment(String.format("Exit to block %d",
-							blk.successors.get(0).index));
-					assert blk.successors.size() == 1;
-					cg.emit("jmp", labels.get(blk.successors.get(0)));
+			if (ast.sym.used) { 
+				ControlFlowGraph cfg = ast.cfg;
+				assert cfg != null;
+	
+				Map<BasicBlock, String> labels = new HashMap<>();
+				for (BasicBlock blk : cfg.allBlocks)
+					labels.put(blk, cg.uniqueLabel());
+				String exitLabel = cg.uniqueLabel();
+	
+				cg.emit("jmp", labels.get(cfg.start));
+	
+				for (BasicBlock blk : cfg.allBlocks) {
+	
+					cg.emitCommentSection("Basic block " + blk.index);
+					cg.emitLabel(labels.get(blk));
+	
+					for (Ast instr : blk.instructions)
+						cg.sdg.gen(instr);
+	
+					if (blk == cfg.end) {
+						cg.emitComment(String.format("Return"));
+						assert blk.successors.size() == 0;
+						cg.emit("jmp", exitLabel);
+					} else if (blk.condition != null) {
+						assert blk.successors.size() == 2;
+						cg.emitComment(String.format(
+								"Exit to block %d if true, block %d if false",
+								blk.trueSuccessor().index,
+								blk.falseSuccessor().index));
+						cg.genJumpIfFalse(blk.condition,
+								labels.get(blk.falseSuccessor()));
+						cg.emit("jmp", labels.get(blk.trueSuccessor()));
+					} else {
+						cg.emitComment(String.format("Exit to block %d",
+								blk.successors.get(0).index));
+						assert blk.successors.size() == 1;
+						cg.emit("jmp", labels.get(blk.successors.get(0)));
+					}
 				}
+				
+				cg.emitLabel(exitLabel);
 			}
 
-			cg.emitLabel(exitLabel);
 			if (ast.sym.returnType.equals(context.getTypeSymbols().getVoidType())) {
 				cg.emitMethodSuffix(true);
 			} else {

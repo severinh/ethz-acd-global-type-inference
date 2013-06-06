@@ -22,9 +22,10 @@ public class MethodSymbol extends Symbol {
 
 	private final ClassSymbol owner;
 	private final Optional<MethodSymbol> overrides;
-	private boolean overridden = false;
+	private final List<MethodSymbol> overriddenBy;
 	public TypeSymbol returnType;
 	public int vtableIndex = -1;
+	public boolean used = false;
 
 	// Third-party library is missing non-null annotations
 	@SuppressWarnings("null")
@@ -37,6 +38,7 @@ public class MethodSymbol extends Symbol {
 		this.parameters = new ArrayList<>();
 		this.owner = owner;
 		this.returnType = BottomTypeSymbol.INSTANCE;
+		this.overriddenBy = new ArrayList<>();
 
 		Optional<MethodSymbol> overrides = Optional.absent();
 		if (owner.getSuperClass().isPresent()) {
@@ -44,10 +46,18 @@ public class MethodSymbol extends Symbol {
 			MethodSymbol nullOverrides = superClass.tryGetMethod(name);
 			if (nullOverrides != null) {
 				overrides = Optional.of(nullOverrides);
-				nullOverrides.setOverridden(true);
+				nullOverrides.addOverrider(this);
 			}
 		}
 		this.overrides = overrides;
+	}
+
+	private void addOverrider(MethodSymbol methodSymbol) {
+		overriddenBy.add(methodSymbol);
+		if (overrides.isPresent()) {
+			MethodSymbol parent = overrides.get();
+			parent.addOverrider(methodSymbol);
+		}
 	}
 
 	@Override
@@ -98,12 +108,12 @@ public class MethodSymbol extends Symbol {
 		return null;
 	}
 
-	public boolean isOverridden() {
-		return overridden;
+	public List<MethodSymbol> getOverriddenBy() {
+		return overriddenBy;
 	}
 
-	public void setOverridden(boolean overridden) {
-		this.overridden = overridden;
+	public boolean isOverridden() {
+		return !overriddenBy.isEmpty();
 	}
 
 	/**

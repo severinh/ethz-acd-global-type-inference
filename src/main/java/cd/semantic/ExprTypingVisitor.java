@@ -281,6 +281,11 @@ public class ExprTypingVisitor extends
 					"No variable %s was found", var.getName());
 		}
 		var.setSymbol(symbol);
+		if (symbol.getType().equals(typeSymbols.getBottomType())) {
+			throw new SemanticFailure(Cause.POSSIBLY_UNINITIALIZED,
+					"Variable %s may be used uninitialized!", 
+					var.getName());
+		}
 		return symbol.getType();
 	}
 
