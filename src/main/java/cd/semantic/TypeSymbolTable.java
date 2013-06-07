@@ -294,8 +294,7 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	/**
 	 * Returns the lowest common ancestor type of two types.
 	 * 
-	 * @todo The implementation is currently not very efficient and may even be
-	 *       incorrect
+	 * The implementation is not particularly efficient.
 	 */
 	public TypeSymbol getLCA(TypeSymbol first, TypeSymbol second) {
 		if (isSubType(first, second)) {
