@@ -19,16 +19,11 @@ public abstract class TypeInferenceWithConstraints implements TypeInference {
 		Set<TypeSymbol> possibleTypes = typeSet.getTypes();
 		TypeSymbol type = null;
 		if (possibleTypes.isEmpty()) {
-			// Use the bottom type if there are no types in the type
-			// set. Since the constraint system has been solved
-			// successfully, this usually (always?) means that the
-			// variable symbol is not used at all.
-
-			// TODO: The above is no true. if e.g. a field of an object is only
-			// assigned to to the same field of another object of the same class
-			// we do not have any constraints and therefore get bottom. This is
-			// not ok, since it's relevant for the code generator!
-
+			// Use the bottom type if there are no types in the type set.
+			// This may happen if no constraint that imposes a lower bound on
+			// the type variable, e.g., when the variable is never used. We
+			// cannot choose an arbitrary type such as Object though because
+			// there may still be upper bounds that are violated otherwise.
 			type = typeSymbols.getBottomType();
 		} else if (possibleTypes.size() == 1) {
 			type = possibleTypes.iterator().next();
@@ -37,12 +32,9 @@ public abstract class TypeInferenceWithConstraints implements TypeInference {
 				throw new SemanticFailure(Cause.TYPE_INFERENCE_ERROR,
 						"Type inference resulted in ambiguous type for " + name);
 			} else {
-				// TODO: This should not be necessary anymore since the type set
-				// always inclues the LCA.
 				type = typeSymbols.getLCA(possibleTypes);
 			}
 		}
 		return type;
 	}
-
 }
