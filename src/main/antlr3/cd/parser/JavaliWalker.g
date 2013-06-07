@@ -52,13 +52,16 @@ import cd.exceptions.ParseFailure;
 	public <T> List<T> emptyList() {
 		return java.util.Collections.emptyList();
 	}
+	
+	public Seq seq() {
+		return new Seq(null);
+	}
     
     @SuppressWarnings({"unchecked", "varargs"})
-	public Seq seq(List<? extends Ast>... members) {
+	public Seq seq(List<? extends Ast> members) {
 		Seq res = new Seq(null);
 		if (members != null) {
-			for (List<? extends Ast> lst : members)
-				res.rwChildren().addAll(lst);
+			res.rwChildren().addAll(members);
 		}
 		return res;
 	}
