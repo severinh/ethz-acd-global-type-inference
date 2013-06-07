@@ -51,6 +51,7 @@ public class Main {
 		}
 	}
 
+	@SuppressWarnings("null")
 	private static CommandLine getCompilerOptions(String[] args) {
 		Options options = new Options();
 		options.addOption("i", "infer-types", false, "infer types globally");

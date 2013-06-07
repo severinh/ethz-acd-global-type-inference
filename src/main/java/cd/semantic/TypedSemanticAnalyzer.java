@@ -48,7 +48,6 @@ public class TypedSemanticAnalyzer {
 	 * and perform semantic checks on them.
 	 */
 	private void checkUsedMethodBodies(List<ClassDecl> classDecls) {
-		@SuppressWarnings("null")
 		MethodSymbol main = context.getMainType().getMethod("main");
 		ReachableMethodChecker reachableMethodChecker = new ReachableMethodChecker();
 		reachableMethodChecker.checkReachableFrom(context.getMethodDecl(main));

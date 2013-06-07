@@ -160,8 +160,6 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	 */
 	@Nonnull
 	public ImmutableSet<PrimitiveTypeSymbol> getNumericalTypeSymbols() {
-		// Third-party library is missing non-null annotations
-		@SuppressWarnings("null")
 		@Nonnull
 		ImmutableSet<PrimitiveTypeSymbol> result = ImmutableSet.of(
 				getIntType(), getFloatType());
@@ -212,8 +210,6 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 				builder.add((ArrayTypeSymbol) typeSymbol);
 			}
 		}
-		// Third-party library is missing non-null annotations
-		@SuppressWarnings("null")
 		@Nonnull
 		ImmutableSet<ArrayTypeSymbol> result = builder.build();
 		return result;
@@ -232,8 +228,6 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 				builder.add(classSym);
 			}
 		}
-		// Third-party library is missing non-null annotations
-		@SuppressWarnings("null")
 		@Nonnull
 		ImmutableSet<ClassSymbol> result = builder.build();
 		return result;

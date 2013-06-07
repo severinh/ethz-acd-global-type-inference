@@ -25,8 +25,6 @@ public class TypeConstraintBuilder {
 
 	private final ImmutableList<ConstraintCondition> conditions;
 
-	// Third-party library is missing non-null annotations
-	@SuppressWarnings("null")
 	public TypeConstraintBuilder(ConstraintCondition... conditions) {
 		super();
 		this.conditions = ImmutableList.copyOf(conditions);

@@ -26,8 +26,6 @@ public class MethodSymbol extends Symbol {
 	public TypeSymbol returnType;
 	public int vtableIndex = -1;
 
-	// Third-party library is missing non-null annotations
-	@SuppressWarnings("null")
 	public MethodSymbol(String name, ClassSymbol owner) {
 		super(name);
 		
@@ -68,8 +66,6 @@ public class MethodSymbol extends Symbol {
 		return scope;
 	}
 
-	// Third-party library is missing non-null annotations
-	@SuppressWarnings("null")
 	public Collection<VariableSymbol> getLocals() {
 		return Collections.unmodifiableCollection(locals.values());
 	}
@@ -86,8 +82,6 @@ public class MethodSymbol extends Symbol {
 		return locals.get(name);
 	}
 
-	// Third-party library is missing non-null annotations
-	@SuppressWarnings("null")
 	public List<VariableSymbol> getParameters() {
 		return Collections.unmodifiableList(parameters);
 	}

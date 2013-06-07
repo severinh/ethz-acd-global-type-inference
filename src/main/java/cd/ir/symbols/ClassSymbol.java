@@ -1,5 +1,7 @@
 package cd.ir.symbols;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -7,12 +9,11 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import com.google.common.base.Optional;
-
 import cd.exceptions.SemanticFailure;
 import cd.exceptions.SemanticFailure.Cause;
 import cd.semantic.SymbolTable;
-import static com.google.common.base.Preconditions.checkArgument;
+
+import com.google.common.base.Optional;
 
 public class ClassSymbol extends TypeSymbol {
 
@@ -42,15 +43,11 @@ public class ClassSymbol extends TypeSymbol {
 		this.methods = new LinkedHashMap<>();
 	}
 
-	// Third-party library is missing non-null annotations
-	@SuppressWarnings("null")
 	public ClassSymbol(String name, ClassSymbol superClass) {
 		this(name, Optional.of(superClass));
 	}
 
 	public static ClassSymbol makeObjectClass() {
-		// Third-party library is missing non-null annotations
-		@SuppressWarnings("null")
 		ClassSymbol result = new ClassSymbol("Object",
 				Optional.<ClassSymbol> absent());
 		return result;
@@ -134,8 +131,6 @@ public class ClassSymbol extends TypeSymbol {
 	 * 
 	 * @return the list of fields, not including the ones of super-classes
 	 */
-	// Third-party library is missing non-null annotations
-	@SuppressWarnings("null")
 	public Collection<VariableSymbol> getDeclaredFields() {
 		return Collections.unmodifiableCollection(fields.values());
 	}
@@ -145,8 +140,6 @@ public class ClassSymbol extends TypeSymbol {
 	 * 
 	 * @return the list of methods, not including the ones of super-classes
 	 */
-	// Third-party library is missing non-null annotations
-	@SuppressWarnings("null")
 	public Collection<MethodSymbol> getDeclaredMethods() {
 		return Collections.unmodifiableCollection(methods.values());
 	}

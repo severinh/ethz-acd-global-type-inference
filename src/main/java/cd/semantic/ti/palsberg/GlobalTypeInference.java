@@ -19,7 +19,6 @@ import cd.semantic.ti.palsberg.generators.GlobalConstraintGeneratorContext;
 import cd.semantic.ti.palsberg.generators.MethodConstraintGenerator;
 import cd.semantic.ti.palsberg.solving.ConstraintSolver;
 import cd.semantic.ti.palsberg.solving.TypeVariable;
-import cd.util.NonnullByDefault;
 
 public class GlobalTypeInference extends TypeInferenceWithConstraints {
 

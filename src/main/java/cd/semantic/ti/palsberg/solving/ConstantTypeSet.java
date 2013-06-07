@@ -12,14 +12,10 @@ public class ConstantTypeSet extends TypeSet {
 
 	private final ImmutableSet<TypeSymbol> types;
 
-	// Third-party library is missing non-null annotations
-	@SuppressWarnings("null")
 	public ConstantTypeSet(TypeSymbol... syms) {
 		this.types = ImmutableSet.copyOf(syms);
 	}
 
-	// Third-party library is missing non-null annotations
-	@SuppressWarnings("null")
 	public ConstantTypeSet(Set<? extends TypeSymbol> types) {
 		this.types = ImmutableSet.copyOf(types);
 	}

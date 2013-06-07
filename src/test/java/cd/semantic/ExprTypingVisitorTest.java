@@ -50,7 +50,6 @@ public class ExprTypingVisitorTest {
 	private VariableSymbol floatVariable;
 	private VariableSymbol booleanVariable;
 	private VariableSymbol topVariable;
-	private VariableSymbol bottomVariable;
 	private VariableSymbol objectVariable;
 	private VariableSymbol xVariable;
 	private VariableSymbol zVariable;
@@ -77,7 +76,6 @@ public class ExprTypingVisitorTest {
 		floatVariable = addVariableSymbol("f", types.getFloatType());
 		booleanVariable = addVariableSymbol("b", types.getBooleanType());
 		topVariable = addVariableSymbol("top", types.getTopType());
-		bottomVariable = addVariableSymbol("bottom", types.getBottomType());
 		objectVariable = addVariableSymbol("o", types.getObjectType());
 		xVariable = addVariableSymbol("x", xClass);
 		zVariable = addVariableSymbol("z", zClass);
@@ -105,10 +103,6 @@ public class ExprTypingVisitorTest {
 
 	private Var makeTopVar() {
 		return Var.withSym(topVariable);
-	}
-
-	private Var makeBottomVar() {
-		return Var.withSym(bottomVariable);
 	}
 
 	private Var makeObjectVar() {
@@ -150,10 +144,6 @@ public class ExprTypingVisitorTest {
 
 	private void assertBooleanType(Expr expr) {
 		assertType(types.getBooleanType(), expr);
-	}
-
-	private void assertBottomType(Expr expr) {
-		assertType(types.getBottomType(), expr);
 	}
 
 	private void assertObjectType(Expr expr) {

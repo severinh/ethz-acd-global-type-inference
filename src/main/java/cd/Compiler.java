@@ -37,7 +37,6 @@ import cd.util.FileUtil;
 
 public class Compiler {
 
-	@SuppressWarnings("null")
 	public static final Logger LOG = LoggerFactory
 			.getLogger(Compiler.class);
 

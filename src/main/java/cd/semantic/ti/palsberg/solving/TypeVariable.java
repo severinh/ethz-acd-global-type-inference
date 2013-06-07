@@ -23,8 +23,6 @@ public class TypeVariable extends TypeSet {
 		this.description = description;
 	}
 
-	// Third-party library is missing non-null annotations
-	@SuppressWarnings("null")
 	@Override
 	public Set<TypeSymbol> getTypes() {
 		return ImmutableSet.copyOf(types);
