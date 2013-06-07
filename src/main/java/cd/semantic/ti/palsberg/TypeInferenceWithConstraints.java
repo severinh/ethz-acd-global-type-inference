@@ -37,6 +37,8 @@ public abstract class TypeInferenceWithConstraints implements TypeInference {
 				throw new SemanticFailure(Cause.TYPE_INFERENCE_ERROR,
 						"Type inference resulted in ambiguous type for " + name);
 			} else {
+				// TODO: This should not be necessary anymore since the type set
+				// always inclues the LCA.
 				type = typeSymbols.getLCA(possibleTypes);
 			}
 		}
