@@ -7,7 +7,9 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import cd.ir.ast.ClassDecl;
+import cd.ir.ast.MethodDecl;
 import cd.ir.symbols.ClassSymbol;
+import cd.ir.symbols.MethodSymbol;
 import cd.semantic.TypeSymbolTable;
 
 /**
@@ -117,6 +119,22 @@ public class CompilationContext {
 
 	public CompilerOptions getOptions() {
 		return options;
+	}
+	
+	/**
+	 * Finds the MethodDecl of a MethodSymbol
+	 * @param msym
+	 * @return
+	 */
+	public @Nullable MethodDecl getMethodDecl(MethodSymbol msym) {
+		for (ClassDecl cdecl : getAstRoots()) {
+			for (MethodDecl mdecl : cdecl.methods()) {
+				if (msym.equals(mdecl.sym)) {
+					return mdecl;
+				}
+			}
+		}
+		return null;
 	}
 
 }

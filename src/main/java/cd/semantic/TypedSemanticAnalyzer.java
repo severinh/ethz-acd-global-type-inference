@@ -51,26 +51,10 @@ public class TypedSemanticAnalyzer {
 		@SuppressWarnings("null")
 		MethodSymbol main = context.getMainType().getMethod("main");
 		ReachableMethodChecker reachableMethodChecker = new ReachableMethodChecker();
-		reachableMethodChecker.checkReachableFrom(getMethodDecl(main));
+		reachableMethodChecker.checkReachableFrom(context.getMethodDecl(main));
 		reachableMethodChecker.removeUnusedMethods();
 	}
 	
-	/**
-	 * Finds the MethodDecl of a MethodSymbol
-	 * @param msym
-	 * @return
-	 */
-	private MethodDecl getMethodDecl(MethodSymbol msym) {
-		for (ClassDecl cdecl : context.getAstRoots()) {
-			for (MethodDecl mdecl : cdecl.methods()) {
-				if (msym.equals(mdecl.sym)) {
-					return mdecl;
-				}
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * Check for errors related to inheritance: circular inheritance, invalid
 	 * super classes. Note that this must be run early because other code
@@ -169,7 +153,7 @@ public class TypedSemanticAnalyzer {
 			toVisit.addAll(msym.getOverriddenBy());
 			for (MethodSymbol m : toVisit) {
 				if (!usedMethods.contains(m)) {
-					visit(getMethodDecl(m), null);
+					visit(context.getMethodDecl(m), null);
 				}
 			}
 		}
@@ -186,7 +170,7 @@ public class TypedSemanticAnalyzer {
 				unusedMethods.removeAll(usedMethods);
 				for (MethodSymbol unusedMethodSym : unusedMethods) {
 					csym.removeMethod(unusedMethodSym);
-					cdecl.removeChild(getMethodDecl(unusedMethodSym));
+					cdecl.removeChild(context.getMethodDecl(unusedMethodSym));
 				}
 			}
 		}
