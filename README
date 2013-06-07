@@ -42,6 +42,35 @@ To get the list of available options (type inference mode, optimization), run
 $ ./javalic --help
 
 
+Testing
+-------
+
+The Javali files for end-to-end tests are contained in src/test/javali.
+We reuse the reference compiler, but in cases where the output of the
+reference compiler deviates from the expected output of our compiler,
+we use overrides. This also applies to Javali files that use the extended
+syntax as described in the report ('var' keyword).
+
+Overrides are represented as files with an 'override' suffix. We run the
+tests for all Javali files using each implementation of type inference,
+and also without any type inference. To that end, we use different
+suffixes depending on what type of local inference the override applies to.
+
+- .override applies to any type inference implementation
+- .override.gti applies only to global type inference
+- .override.ltiwc applies to local type inference with constraints
+- .override.ltil applies to the efficient local type inference
+
+Example:
+
+- arrays/InvariantArrayTest.javali.semantic.ref.override
+
+  The first line is empty, indicating that our compiler with type inference
+  should not yield a semantic error (in contrast to the reference compiler).
+  The remaining lines usually contain comments explaining why the override
+  exists.
+
+
 Eclipse Project
 ---------------
 
