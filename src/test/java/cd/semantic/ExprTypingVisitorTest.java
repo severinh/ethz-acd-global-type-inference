@@ -169,22 +169,15 @@ public class ExprTypingVisitorTest {
 			if (!op.equals(BOp.B_MOD)) {
 				assertFloatType(new BinaryOp(makeFloatVar(), op, makeFloatVar()));
 			}
-
-			assertIntType(new BinaryOp(makeIntVar(), op, makeBottomVar()));
-			assertBottomType(new BinaryOp(makeBottomVar(), op, makeBottomVar()));
 		}
 
 		for (BOp op : new BOp[] { BOp.B_AND, BOp.B_OR }) {
 			assertBooleanType(new BinaryOp(makeBoolVar(), op, makeBoolVar()));
-			assertBooleanType(new BinaryOp(makeBoolVar(), op, makeBottomVar()));
-			assertBooleanType(new BinaryOp(makeBottomVar(), op, makeBottomVar()));
 		}
 
 		for (BOp op : new BOp[] { BOp.B_EQUAL, BOp.B_NOT_EQUAL }) {
 			assertBooleanType(new BinaryOp(makeIntVar(), op, makeIntVar()));
 			assertBooleanType(new BinaryOp(makeBoolVar(), op, makeBoolVar()));
-			assertBooleanType(new BinaryOp(makeBottomVar(), op, makeBottomVar()));
-			assertBooleanType(new BinaryOp(makeBottomVar(), op, makeIntVar()));
 			assertBooleanType(new BinaryOp(makeObjectVar(), op, makeObjectVar()));
 			assertBooleanType(new BinaryOp(makeXVar(), op, makeXVar()));
 			assertBooleanType(new BinaryOp(makeXVar(), op, makeObjectVar()));
@@ -193,8 +186,6 @@ public class ExprTypingVisitorTest {
 		for (BOp op : new BOp[] { BOp.B_LESS_THAN, BOp.B_LESS_OR_EQUAL,
 				BOp.B_GREATER_THAN, BOp.B_GREATER_OR_EQUAL }) {
 			assertBooleanType(new BinaryOp(makeIntVar(), op, makeIntVar()));
-			assertBooleanType(new BinaryOp(makeIntVar(), op, makeBottomVar()));
-			assertBooleanType(new BinaryOp(makeBottomVar(), op, makeBottomVar()));
 		}
 	}
 
@@ -258,7 +249,6 @@ public class ExprTypingVisitorTest {
 		assertObjectType(new Cast(makeObjectVar(), types.getObjectType().name));
 		assertType(xClass, new Cast(makeObjectVar(), xClass.name));
 		assertObjectType(new Cast(makeXVar(), types.getObjectType().name));
-		assertObjectType(new Cast(makeBottomVar(), types.getObjectType().name));
 		assertIntType(new Cast(makeIntVar(), types.getIntType().name));
 	}
 
@@ -294,7 +284,6 @@ public class ExprTypingVisitorTest {
 			arrayVariable.setType(arrayType);
 
 			assertType(elementType, new Index(makeArrayVar(), makeIntVar()));
-			assertType(elementType, new Index(makeArrayVar(), makeBottomVar()));
 		}
 	}
 
@@ -334,11 +323,6 @@ public class ExprTypingVisitorTest {
 	public void testMethodCall() {
 		assertIntType(new MethodCallExpr(makeXVar(), xClassMethod.name,
 				Arrays.asList(makeXVar())));
-	}
-
-	@Test
-	public void testIndexBottomType() {
-		assertBottomType(new Index(makeBottomVar(), makeIntVar()));
 	}
 
 	@Test
@@ -387,13 +371,6 @@ public class ExprTypingVisitorTest {
 	@Test(expected = SemanticFailure.class)
 	public void testIncorrectUnaryOpMinus() {
 		type(new UnaryOp(UOp.U_MINUS, makeTopVar()));
-	}
-
-	@Test
-	public void testUnaryOpBottom() {
-		assertBooleanType(new UnaryOp(UOp.U_BOOL_NOT, makeBottomVar()));
-		assertBottomType(new UnaryOp(UOp.U_MINUS, makeBottomVar()));
-		assertBottomType(new UnaryOp(UOp.U_PLUS, makeBottomVar()));
 	}
 
 	@Test
