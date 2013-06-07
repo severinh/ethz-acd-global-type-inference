@@ -69,12 +69,3 @@ Example:
   should not yield a semantic error (in contrast to the reference compiler).
   The remaining lines usually contain comments explaining why the override
   exists.
-
-
-Eclipse Project
----------------
-
-After opening the Eclipse project, it may be necessary to install
-some software to make Maven play nicely with Eclipse.
-
-TODO
