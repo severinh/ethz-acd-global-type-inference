@@ -53,6 +53,7 @@ import cd.exceptions.ParseFailure;
 		return java.util.Collections.emptyList();
 	}
     
+    @SuppressWarnings({"unchecked", "varargs"})
 	public Seq seq(List<? extends Ast>... members) {
 		Seq res = new Seq(null);
 		if (members != null) {
