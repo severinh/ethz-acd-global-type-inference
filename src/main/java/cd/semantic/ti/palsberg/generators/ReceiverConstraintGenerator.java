@@ -12,6 +12,19 @@ import cd.semantic.ti.palsberg.constraints.ConstraintCondition;
 import cd.semantic.ti.palsberg.solving.ConstantTypeSet;
 import cd.semantic.ti.palsberg.solving.TypeSet;
 
+/**
+ * Generic code that generates constraints for any expression that involves a
+ * potentially unknown receiver. This includes method calls, field access and
+ * array accesses. All of them require very similar conditional constraints.
+ * 
+ * The class is instantiated for each expression individually.
+ * 
+ * @param <A>
+ *            The expression or statement for which to generate constraints
+ * @param <RT>
+ *            The kind of type symbols used for receiver types, such as
+ *            {@link ClassSymbol} for field accesses and method calls.
+ */
 public abstract class ReceiverConstraintGenerator<A extends Ast, RT extends TypeSymbol> {
 
 	protected final ExprConstraintGenerator generator;

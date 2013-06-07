@@ -5,6 +5,11 @@ import java.util.List;
 import cd.ir.ast.Expr;
 import cd.ir.ast.MethodCall;
 
+/**
+ * Generates conditional constraints for method call statements.
+ * 
+ * @see ReceiverConstraintGenerator
+ */
 public class MethodCallConstraintGenerator extends
 		MethodCallConstraintGeneratorBase<MethodCall> {
 

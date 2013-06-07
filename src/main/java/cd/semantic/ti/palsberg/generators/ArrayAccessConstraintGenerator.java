@@ -10,6 +10,11 @@ import cd.ir.ast.Index;
 import cd.ir.symbols.ArrayTypeSymbol;
 import cd.semantic.ti.palsberg.solving.TypeSet;
 
+/**
+ * Generates conditional constraints for an array access.
+ * 
+ * @see ReceiverConstraintGenerator
+ */
 public class ArrayAccessConstraintGenerator extends
 		ReceiverConstraintGenerator<Index, ArrayTypeSymbol> {
 

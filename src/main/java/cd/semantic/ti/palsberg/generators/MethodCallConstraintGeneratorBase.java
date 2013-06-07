@@ -12,6 +12,16 @@ import cd.ir.symbols.MethodSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.semantic.ti.palsberg.solving.TypeSet;
 
+/**
+ * Generates conditional constraints for method call statements and method call
+ * expressions.
+ * 
+ * @param <A>
+ *            The type of AST node to generate expressions for, e.g.,
+ *            {@link MethodCall} or {@link MethodCallExpr}.
+ * 
+ * @see ReceiverConstraintGenerator
+ */
 public abstract class MethodCallConstraintGeneratorBase<A extends Ast> extends
 		ReceiverConstraintGenerator<A, ClassSymbol> {
 

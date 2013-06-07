@@ -13,6 +13,11 @@ import cd.ir.symbols.ClassSymbol;
 import cd.ir.symbols.VariableSymbol;
 import cd.semantic.ti.palsberg.solving.TypeSet;
 
+/**
+ * Generates conditional constraints for a field access.
+ * 
+ * @see ReceiverConstraintGenerator
+ */
 public class FieldAccessConstraintGenerator extends
 		ReceiverConstraintGenerator<Field, ClassSymbol> {
 

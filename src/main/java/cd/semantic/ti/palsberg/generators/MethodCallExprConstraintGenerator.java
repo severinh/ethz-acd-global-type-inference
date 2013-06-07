@@ -1,9 +1,15 @@
 package cd.semantic.ti.palsberg.generators;
 
 import java.util.List;
+
 import cd.ir.ast.Expr;
 import cd.ir.ast.MethodCallExpr;
 
+/**
+ * Generates conditional constraints for method call expressions.
+ * 
+ * @see ReceiverConstraintGenerator
+ */
 public class MethodCallExprConstraintGenerator extends
 		MethodCallConstraintGeneratorBase<MethodCallExpr> {
 
