@@ -76,7 +76,7 @@ public class ConstraintSolver {
 			// is monotonic, i.e., types are only added but not removed from the
 			// type variable, it is safe to add the LCA.
 			// NOTE: Does not add "intermediate" types between the types in the
-						// set and the LCA. Should not be a problem.
+			// set and the LCA. Should not be a problem.
 			TypeSymbol lca = typeSymbols.getLCA(constraint.getSuperTypeSet()
 					.getTypes());
 			constraint.getSuperTypeSet().extend(lca);
