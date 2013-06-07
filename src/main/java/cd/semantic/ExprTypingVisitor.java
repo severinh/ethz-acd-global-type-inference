@@ -51,11 +51,6 @@ public class ExprTypingVisitor extends
 		return visit(expr, scope);
 	}
 
-	/**
-	 * @todo Copied from {@link TypeChecker}. Once the method does not depend on
-	 *       the type symbol table anymore, it should be possible to get rid of
-	 *       this redundancy again
-	 */
 	public void checkType(TypeSymbol expectedType, Expr ast,
 			SymbolTable<VariableSymbol> scope) {
 		TypeSymbol actualType = type(ast, scope);
@@ -200,7 +195,8 @@ public class ExprTypingVisitor extends
 		TypeSymbol argType = type(field.arg(), scope);
 		if (argType.equals(typeSymbols.getNullType())) {
 			throw new SemanticFailure(Cause.TYPE_ERROR,
-					"Guaranteed null-dereference when accessing field %s", field.fieldName);
+					"Guaranteed null-dereference when accessing field %s",
+					field.fieldName);
 		}
 		// Class of the receiver of the field access
 		ClassSymbol argClass = TypeChecker.asClass(argType);
@@ -285,8 +281,7 @@ public class ExprTypingVisitor extends
 		var.setSymbol(symbol);
 		if (symbol.getType().equals(typeSymbols.getBottomType())) {
 			throw new SemanticFailure(Cause.POSSIBLY_UNINITIALIZED,
-					"Variable %s may be used uninitialized!", 
-					var.getName());
+					"Variable %s may be used uninitialized!", var.getName());
 		}
 		return symbol.getType();
 	}
@@ -297,10 +292,11 @@ public class ExprTypingVisitor extends
 		TypeSymbol receiverType = type(methodCall.receiver(), scope);
 		if (receiverType.equals(typeSymbols.getNullType())) {
 			throw new SemanticFailure(Cause.TYPE_ERROR,
-					"Guaranteed null-dereference when calling method %s", methodCall.methodName);
+					"Guaranteed null-dereference when calling method %s",
+					methodCall.methodName);
 		}
-		ClassSymbol rcvrClassType = TypeChecker.asClass(type(methodCall.receiver(),
-				scope));
+		ClassSymbol rcvrClassType = TypeChecker.asClass(type(
+				methodCall.receiver(), scope));
 		MethodSymbol mthd = rcvrClassType.getMethod(methodCall.methodName);
 
 		methodCall.sym = mthd;

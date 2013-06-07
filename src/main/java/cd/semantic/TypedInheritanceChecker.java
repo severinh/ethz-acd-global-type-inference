@@ -14,8 +14,6 @@ import cd.util.Pair;
  * 
  * In particular, it checks that the parameter and return types of overriding
  * methods match.
- * 
- * @todo find a better class name
  */
 public class TypedInheritanceChecker extends AstVisitor<Void, Void> {
 

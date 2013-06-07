@@ -15,8 +15,6 @@ import cd.ir.AstVisitor;
  * 
  * It does however not check that the parameter and return types of overriding
  * methods match, since they may not be typed yet.
- * 
- * @todo find a better class name
  */
 public class UntypedInheritanceChecker extends AstVisitor<Void, Void> {
 

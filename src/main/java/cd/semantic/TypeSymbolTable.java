@@ -240,8 +240,6 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	 *            the type symbol
 	 * @return the super type of the given type, or <code>null</code> if there
 	 *         is none
-	 * 
-	 * @todo incomplete and it should better use {@link Optional}.
 	 */
 	public TypeSymbol getSuperType(TypeSymbol sym) {
 		if (sym instanceof PrimitiveTypeSymbol) {
@@ -265,9 +263,6 @@ public class TypeSymbolTable extends SymbolTable<TypeSymbol> {
 	 * @param sub
 	 *            the alleged sub type
 	 * @return
-	 * 
-	 * @todo This method was copied from {@link TypeChecker}. Eventually, it
-	 *       should be turned into a method of {@link TypeSymbol}.
 	 */
 	public boolean isSubType(TypeSymbol sup, TypeSymbol sub) {
 		if (sub == getNullType()) {

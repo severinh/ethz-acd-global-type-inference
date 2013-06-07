@@ -16,9 +16,6 @@ import com.google.common.collect.ImmutableList;
  * It is generic in the sense that it handles type sets of any kind (constant or
  * variable) for both sides of the inequality and determines the right
  * {@link TypeConstraint} subclass using double invocation.
- * 
- * @todo If it is already clear if that the constraint will always be satisfied,
- *       the builder could also return {@link Optional#absent()}.
  */
 @NonnullByDefault
 public class TypeConstraintBuilder {
