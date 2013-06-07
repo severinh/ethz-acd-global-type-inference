@@ -198,7 +198,10 @@ public class ExprTypingVisitor extends
 	@Override
 	public TypeSymbol field(Field field, SymbolTable<VariableSymbol> scope) {
 		TypeSymbol argType = type(field.arg(), scope);
-
+		if (argType.equals(typeSymbols.getNullType())) {
+			throw new SemanticFailure(Cause.TYPE_ERROR,
+					"Guaranteed null-dereference when accessing field %s", field.fieldName);
+		}
 		// Class of the receiver of the field access
 		ClassSymbol argClass = TypeChecker.asClass(argType);
 		VariableSymbol fieldSymbol = argClass.getField(field.fieldName);
@@ -212,10 +215,9 @@ public class ExprTypingVisitor extends
 		checkType(typeSymbols.getIntType(), index.right(), scope);
 
 		TypeSymbol arrayType = type(index.left(), scope);
-		// Do not complain if the type of the array variable is the bottom type.
-		// Instead, return the bottom type as the element type as well
-		if (arrayType == typeSymbols.getBottomType()) {
-			return typeSymbols.getBottomType();
+		if (arrayType == typeSymbols.getNullType()) {
+			throw new SemanticFailure(Cause.TYPE_ERROR,
+					"Guaranteed null-dereference when accessing array");
 		} else {
 			return asArray(arrayType).elementType;
 		}
@@ -292,9 +294,14 @@ public class ExprTypingVisitor extends
 	@Override
 	public TypeSymbol methodCall(MethodCallExpr methodCall,
 			SymbolTable<VariableSymbol> scope) {
-		ClassSymbol rcvrType = TypeChecker.asClass(type(methodCall.receiver(),
+		TypeSymbol receiverType = type(methodCall.receiver(), scope);
+		if (receiverType.equals(typeSymbols.getNullType())) {
+			throw new SemanticFailure(Cause.TYPE_ERROR,
+					"Guaranteed null-dereference when calling method %s", methodCall.methodName);
+		}
+		ClassSymbol rcvrClassType = TypeChecker.asClass(type(methodCall.receiver(),
 				scope));
-		MethodSymbol mthd = rcvrType.getMethod(methodCall.methodName);
+		MethodSymbol mthd = rcvrClassType.getMethod(methodCall.methodName);
 
 		methodCall.sym = mthd;
 

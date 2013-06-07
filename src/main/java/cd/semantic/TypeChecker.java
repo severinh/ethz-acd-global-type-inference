@@ -72,8 +72,10 @@ public class TypeChecker {
 
 		@Override
 		public Void assign(Assign ast, SymbolTable<VariableSymbol> locals) {
-			TypeSymbol lhs = typeLhs(ast.left(), locals);
+			// Check rhs first since a problematic inferred type in the lhs is usually caused by the rhs.
+			// We want to report the cause, not a consequence of it.
 			TypeSymbol rhs = type(ast.right(), locals);
+			TypeSymbol lhs = typeLhs(ast.left(), locals);
 			if (!typeSymbols.isSubType(lhs, rhs))
 				throw new SemanticFailure(Cause.TYPE_ERROR,
 						"Type %s cannot be assigned to %s", rhs, lhs);
@@ -124,9 +126,14 @@ public class TypeChecker {
 		@Override
 		public Void methodCall(MethodCall ast,
 				SymbolTable<VariableSymbol> locals) {
-
-			ClassSymbol rcvrType = asClass(type(ast.receiver(), locals));
-			MethodSymbol mthd = rcvrType.getMethod(ast.methodName);
+			TypeSymbol receiverType = type(ast.receiver(), locals);
+			if (receiverType.equals(typeSymbols.getNullType())) {
+				throw new SemanticFailure(Cause.TYPE_ERROR,
+						"Guaranteed null-dereference when calling method %s", ast.methodName);
+			}
+			
+			ClassSymbol rcvrClassType = asClass(receiverType);
+			MethodSymbol mthd = rcvrClassType.getMethod(ast.methodName);
 
 			ast.sym = mthd;
 
