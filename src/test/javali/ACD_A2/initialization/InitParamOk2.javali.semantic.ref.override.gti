@@ -1,0 +1,4 @@
+TYPE_ERROR
+# Dereferencing the null parameter causes the method return type to be bottom, even though
+# it has a return statement with an expression. This is detected before we look at the method 
+# with the null dereference, unfortunately.
