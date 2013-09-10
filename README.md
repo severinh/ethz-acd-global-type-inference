@@ -27,7 +27,9 @@ Building
 
 Run the following to build the whole compiler:
 
-$ mvn install
+```bash
+mvn install
+```
 
 
 Running
@@ -35,11 +37,15 @@ Running
 
 To compile a single Javali source file 'foo.javali', run
 
-$ ./javalic foo.javali
+```bash
+./javalic foo.javali
+```
 
 To get the list of available options (type inference mode, optimization), run
 
-$ ./javalic --help
+```bash
+./javalic --help
+```
 
 
 Testing
